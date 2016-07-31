@@ -1,5 +1,5 @@
 # exp team
-百度经验研发团队博客，让我们团结一致，让我们的团队更强.
+百度经验研发团队博客，让我们团结一致，让我们的团队更强。
 
 ## 技术栈
 我们的博客基于[hexo](https://hexo.io/zh-cn/)搭建，需要[node](https://nodejs.org/en/)和[git](https://git-scm.com/)环境的支持，具体安装过程可以看[这里](https://exp-team.github.io/)
