@@ -17,7 +17,9 @@
 第一步，下载项目，并切换到source分支
 
 	git clone git@github.com:exp-team/exp-team.github.io.git
-
+	
+	git fetch origin
+	
 	git checkout -b source origin/source
 
 第二步，安装npm插件，**仅需安装一次**
