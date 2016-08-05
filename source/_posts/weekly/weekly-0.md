@@ -3,6 +3,7 @@ title: expfe技术周刊第0期
 categories: weekly
 tags: weekly
 date: 2016-07-29
+author: 颜海镜
 ---
 
 7.23-7.29，喜大普奔，expfe技术周刊成立了，贵在坚持
