@@ -34,7 +34,7 @@
 发布源文件，将源文件发布到github
 
 	git add .
-	git ci -m "blog: add"
+	git commit -m "blog: add"
 	git push origin source
 
 发布博文,确认没问题即可发布博文，搞定收工
