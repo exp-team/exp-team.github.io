@@ -18,6 +18,8 @@
 
 	git clone git@github.com:exp-team/exp-team.github.io.git
 	
+	cd exp-team.github.io
+	
 	git fetch origin
 	
 	git checkout -b source origin/source
