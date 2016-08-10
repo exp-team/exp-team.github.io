@@ -72,3 +72,6 @@ deploy:
   repo: git@github.com:exp-team/exp-team.github.io.git
   branch: master
   message: "Site updated: {{ now('YYYY-MM-DD HH:mm:ss') }}"
+
+duoshuo:
+  short_name: exp-team
