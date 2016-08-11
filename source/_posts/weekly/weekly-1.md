@@ -5,7 +5,6 @@ tags: weekly
 date: 2016-08-07
 author: 赵文琳
 ---
-
 8.01-8.07，喜大普奔，expfe技术周刊成立了，贵在坚持
 
 ## 本期推荐
@@ -15,9 +14,7 @@ author: 赵文琳
 
 ### [移动H5前端性能优化指南](http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&mid=202342998&idx=1&sn=ecf38a93367b65cf9504a6a9608c672d&scene=1&srcid=0804fNfkcN3SkvU0bh8Ujfmp#rd)
 
-## HTML5
-
-### CSS
+<!-- more -->
 
 ## JavaScript
 ### [ES6中Arguments和Parameters用法解析](http://sc.qq.com/fx/u?r=X5KmnvA&t=9)

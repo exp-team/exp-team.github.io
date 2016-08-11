@@ -1,1 +1,13 @@
-<%- partial('_partial/archive', {pagination: 2, index: true}) %>
+<% page.posts.each(function(post){ %>
+<% post.excerpt = post.excerpt || post.content.slice(0, 120) %>
+    <%- partial('_partial/article', {post: post, index: true}) %>
+<% }) %>
+
+<% if (page.total > 1){ %>
+  <nav id="page-nav">
+    <%- paginator({
+      prev_text: "&laquo; __('prev')",
+      next_text: "__('next') &raquo;"
+    }) %>
+  </nav>
+<% } %>

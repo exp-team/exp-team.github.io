@@ -5,8 +5,9 @@ tags: [tool,python]
 date: 2016-08-11
 author: Wayne C.
 ---
-
 Haijing said that he would allow me to write some blogs in English, because he wanna challenge himself. So, as a considerate coder, I must do as he said.
+
+<!-- more -->
 
 ## CI Process
 

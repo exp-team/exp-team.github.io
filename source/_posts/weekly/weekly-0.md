@@ -5,7 +5,6 @@ tags: weekly
 date: 2016-07-29
 author: 颜海镜
 ---
-
 7.23-7.29，喜大普奔，expfe技术周刊成立了，贵在坚持
 
 ## 本期推荐
@@ -14,6 +13,8 @@ author: 颜海镜
 ### [工作五年，后面四年重复着第一年的活儿？](http://card.weibo.com/article/h5/s#cid=1001594000139822902178&vid=1649383554&extparam=&from=&wm=0&ip=220.181.38.113)
 
 ### [前端技能之切图](http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&mid=2651221805&idx=1&sn=b0c7c3882a9198261d605c988acc7521&scene=1&srcid=0726dRzjmKjiIAG83gFVrHbK#rd)
+
+<!-- more -->
 
 ## HTML5
 ### [拥抱Web设计新趋势：SVG Sprites实践应用](http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&mid=2651221758&idx=1&sn=bf17e6fbb408935f42b6181ce69b8ee4&scene=1&srcid=0725ZW0yng3S2ScDdOBtSb70#rd)
