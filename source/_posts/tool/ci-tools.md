@@ -58,7 +58,7 @@ if os.path.exists(issue_file):
     * You can change the upload.py position as your wish.
 
 ~~~python
-(status, output) = commands.getstatusoutput('python /Users/baidu/Documents/Tools/upload.py -y -m "' + comment + '"')
+(status, output) = commands.getstatusoutput('python /Users/Documents/Tools/upload.py -y -m "' + comment + '"')
 if status != 0:
     notice('execute upload.py failed!', False)
     sys.exit(-1)
