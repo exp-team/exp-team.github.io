@@ -41,6 +41,11 @@
 	git commit -m "blog: add"
 	git push origin source
 
+如果远程有更新的提交就会发生冲突，请先把远程新的比较合并到本地在提交
+
+	git fetch
+	git rebase origin/source
+
 发布博文,确认没问题即可发布博文，搞定收工
 
 	hexo deploy -g
