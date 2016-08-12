@@ -10,7 +10,7 @@
 
 第三步，安装hexo命令行工具
 
-	npm install -g hexo-cli@1.0.2
+	npm install -g hexo-cli@1.0.2 --registry=https://registry.npm.taobao.org
 
 
 ## 如何写博客
@@ -26,7 +26,7 @@
 
 第二步，安装npm插件，**仅需安装一次**
 
-	npm install
+	npm install --registry=https://registry.npm.taobao.org
 
 第三步，在source/_posts目录下编写博文；附赠[markdown语法说明](http://wowubuntu.com/markdown/)
 
