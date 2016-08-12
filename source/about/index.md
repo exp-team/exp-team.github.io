@@ -1,7 +1,6 @@
 ---
 layout: page
 title: "关于!"
-date: 2016-07-31
 ---
 
 Hello ！
