@@ -21,7 +21,7 @@ author: 侯策
 
 ### [web app变革之rem](https://isux.tencent.com/web-app-rem.html)
 
-### Other
+## Other
 
 ### [HTML 不同空格的特性与表现研究](http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&mid=2651222451&idx=1&sn=243e858964dbc3cf151e4efbbf175ddf&scene=1&srcid=0810eI96CWM8y9VWuxn0Vh8u&from=groupmessage&isappinstalled=0#wechat_redirect)
 
