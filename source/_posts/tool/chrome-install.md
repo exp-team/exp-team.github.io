@@ -12,7 +12,7 @@ author: 赵文琳
 1、windows
 http://google-chrome.en.uptodown.com/windows/old
 之前在win7上装了旧版本的64位，浏览器无法打开网页，在右键单击Chrome在桌面的快捷方式，在“属性”的“目标”项目中追加：-no-sandbox，很遗憾还是没有成功~，大家也可以自行尝试一下
-![](/bimg/416.png)
+![](/bimg/b1.png)
 2、mac
 http://google-chrome.en.uptodown.com/mac/old
 3、ubuntu
