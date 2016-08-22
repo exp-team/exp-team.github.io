@@ -1,17 +1,22 @@
 ---
 title: js原生事件总结
-categories: summarize
-tags: summarize
+categories: js
+tags: js
 date: 2016-08-21
 author: 赵文琳
 ---
 最近把自己学习js原生事件的学习总结了一下，可供大家参考一下下，哪里有不对的地方还请大家指正哦~
+
 <!-- more -->
+
 事件的第一个概念就是事件流，所谓的事件流就是页面接受事件的顺序。IE的事件流叫冒泡事件，Netscape Communicator提出了另一个事件流叫事件捕获，一下两张图就能很直观的理解这两种事件流
 冒泡：
-![](/bimg/b417.png)
+
+![](/bimg/b2.png)
+
 捕获：
-![](/bimg/b418.png)
+
+![](/bimg/b3.png)
 
 所有的浏览器都支持冒泡，但是具体实现还是有一些差别，有的会跳过<HTML>直接从body到文档，有的是会冒泡到window对象
 
