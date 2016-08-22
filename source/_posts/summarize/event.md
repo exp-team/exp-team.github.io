@@ -1,7 +1,7 @@
 ---
 title: js原生事件总结
-categories: tool
-tags: tool
+categories: summarize
+tags: summarize
 date: 2016-08-21
 author: 赵文琳
 ---
