@@ -1,7 +1,7 @@
 env:
   global:
     - GH_REF: github.com/exp-team/exp-team.github.io.git
-    - secure: "wYcYLZpOT6q1FCf/sfdKhzB5k4JshWaHzW607z2XTB7WUU0ValTh8RNSkK63tNsFDpMlResmFSlR+g0Bt8UNLe5sb8wIXtSRc44TO3r4nh9uvSDdfbTZs7fd31JTU7N46lhJ643EY4us0syQCtNHiOJ4Tvbwl7g6vlQPx9xgJMyvtGkak8C2NEA34i94CbI9Erp93rv+cLjTNmOa5q/i18Kt4e67acGDSOmkSbrUuS0GywlFA5YK0QTGtrV8J8gwWgU8yeUmtXGqjs6tSnf1sO+sP7DzBQ82k4t9fPAeyH6KLuNiP9dceTOFFK+dYESuf5aMb6KdPsG+r4EUaXzjReKSAZLRdnsEI5UJa+0WysAQxy6NQ9GE4PXAb9vayfShFK5tVHQ+EcQSVfvzWOIeYrMlECEtVFbBi5OfUKvWRTXuNcdBWJZGsz00LbkwTElIW0kYm+3x3sVmXFAjMRk0YkpLDYSO0sWWcd9grz+aQHeovlApmae1FAOEWzbbFkTMkKZvOQjN66Qjwb6hCa5R/x/esdF7UPekxgyvldh0HaUGl00PZRdSPcIews9ftR/zxGctX1agNQbpbJOryMB/iEGLRzlXJziTt2bdHy/k0NddgPTNr2kc9k8Ypk/Yyecd8oLEtJrQo/BjV2IL+6TmJyw7iGIQjfzkGMrHb73dwK4="
+    - secure: "pugvKV4WLzhxKZlXFeb2L7mju9rolTEuzyILMEI5k8Zrh76AHFZ/y/AePCrxFVepK5rt12jLfxoF81WoZ5cPaEZXBPStQ/8GzXjCGXV7wL5DOuMYr9NppjosLi7TEnNxtCoXAojUKvn5tI5HTjF291dYKVWCs9yQKAQXUR6PDwoQMhR0gsMVisf0m8HK+994EvXdfHil+Oqs+R0j0n1mMJLQgloQx8hGMyHSvSUeu4uiRP+WsWhKR2dDmNTxUsn162qSXEC0UiwxpnDYrfDP4kKi2a3ZjKq6v9ptxpU/SrkP9dkmwLlhr5dCBLDZb6tycgsvL6/JJJWRPIijlTJCPFCFRAKKu1mgweXvmY2caeRtiz1NTf48TPa5Y0Z9qmtD08S5qPInvXfwLQ3I8jAktd9zh6bb4H7cqTxMSjglIvHDkR8s1uBIKbTsPHll/oMn19tY3iOwglfQ8rEDSWzxO7LcszvFjk7NLH/qkT9aMwqcY0yLt6IfTwAtB40wsEUXHTqZlt3CPWvE22hRIKfSmVVAsOyRU6t4XxW5p5lilRhTGTwy9KeQE2rpB6sim17dQakzTE8Xu2r9V2l/0JVafZZ/QL72I8DptLWNNCxpFImLw0nmiPJBGzofDJNDdtmN9uSBc9RUMcafQFIrh2aZK1VCDEqAP+2UATmrQiRdesQ="
 
 # S: Build Lifecycle
 install:
@@ -20,5 +20,5 @@ after_script:
   - git config user.email "yanhaijing@yeah.net"
   - git add .
   - git commit -m "travis-ci auto update"
-  - git push -f "https://${GH_TOKEN}@${GH_REF}" master:master
+  - git push -f "https://${GH_TOKEN}@${GH_REF}" master:aaa
 # E: Build LifeCycle
