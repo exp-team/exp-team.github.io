@@ -1,7 +1,5 @@
-# exp team
+# exp team ![](https://travis-ci.org/exp-team/exp-team.github.io.svg?branch=source)
 百度经验研发团队博客，让我们团结一致，让我们的团队更强。
-
-123
 
 ## 技术栈
 我们的博客基于[hexo](https://hexo.io/zh-cn/)搭建，需要[node](https://nodejs.org/en/)和[git](https://git-scm.com/)环境的支持，具体安装过程可以看[这里](https://exp-team.github.io/)
@@ -43,12 +41,16 @@
 	git commit -m "blog: add"
 	git push origin source
 
-如果远程有更新的提交就会发生冲突，请先把远程新的比较合并到本地在提交
+**遇到冲突怎么办？**如果远程有更新的提交就会发生冲突，请先把远程新的比较合并到本地在提交
 
 	git fetch
 	git rebase origin/source
 
-发布博文,确认没问题即可发布博文，搞定收工
+目前提交到source分之，会自动部署到master分支，参考[使用 Travis CI 自动更新 GitHub Pages](http://notes.iissnan.com/2016/publishing-github-pages-with-travis-ci/)
+
+**注意：到此为止了，下面是手动发布过程**
+
+<del>发布博文,确认没问题即可发布博文，搞定收工</del>
 
 	hexo deploy -g
 
