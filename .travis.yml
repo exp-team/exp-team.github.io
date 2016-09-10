@@ -1,0 +1,24 @@
+env:
+  global:
+    - GH_REF: github.com/exp-team/exp-team.github.io.git
+    - secure: "bX94NryoejRBQCvprWuytsjAVvLMszOFHRRqdX/PiDxDT0uRMb7lZ5l5WIWlcFNmdZFZDtEdSd7gVw1gFJB2I1vAmeWqlH2aPTWcvpAYEs5kLhx8KYu73Av5T9quS56dr2mYtypOcyfU75CvA2EECqQ/8GZcmsD46VDEVuEF3NQ17RK5/koHXqB+iiG5V3RpUIIpdmBcaXD3UYYEJfkw7Te4f1/3KvWpF7QoxuxO9qHuMLMSV/k82UydJ9D1aSW0XOJK1VfL/LczFgGOvHS//J/cryNI0OzJjkoaXO5YB4EgyeoF/hfSCflXMcyeDQB3KaQ1I2qLhd0cVeegQtCYz3mI6fT8Gy0YGvDsa+SIYW4kRk6Qm2YqIY9M5W2UlKBYn2u++Jdub9K4IbIXkHLRqj8xcLnTMLGNyPRtLC0s/Yg7Am2wTwFp8W+F64q4Lj5aWCJVplkYpUDoE/ZRvwyewvIiOQeW2QGUJGCPlnKDL+Fg4C/3+FwPr1+JGTYgn9GNXbD4+aMCJELmPrSLYzgmspW1c0/ZPnjbtvYsna92J4QOvPUlvBco0g7LYhfmU8g0VlORgiPlV6VH55nH1De4uAo/ffmD+52qm7IiJOUAB+Hru4DCh3fO9Ot4rETYYSXC18Mv1ge/ogINQn7JIz36s+wKAQu9u/lrBWh8GqXqDvg="
+
+# S: Build Lifecycle
+install:
+  - npm install
+
+before_script:
+  - npm install -g hexo-cli@1.0.2
+
+script:
+  - hexo generate
+
+after_script:
+  - cd public
+  - git init
+  - git config user.name "exp-team"
+  - git config user.email "yanhaijing@yeah.net"
+  - git add .
+  - git commit -m "travis-ci auto update"
+  - git push -f "https://${GH_TOKEN}@${GH_REF}" master:master
+# E: Build LifeCycle
