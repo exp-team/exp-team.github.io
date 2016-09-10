@@ -1,4 +1,4 @@
-# exp team
+# exp team ![](https://travis-ci.org/exp-team/exp-team.github.io.svg?branch=source)
 百度经验研发团队博客，让我们团结一致，让我们的团队更强。
 
 这里是生成目录，请[访问这里](https://github.com/exp-team/exp-team.github.io/tree/source)。
