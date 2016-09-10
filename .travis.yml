@@ -16,7 +16,7 @@ script:
 after_script:
   - cd public
   - git init
-  - git config user.name "exp-team"
+  - git config user.name "yanhaijing"
   - git config user.email "yanhaijing@yeah.net"
   - git add .
   - git commit -m "travis-ci auto update"
