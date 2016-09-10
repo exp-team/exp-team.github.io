@@ -4,6 +4,7 @@
 ## 技术栈
 我们的博客基于[hexo](https://hexo.io/zh-cn/)搭建，需要[node](https://nodejs.org/en/)和[git](https://git-scm.com/)环境的支持，具体安装过程可以看[这里](https://exp-team.github.io/)
 
+
 第一步，安装git，可参考[这里](https://git-scm.com/book/zh/v2/%E8%B5%B7%E6%AD%A5-%E5%AE%89%E8%A3%85-Git)；附赠[常用git命令](http://yanhaijing.com/git/2014/11/01/my-git-note/)
 
 第二步，安装node，可参考[这里](http://nodejs.cn/download/package-manager/)；附赠[npm使用指南](http://yanhaijing.com/tool/2015/09/01/my-npm-note/)
