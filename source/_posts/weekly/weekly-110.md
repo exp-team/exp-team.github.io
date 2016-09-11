@@ -5,7 +5,7 @@ tags: weekly
 date: 2016-09-11
 author: 侯策
 ---
-9.4-9.11，纸上得来终觉浅，绝知此事要躬行。期刊的意义在于夯实基础，开阔眼界，但是所有价值最终还要在代码上体现。
+9.4-9.11，纸上得来终觉浅，绝知此事要躬行。
 
 ## 本期推荐
 ### [when react meets VIRTUAL REALITY](http://m.youku.com/video/id_XMTYxNTQ2MDM4NA==.html?x=&from=groupmessage&isappinstalled=1)
@@ -19,7 +19,7 @@ This talk explores these concepts by incrementally building up a mobile VR engin
 
 
 ### [认识javascript中的作用域和上下文](http://mp.weixin.qq.com/s?__biz=MzIzNjE5NzAyMA==&mid=2649879768&idx=1&sn=03e5dd16a44d7ba23cef4dfd4b7a012e&scene=1&srcid=0909Z9n37xFfLJ3bCVxMjCoG&from=groupmessage&isappinstalled=0#wechat_redirect)
-在追求最新技术和理念的同时，JS的基础知识同样不可忽略。所谓“水之积也不厚，则其负大舟也无力”－《庄子·逍摇游》，想想作为新同学，多少次因为JS中的this漂移踩了坑；多少次挣扎在原型链里不得解；面试时，闭包的知识有多少次被提及。“墙高基下，虽得必失”，千里之行，还有从基础开始。这里给大家安利一篇颜海镜大神的文章，希望大家能对js中的作用域了解有所加深。
+在追求最新技术和理念的同时，JS的基础知识同样不可忽略。所谓“水之积也不厚，则其负大舟也无力”－《庄子·逍摇游》，想想作为新同学，多少次因为JS中的this漂移踩了坑；多少次挣扎在原型链里不得解；面试时，闭包的知识有多少次被提及。“墙高基下，虽得必失”，千里之行，还要从基础开始。这里给大家安利一篇颜海镜大神的文章，希望大家能对js中的作用域了解有所加深。
 最后，给大家布置课后作业：ES6中，关于作用域的改进有哪些呢？
 
 <!-- more -->
@@ -38,6 +38,5 @@ This talk explores these concepts by incrementally building up a mobile VR engin
 
 ## 其他
 ### [深入浅出ES6：代理 Proxies](http://mp.weixin.qq.com/s?__biz=MzIwNjQwMzUwMQ==&mid=2247484217&idx=1&sn=25841588efe33011c3abb62285db1147&scene=1&srcid=0908rX8cSzXLWS1CNn4cpF3u&from=groupmessage&isappinstalled=0#wechat_redirect)
-有的时候我们想要做出一些非常惊人、吸引用户眼球的动画效果，为了减少我们的开发成本，我们通常需要借助一些现成的工具来提高开发效率，这11款HTML5动画功工具可以供大家参考参考。
 
 
