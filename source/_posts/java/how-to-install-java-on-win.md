@@ -53,7 +53,7 @@ author: 颜海镜
 
 我们可以键入`javac -version`来验证
 
-![](/bimg/412.png)
+![](/bimg/414.png)
 
 第三步，配置CLASSPATH，新建变量`CLASSPATH`，键入下面的语句`.;%JAVA_HOME%\lib;%JAVA_HOME%\lib\tools.jar`
 
@@ -70,7 +70,7 @@ author: 颜海镜
 
 然后运行`javac Hello`编译，在用`java`执行
 
-![](/bimg/414.png)
+![](/bimg/415.png)
 
 ## 总结
 按照上面的步骤我们就将环境配置好了。
