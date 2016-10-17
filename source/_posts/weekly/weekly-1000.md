@@ -9,7 +9,7 @@ author: 赵文琳
 
 ## 本期推荐
 ### [php-smarty模板引擎](http://www.jianshu.com/p/32e08dec123a)
-这篇文章对于smarty模板的讲解非常全面，由浅到深，从smarty的简介到api到设计都有介绍到，个人觉得讲的内容有点多，有点不好消化，感兴趣的也可以去看一下smarty的官方文档。###[Smarty3 手册 | Smarty](http://www.smarty.net/docs/zh_CN/)	
+这篇文章对于smarty模板的讲解非常全面，由浅到深，从smarty的简介到api到设计都有介绍到，个人觉得讲的内容有点多，有点不好消化，感兴趣的也可以去看一下smarty的官方文档。[Smarty3 手册 | Smarty](http://www.smarty.net/docs/zh_CN/)	
 ### [回调地狱的今生前世@JavaScript](https://github.com/rccoder/blog/issues/17)
 一想到回调，大家都会想到异步，因为JavaScript一门单线程的语言，在执行过程中线程不能被阻塞，所以在js编程的时候我们都会采用回调的方式来实现异步，异步编程就是在执行一个指令之后不是马上得到结果，而是继续执行后面的指令，等到特定的事件触发后，才得到结果。这篇文章只是对比性的介绍了四种异步编程的方式：回调、promise、Generator、await/async；个人觉得并不够详细，更多细节还得单独的去找相关的知识点，以前开发过程中用得最多的就是回调，但是es6推出的promise引领了新的潮流，promise是一个对返回结果具有占位符意义的对象，函数的调用者注册回调函数，一旦结果运算完毕就通知promis。Generrator以及await/async暂时还没有尝试过，待我大师兄分享完过后再补充；
 
