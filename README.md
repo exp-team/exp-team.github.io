@@ -48,9 +48,10 @@
 
 目前提交到source分之，会自动部署到master分支，参考[使用 Travis CI 自动更新 GitHub Pages](http://notes.iissnan.com/2016/publishing-github-pages-with-travis-ci/)
 
-**注意：到此为止了，下面是手动发布过程**
+**<del>注意：到此为止了，下面是手动发布过程</del>**
+**注意：自动发布尚未搞定，请使用下面的手动过程**
 
-<del>发布博文,确认没问题即可发布博文，搞定收工</del>
+发布博文,确认没问题即可发布博文，搞定收工
 
 	hexo deploy -g
 
