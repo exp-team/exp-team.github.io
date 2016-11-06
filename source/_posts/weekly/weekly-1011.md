@@ -3,7 +3,7 @@ title: expfe技术周刊第1011期
 categories: weekly
 tags: weekly
 date: 2016-11-06
-author: 侯策
+author: 赵文琳
 ---
 10.31-11.6，雾霾这么大，我们快看不清这个世界了，但是一定要来这里看一看~
 
