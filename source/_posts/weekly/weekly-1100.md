@@ -2,48 +2,40 @@
 title: expfe技术周刊第1100期
 categories: weekly
 tags: weekly
-date: 2016-11-26
-author: Lucas，饲养猿
+date: 2016-11-12
+author: 颜海镜
 ---
-11.7-11.26，“宫城团回凛严光，白天碎碎堕琼芳”。
-本周帝都迎来了入冬初雪：四季变换如若总让人猝不及防，那么技术更迭却总能够如约而至。
+11.7-11.12，本期收集了那么多如何学习前端的文章，你应该猜到团队了来了位新同学，所以本期主题就是前端入门。
 
 ## 本期推荐
 
-### [JS 5种不同的方法实现装饰者模式（译）](https://zhuanlan.zhihu.com/p/20743493?from=singlemessage&isappinstalled=0)
-不错的一篇文章，为了自身乐趣和加强理解使用闭包、猴子补丁、原型、代理和中间件5种不同方式在 javascript 中实现装饰者模式。
+### [在2016年如何学习JavaScript？](https://zhuanlan.zhihu.com/p/23334342)
+前段时间有一篇文章很有感触，就是《在2016年学习js是怎样一种体验》，我其实深有体会，前端发展速度太快了，特别是最近几年，新名词太多太多，仿佛记住这些词都很困难，前端对新人来说上手难度越来越大，这篇文章介绍了在2016年如何一步一步去学习前端。
 
+### [6周学习计划，攻克JavaScript难关](http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&mid=2651223880&idx=1&sn=9d59b9f4a399a75e98950e162cb89398&chksm=bd49aecc8a3e27da998d1448fa4370c77d702e1e7a918f998e4fa9cec101f046decee64ac172&mpshare=1&scene=1&srcid=1112cSLwvdvgtt7PMhOw2YiO#rd)
+这其实是讲如何学习react，通过6周时间，6个阶段，学会6个技术，按照本文一步一步走下去，react就不在话下了，也建议老司机关注一下react，这个技术有点意思。
 
-### [2016 JavaScript 发展现状大调查](http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&mid=2651224014&idx=1&sn=25ee1479f8c00fda80afae6fa5413ef1&chksm=bd49ae4a8a3e275c2bd13d64983385748aa783321b98e2d98d2dda508127c90906903ea2ddb5&mpshare=1&scene=1&srcid=1121ZEDSvG9GXWCr22ho8UGo#rd)
-一旦临近年底，各种总结，各种评选颁奖。那么作为有点“乱”的前端界，也不能少。
+### [前端的学习](http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&mid=2651223798&idx=1&sn=4d84d3dd80d44264b2b3794977e09c66&chksm=bd49af728a3e2664d8bda1337516a1a7846f8047942663f30e7af644205350da497359f91ab7&mpshare=1&scene=1&srcid=1109Htuolk6iWEhdmBUWwan3#rd)
+@大漠 老师通过亲身经历，现身说法，将你如何学好前端，特别是在如今技术发展的速度超过我们学习速度的情况下，如何在信息爆炸，信息过载的情况下，学好前端呢。
 
 <!-- more -->
 
-## 前端新潮
+## JavaScript
 
-### [组件化——前端编程的选择](http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&mid=2651224143&idx=2&sn=b2f3457ee7fc5f81858886efb7be0374&chksm=bd49a1cb8a3e28dd1dcebea92d0ac6aa61aa4df2061b47f0b00956aa0111f838dfa29e4f3a1e&mpshare=1&scene=1&srcid=1125IIjmzOrdk0m7t3HpYkuy#rd)
-不管是迭代型产品还是日常的运营活动页，总会遇到蛮多重复的工作，如果能站在比业务层高一点的角度来看的话，就很有必要做到”服务”，这样不管是对项目还是自身来说都是利大于弊。对自己来说意义更大，有沉淀，有影响力。今天的文章由EAII企业架构创新研究院@郭怀成带来授权分享。
+### [理解 Javascript 的 async await](http://zcfy.cc/article/understanding--s-async-await-1586.html)
+虽然你们在吹捧，但我始终觉得generator不适合用来做异步，非常蹩脚的感觉，就像我们用float做多列一样，社区也意识到了这个问题，所以异步函数来了，就是ES2017，就在2017年6月的那个夜晚。
 
-## CSS
+### [Angular 3 is hot on the heels of Angular 2](http://www.infoworld.com/article/3139891/javascript/angular-3-is-hot-on-the-heels-of-angular-2.html)
+啥也不想说，jq都出3.0了，我们还在用1.0，ng都出3了，我还没学会1.x，蓝瘦香菇。
 
-### [既然写 CSS 很容易，那为什么大家还是把 CSS 写的那么烂呢？](http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&mid=2650963848&idx=1&sn=946969566285d2023b3dc1e49721a03b&chksm=843a13eeb34d9af8afed798ef742d937e07ee35b4a65182786a27d758cb45e488ab2505ec194&mpshare=1&scene=1&srcid=1122XbVzsEaIA8HN8RIiUVxm#rd)
-Why CSS still sucks in 2016???
+## Other
 
+### [Git 的工作原理](http://gold.xitu.io/entry/581efecb2f301e005c1d2251)
+我们马上就要迁到git了，这篇文章刚好应景，如果你不懂git或者只是会用几个命令，那么看看这篇文章吧，让我们一探git内部的神秘。
 
-## 其他
-### [程序员提交代码的 emoji 指南](http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&mid=2650963837&idx=1&sn=6417ad5d02622fb2b4f765170e95dfa7&chksm=843a131bb34d9a0d5c05eac862140d1b6fb564705f429c04130e76665565219ec901b80b5dbf&mpshare=1&scene=1&srcid=1119QJckFwjEboCtC0mGYyzK#rd)
+### [从2016年11月期《技术雷达》看前端的未来](https://zhuanlan.zhihu.com/p/23492610)
+@Phodal 大大预测2020年的前端是什么样子，js真是无所不能，快来围观。
 
-### [谈谈主动工作](http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&mid=2651223990&idx=1&sn=bd8613aa2a6d088ff1b9dc290bccef3d&chksm=bd49ae328a3e27249a2da8b06737be5f28df53edca946e041c17788c70763c35cb817bf465db&mpshare=1&scene=1&srcid=1119aU3KMPedMEwelSDQZvJb#rd)
-
-### [各种编程语言都是什么星座？](http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&mid=2650963854&idx=1&sn=2ff451c6638da8be0dff5f3cbdc88a29&chksm=843a13e8b34d9afe84d23accc9a75cdc31df611b80c7be6cba21b5f7c17d2f7c5572743ba4ea&mpshare=1&scene=1&srcid=11248LjhWF3vScFZKDscmjWM#rd)
-
-### [我们应该先学习哪种语言 ʇdıɹɔsɐʌɐɾ :ɹǝʍsuɐ](http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&mid=2650963827&idx=1&sn=2a327830a340d5efdfbf43135b5f495d&chksm=843a1315b34d9a031832b37e7c1a3d90a84631b0bcf7749e06f413c903cc4fa9f348ebaeba95&mpshare=1&scene=1&srcid=1124xQOI9SRb5TGicdbsxS3L#rd)
-
-
-
-
-
-
-
-
+### [大话程序猿VS产品狗](http://blog.thankbabe.com/2016/06/26/cpgandcxy/?from=sf8)
+peace or war
 
