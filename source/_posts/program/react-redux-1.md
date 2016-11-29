@@ -2,7 +2,7 @@
 title: 一个很简单的react+redux工程实例
 categories: program
 tags: program
-date: 2016-12-01
+date: 2016-11-26
 author: 侯策
 ---
 
