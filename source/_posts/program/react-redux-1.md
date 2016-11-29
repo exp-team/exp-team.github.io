@@ -36,9 +36,19 @@ author: 侯策
 ![](/bimg/c2.png)
 
 ### app/ app文件夹下
+
 action.es定义了页面交互中dispatch的所有action；
+
+![](/bimg/c6.png)
+
 app.jsx是页面入口脚本；
+
+![](/bimg/c8.png)
+
 component.jsx定义了页面的组件；
+
+![](/bimg/c7.png)
+
 reducer.jsx接收action，该文件定义了所有用到的reducer。
 
 ### lib + lib-nomod 文件夹下
