@@ -1,5 +1,5 @@
 ---
-title: 一个很简单的react+redux工程实例
+title: 一个简单的react+redux工程实例
 categories: program
 tags: program
 date: 2016-11-26
