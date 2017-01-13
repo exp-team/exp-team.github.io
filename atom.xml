@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://exp-team.github.io/"/>
-  <updated>2017-01-13T10:19:58.000Z</updated>
+  <updated>2017-01-13T12:10:22.000Z</updated>
   <id>https://exp-team.github.io/</id>
   
   <author>
@@ -14,6 +14,37 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>expfe技术周刊第10100期</title>
+    <link href="https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/"/>
+    <id>https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/</id>
+    <published>2017-01-12T16:00:00.000Z</published>
+    <updated>2017-01-13T12:10:22.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>1.8-1.13，新的一期，继续积累！</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="《JS-闯关记》之原型及原型链"><a href="#《JS-闯关记》之原型及原型链" class="headerlink" title="《JS 闯关记》之原型及原型链"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;mid=2650101216&amp;idx=1&amp;sn=dcc39636ebff46aca84df68533fb0742&amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;scene=0" target="_blank" rel="external">《JS 闯关记》之原型及原型链</a></h3><p>原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的<strong>proto</strong> 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、<strong>proto</strong> 这五个概念入手。</p>
+<h3 id="H5项目常见问题及注意事项"><a href="#H5项目常见问题及注意事项" class="headerlink" title="H5项目常见问题及注意事项"></a><a href="http://www.open-open.com/lib/view/open1449325854077.html" target="_blank" rel="external">H5项目常见问题及注意事项</a></h3><p>再也不用为PM嘴中的“H5”发愁了。</p>
+<a id="more"></a>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="揭秘babel的魔法之class魔法处理-amp-version-12010110-amp-nettype-WIFI-amp-fontScale-100-amp-pass-ticket-YhSJKWrB-2F17Rk3IFLm1QVJfny1S3Hj2eASyskesufAovgpp4Epi4cJWUpue0DZv3"><a href="#揭秘babel的魔法之class魔法处理-amp-version-12010110-amp-nettype-WIFI-amp-fontScale-100-amp-pass-ticket-YhSJKWrB-2F17Rk3IFLm1QVJfny1S3Hj2eASyskesufAovgpp4Epi4cJWUpue0DZv3" class="headerlink" title="揭秘babel的魔法之class魔法处理&amp;version=12010110&amp;nettype=WIFI&amp;fontScale=100&amp;pass_ticket=YhSJKWrB%2F17Rk3IFLm1QVJfny1S3Hj2eASyskesufAovgpp4Epi4cJWUpue0DZv3)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzIzNjE5NzAyMA==&amp;mid=2649879842&amp;idx=1&amp;sn=0e7eb27fd9bb7f5ba9bbd2b3640ba663&amp;chksm=f0ded0d1c7a959c785fd8c8b384e348506ea4dd40ca72a8fac00aa4f34ab07aacab6aa92514b&amp;mpshare=1&amp;scene=1&amp;srcid=01132iAX9Sp6Gpll9otS2un8&amp;key=59506e83f2f7e1fd47b66ec743010bafb62e75b40f02a088b7a58ef822f0fcfe14c244308ee819c24dd7303946792d0ace78d7c18cb31a020ca5b42528939fa5ce021ed6ae7a77d738521132ff2afee9&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a>&amp;version=12010110&amp;nettype=WIFI&amp;fontScale=100&amp;pass_ticket=YhSJKWrB%2F17Rk3IFLm1QVJfny1S3Hj2eASyskesufAovgpp4Epi4cJWUpue0DZv3)</h3><p>揭秘Babel的同时，在复习一遍原型链基础支持～</p>
+<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="如何让你的-CSS-更具有可维护性？——大神有绝招-amp-version-12010110-amp-nettype-WIFI-amp-fontScale-100-amp-pass-ticket-YhSJKWrB-2F17Rk3IFLm1QVJfny1S3Hj2eASyskesufAovgpp4Epi4cJWUpue0DZv3"><a href="#如何让你的-CSS-更具有可维护性？——大神有绝招-amp-version-12010110-amp-nettype-WIFI-amp-fontScale-100-amp-pass-ticket-YhSJKWrB-2F17Rk3IFLm1QVJfny1S3Hj2eASyskesufAovgpp4Epi4cJWUpue0DZv3" class="headerlink" title="如何让你的 CSS 更具有可维护性？——大神有绝招&amp;version=12010110&amp;nettype=WIFI&amp;fontScale=100&amp;pass_ticket=YhSJKWrB%2F17Rk3IFLm1QVJfny1S3Hj2eASyskesufAovgpp4Epi4cJWUpue0DZv3)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964179&amp;idx=1&amp;sn=f7088de66f09efd35057541695582d52&amp;chksm=843aecb5b34d65a3ff8d67142403f3463e08f57041f4212e991248f49770b59943d5c65545bc&amp;mpshare=1&amp;scene=1&amp;srcid=0111H4YARr96el0lj1WY0J09&amp;key=9c48b642bc3f329aad1db085a9bedad5839a1905473ac4a92b6d4d1e87a73571f2270e0d202175d6fe6b9f169466d9f406b479687c6a26913b8871c4f9a363bf682e341d818475fe9f2c96ae11984cf4&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">如何让你的 CSS 更具有可维护性？——大神有绝招</a>&amp;version=12010110&amp;nettype=WIFI&amp;fontScale=100&amp;pass_ticket=YhSJKWrB%2F17Rk3IFLm1QVJfny1S3Hj2eASyskesufAovgpp4Epi4cJWUpue0DZv3)</h3><p>这篇文章教你一种方法，能够写出更具有可维护性的CSS，它就是”BEM”。</p>
+<h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="回顾-2016-年-Node-js-十大文章-amp-version-12010110-amp-nettype-WIFI-amp-fontScale-100-amp-pass-ticket-YhSJKWrB-2F17Rk3IFLm1QVJfny1S3Hj2eASyskesufAovgpp4Epi4cJWUpue0DZv3"><a href="#回顾-2016-年-Node-js-十大文章-amp-version-12010110-amp-nettype-WIFI-amp-fontScale-100-amp-pass-ticket-YhSJKWrB-2F17Rk3IFLm1QVJfny1S3Hj2eASyskesufAovgpp4Epi4cJWUpue0DZv3" class="headerlink" title="回顾 2016 年 Node.js 十大文章&amp;version=12010110&amp;nettype=WIFI&amp;fontScale=100&amp;pass_ticket=YhSJKWrB%2F17Rk3IFLm1QVJfny1S3Hj2eASyskesufAovgpp4Epi4cJWUpue0DZv3)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964196&amp;idx=1&amp;sn=d52e8258b54e0d807e14efa5a2791f84&amp;chksm=843aec82b34d65944704e1f7fc04747934bad078ad91906781f21edeb204a9a55f4d9f129369&amp;mpshare=1&amp;scene=1&amp;srcid=0111eOoheFnpABemlLvmHvL9&amp;key=b43a3af60b96e11ea73bf680a496917e5ddba4f4df02ed09b5d98004f0d1a55fac501bfd1739d34142755619423b1893eb780d1ac2154a6f2457d7e39a0e7ad15fe39d03218e020b131ff64b54503cf9&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">回顾 2016 年 Node.js 十大文章</a>&amp;version=12010110&amp;nettype=WIFI&amp;fontScale=100&amp;pass_ticket=YhSJKWrB%2F17Rk3IFLm1QVJfny1S3Hj2eASyskesufAovgpp4Epi4cJWUpue0DZv3)</h3><p>对于Node.js开发者来说，2016是振奋人心的一年。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;1.8-1.13，新的一期，继续积累！&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;《JS-闯关记》之原型及原型链&quot;&gt;&lt;a href=&quot;#《JS-闯关记》之原型及原型链&quot; class=&quot;headerlink&quot; title=&quot;《JS 闯关记》之原型及原型链&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;amp;mid=2650101216&amp;amp;idx=1&amp;amp;sn=dcc39636ebff46aca84df68533fb0742&amp;amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;amp;scene=0&quot;&gt;《JS 闯关记》之原型及原型链&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的&lt;strong&gt;proto&lt;/strong&gt; 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、&lt;strong&gt;proto&lt;/strong&gt; 这五个概念入手。&lt;/p&gt;
+&lt;h3 id=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;a href=&quot;#H5项目常见问题及注意事项&quot; class=&quot;headerlink&quot; title=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.open-open.com/lib/view/open1449325854077.html&quot;&gt;H5项目常见问题及注意事项&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;再也不用为PM嘴中的“H5”发愁了。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
   
   <entry>
     <title>揭秘babel的魔法之class魔法处理</title>
@@ -411,36 +442,6 @@ var Person = (function () {
   </entry>
   
   <entry>
-    <title>expfe技术周刊第1101期</title>
-    <link href="https://exp-team.github.io/blog/2016/11/26/weekly/weekly-1101/"/>
-    <id>https://exp-team.github.io/blog/2016/11/26/weekly/weekly-1101/</id>
-    <published>2016-11-25T16:00:00.000Z</published>
-    <updated>2017-01-13T08:09:51.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>11.7-11.26，“宫城团回凛严光，白天碎碎堕琼芳”。<br>本周帝都迎来了入冬初雪：四季变换如若总让人猝不及防，那么技术更迭却总能够如约而至。</p>
-<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="JS-5种不同的方法实现装饰者模式（译）"><a href="#JS-5种不同的方法实现装饰者模式（译）" class="headerlink" title="JS 5种不同的方法实现装饰者模式（译）"></a><a href="https://zhuanlan.zhihu.com/p/20743493?from=singlemessage&amp;isappinstalled=0" target="_blank" rel="external">JS 5种不同的方法实现装饰者模式（译）</a></h3><p>不错的一篇文章，为了自身乐趣和加强理解使用闭包、猴子补丁、原型、代理和中间件5种不同方式在 javascript 中实现装饰者模式。</p>
-<h3 id="2016-JavaScript-发展现状大调查"><a href="#2016-JavaScript-发展现状大调查" class="headerlink" title="2016 JavaScript 发展现状大调查"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224014&amp;idx=1&amp;sn=25ee1479f8c00fda80afae6fa5413ef1&amp;chksm=bd49ae4a8a3e275c2bd13d64983385748aa783321b98e2d98d2dda508127c90906903ea2ddb5&amp;mpshare=1&amp;scene=1&amp;srcid=1121ZEDSvG9GXWCr22ho8UGo#rd" target="_blank" rel="external">2016 JavaScript 发展现状大调查</a></h3><p>一旦临近年底，各种总结，各种评选颁奖。那么作为有点“乱”的前端界，也不能少。</p>
-<a id="more"></a>
-<h2 id="前端新潮"><a href="#前端新潮" class="headerlink" title="前端新潮"></a>前端新潮</h2><h3 id="组件化——前端编程的选择"><a href="#组件化——前端编程的选择" class="headerlink" title="组件化——前端编程的选择"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224143&amp;idx=2&amp;sn=b2f3457ee7fc5f81858886efb7be0374&amp;chksm=bd49a1cb8a3e28dd1dcebea92d0ac6aa61aa4df2061b47f0b00956aa0111f838dfa29e4f3a1e&amp;mpshare=1&amp;scene=1&amp;srcid=1125IIjmzOrdk0m7t3HpYkuy#rd" target="_blank" rel="external">组件化——前端编程的选择</a></h3><p>不管是迭代型产品还是日常的运营活动页，总会遇到蛮多重复的工作，如果能站在比业务层高一点的角度来看的话，就很有必要做到”服务”，这样不管是对项目还是自身来说都是利大于弊。对自己来说意义更大，有沉淀，有影响力。今天的文章由EAII企业架构创新研究院@郭怀成带来授权分享。</p>
-<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="既然写-CSS-很容易，那为什么大家还是把-CSS-写的那么烂呢？"><a href="#既然写-CSS-很容易，那为什么大家还是把-CSS-写的那么烂呢？" class="headerlink" title="既然写 CSS 很容易，那为什么大家还是把 CSS 写的那么烂呢？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963848&amp;idx=1&amp;sn=946969566285d2023b3dc1e49721a03b&amp;chksm=843a13eeb34d9af8afed798ef742d937e07ee35b4a65182786a27d758cb45e488ab2505ec194&amp;mpshare=1&amp;scene=1&amp;srcid=1122XbVzsEaIA8HN8RIiUVxm#rd" target="_blank" rel="external">既然写 CSS 很容易，那为什么大家还是把 CSS 写的那么烂呢？</a></h3><p>Why CSS still sucks in 2016???</p>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="程序员提交代码的-emoji-指南"><a href="#程序员提交代码的-emoji-指南" class="headerlink" title="程序员提交代码的 emoji 指南"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963837&amp;idx=1&amp;sn=6417ad5d02622fb2b4f765170e95dfa7&amp;chksm=843a131bb34d9a0d5c05eac862140d1b6fb564705f429c04130e76665565219ec901b80b5dbf&amp;mpshare=1&amp;scene=1&amp;srcid=1119QJckFwjEboCtC0mGYyzK#rd" target="_blank" rel="external">程序员提交代码的 emoji 指南</a></h3><h3 id="谈谈主动工作"><a href="#谈谈主动工作" class="headerlink" title="谈谈主动工作"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651223990&amp;idx=1&amp;sn=bd8613aa2a6d088ff1b9dc290bccef3d&amp;chksm=bd49ae328a3e27249a2da8b06737be5f28df53edca946e041c17788c70763c35cb817bf465db&amp;mpshare=1&amp;scene=1&amp;srcid=1119aU3KMPedMEwelSDQZvJb#rd" target="_blank" rel="external">谈谈主动工作</a></h3><h3 id="各种编程语言都是什么星座？"><a href="#各种编程语言都是什么星座？" class="headerlink" title="各种编程语言都是什么星座？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963854&amp;idx=1&amp;sn=2ff451c6638da8be0dff5f3cbdc88a29&amp;chksm=843a13e8b34d9afe84d23accc9a75cdc31df611b80c7be6cba21b5f7c17d2f7c5572743ba4ea&amp;mpshare=1&amp;scene=1&amp;srcid=11248LjhWF3vScFZKDscmjWM#rd" target="_blank" rel="external">各种编程语言都是什么星座？</a></h3><h3 id="我们应该先学习哪种语言-ʇdiɹosavaɾ-ɹeʍsua"><a href="#我们应该先学习哪种语言-ʇdiɹosavaɾ-ɹeʍsua" class="headerlink" title="我们应该先学习哪种语言 ʇdıɹɔsɐʌɐɾ :ɹǝʍsuɐ"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963827&amp;idx=1&amp;sn=2a327830a340d5efdfbf43135b5f495d&amp;chksm=843a1315b34d9a031832b37e7c1a3d90a84631b0bcf7749e06f413c903cc4fa9f348ebaeba95&amp;mpshare=1&amp;scene=1&amp;srcid=1124xQOI9SRb5TGicdbsxS3L#rd" target="_blank" rel="external">我们应该先学习哪种语言 ʇdıɹɔsɐʌɐɾ :ɹǝʍsuɐ</a></h3>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;11.7-11.26，“宫城团回凛严光，白天碎碎堕琼芳”。&lt;br&gt;本周帝都迎来了入冬初雪：四季变换如若总让人猝不及防，那么技术更迭却总能够如约而至。&lt;/p&gt;
-&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;JS-5种不同的方法实现装饰者模式（译）&quot;&gt;&lt;a href=&quot;#JS-5种不同的方法实现装饰者模式（译）&quot; class=&quot;headerlink&quot; title=&quot;JS 5种不同的方法实现装饰者模式（译）&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/20743493?from=singlemessage&amp;amp;isappinstalled=0&quot;&gt;JS 5种不同的方法实现装饰者模式（译）&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;不错的一篇文章，为了自身乐趣和加强理解使用闭包、猴子补丁、原型、代理和中间件5种不同方式在 javascript 中实现装饰者模式。&lt;/p&gt;
-&lt;h3 id=&quot;2016-JavaScript-发展现状大调查&quot;&gt;&lt;a href=&quot;#2016-JavaScript-发展现状大调查&quot; class=&quot;headerlink&quot; title=&quot;2016 JavaScript 发展现状大调查&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;amp;mid=2651224014&amp;amp;idx=1&amp;amp;sn=25ee1479f8c00fda80afae6fa5413ef1&amp;amp;chksm=bd49ae4a8a3e275c2bd13d64983385748aa783321b98e2d98d2dda508127c90906903ea2ddb5&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1121ZEDSvG9GXWCr22ho8UGo#rd&quot;&gt;2016 JavaScript 发展现状大调查&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;一旦临近年底，各种总结，各种评选颁奖。那么作为有点“乱”的前端界，也不能少。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
-    
-    
-      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
-    
-  </entry>
-  
-  <entry>
     <title>一个简单的react+redux工程实例</title>
     <link href="https://exp-team.github.io/blog/2016/11/26/program/react-redux-1/"/>
     <id>https://exp-team.github.io/blog/2016/11/26/program/react-redux-1/</id>
@@ -697,6 +698,36 @@ function likeBlockReducer (state = initialLikeBlockState, action) {
     
     
       <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第1101期</title>
+    <link href="https://exp-team.github.io/blog/2016/11/26/weekly/weekly-1101/"/>
+    <id>https://exp-team.github.io/blog/2016/11/26/weekly/weekly-1101/</id>
+    <published>2016-11-25T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>11.7-11.26，“宫城团回凛严光，白天碎碎堕琼芳”。<br>本周帝都迎来了入冬初雪：四季变换如若总让人猝不及防，那么技术更迭却总能够如约而至。</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="JS-5种不同的方法实现装饰者模式（译）"><a href="#JS-5种不同的方法实现装饰者模式（译）" class="headerlink" title="JS 5种不同的方法实现装饰者模式（译）"></a><a href="https://zhuanlan.zhihu.com/p/20743493?from=singlemessage&amp;isappinstalled=0" target="_blank" rel="external">JS 5种不同的方法实现装饰者模式（译）</a></h3><p>不错的一篇文章，为了自身乐趣和加强理解使用闭包、猴子补丁、原型、代理和中间件5种不同方式在 javascript 中实现装饰者模式。</p>
+<h3 id="2016-JavaScript-发展现状大调查"><a href="#2016-JavaScript-发展现状大调查" class="headerlink" title="2016 JavaScript 发展现状大调查"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224014&amp;idx=1&amp;sn=25ee1479f8c00fda80afae6fa5413ef1&amp;chksm=bd49ae4a8a3e275c2bd13d64983385748aa783321b98e2d98d2dda508127c90906903ea2ddb5&amp;mpshare=1&amp;scene=1&amp;srcid=1121ZEDSvG9GXWCr22ho8UGo#rd" target="_blank" rel="external">2016 JavaScript 发展现状大调查</a></h3><p>一旦临近年底，各种总结，各种评选颁奖。那么作为有点“乱”的前端界，也不能少。</p>
+<a id="more"></a>
+<h2 id="前端新潮"><a href="#前端新潮" class="headerlink" title="前端新潮"></a>前端新潮</h2><h3 id="组件化——前端编程的选择"><a href="#组件化——前端编程的选择" class="headerlink" title="组件化——前端编程的选择"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224143&amp;idx=2&amp;sn=b2f3457ee7fc5f81858886efb7be0374&amp;chksm=bd49a1cb8a3e28dd1dcebea92d0ac6aa61aa4df2061b47f0b00956aa0111f838dfa29e4f3a1e&amp;mpshare=1&amp;scene=1&amp;srcid=1125IIjmzOrdk0m7t3HpYkuy#rd" target="_blank" rel="external">组件化——前端编程的选择</a></h3><p>不管是迭代型产品还是日常的运营活动页，总会遇到蛮多重复的工作，如果能站在比业务层高一点的角度来看的话，就很有必要做到”服务”，这样不管是对项目还是自身来说都是利大于弊。对自己来说意义更大，有沉淀，有影响力。今天的文章由EAII企业架构创新研究院@郭怀成带来授权分享。</p>
+<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="既然写-CSS-很容易，那为什么大家还是把-CSS-写的那么烂呢？"><a href="#既然写-CSS-很容易，那为什么大家还是把-CSS-写的那么烂呢？" class="headerlink" title="既然写 CSS 很容易，那为什么大家还是把 CSS 写的那么烂呢？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963848&amp;idx=1&amp;sn=946969566285d2023b3dc1e49721a03b&amp;chksm=843a13eeb34d9af8afed798ef742d937e07ee35b4a65182786a27d758cb45e488ab2505ec194&amp;mpshare=1&amp;scene=1&amp;srcid=1122XbVzsEaIA8HN8RIiUVxm#rd" target="_blank" rel="external">既然写 CSS 很容易，那为什么大家还是把 CSS 写的那么烂呢？</a></h3><p>Why CSS still sucks in 2016???</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="程序员提交代码的-emoji-指南"><a href="#程序员提交代码的-emoji-指南" class="headerlink" title="程序员提交代码的 emoji 指南"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963837&amp;idx=1&amp;sn=6417ad5d02622fb2b4f765170e95dfa7&amp;chksm=843a131bb34d9a0d5c05eac862140d1b6fb564705f429c04130e76665565219ec901b80b5dbf&amp;mpshare=1&amp;scene=1&amp;srcid=1119QJckFwjEboCtC0mGYyzK#rd" target="_blank" rel="external">程序员提交代码的 emoji 指南</a></h3><h3 id="谈谈主动工作"><a href="#谈谈主动工作" class="headerlink" title="谈谈主动工作"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651223990&amp;idx=1&amp;sn=bd8613aa2a6d088ff1b9dc290bccef3d&amp;chksm=bd49ae328a3e27249a2da8b06737be5f28df53edca946e041c17788c70763c35cb817bf465db&amp;mpshare=1&amp;scene=1&amp;srcid=1119aU3KMPedMEwelSDQZvJb#rd" target="_blank" rel="external">谈谈主动工作</a></h3><h3 id="各种编程语言都是什么星座？"><a href="#各种编程语言都是什么星座？" class="headerlink" title="各种编程语言都是什么星座？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963854&amp;idx=1&amp;sn=2ff451c6638da8be0dff5f3cbdc88a29&amp;chksm=843a13e8b34d9afe84d23accc9a75cdc31df611b80c7be6cba21b5f7c17d2f7c5572743ba4ea&amp;mpshare=1&amp;scene=1&amp;srcid=11248LjhWF3vScFZKDscmjWM#rd" target="_blank" rel="external">各种编程语言都是什么星座？</a></h3><h3 id="我们应该先学习哪种语言-ʇdiɹosavaɾ-ɹeʍsua"><a href="#我们应该先学习哪种语言-ʇdiɹosavaɾ-ɹeʍsua" class="headerlink" title="我们应该先学习哪种语言 ʇdıɹɔsɐʌɐɾ :ɹǝʍsuɐ"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963827&amp;idx=1&amp;sn=2a327830a340d5efdfbf43135b5f495d&amp;chksm=843a1315b34d9a031832b37e7c1a3d90a84631b0bcf7749e06f413c903cc4fa9f348ebaeba95&amp;mpshare=1&amp;scene=1&amp;srcid=1124xQOI9SRb5TGicdbsxS3L#rd" target="_blank" rel="external">我们应该先学习哪种语言 ʇdıɹɔsɐʌɐɾ :ɹǝʍsuɐ</a></h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;11.7-11.26，“宫城团回凛严光，白天碎碎堕琼芳”。&lt;br&gt;本周帝都迎来了入冬初雪：四季变换如若总让人猝不及防，那么技术更迭却总能够如约而至。&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;JS-5种不同的方法实现装饰者模式（译）&quot;&gt;&lt;a href=&quot;#JS-5种不同的方法实现装饰者模式（译）&quot; class=&quot;headerlink&quot; title=&quot;JS 5种不同的方法实现装饰者模式（译）&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/20743493?from=singlemessage&amp;amp;isappinstalled=0&quot;&gt;JS 5种不同的方法实现装饰者模式（译）&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;不错的一篇文章，为了自身乐趣和加强理解使用闭包、猴子补丁、原型、代理和中间件5种不同方式在 javascript 中实现装饰者模式。&lt;/p&gt;
+&lt;h3 id=&quot;2016-JavaScript-发展现状大调查&quot;&gt;&lt;a href=&quot;#2016-JavaScript-发展现状大调查&quot; class=&quot;headerlink&quot; title=&quot;2016 JavaScript 发展现状大调查&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;amp;mid=2651224014&amp;amp;idx=1&amp;amp;sn=25ee1479f8c00fda80afae6fa5413ef1&amp;amp;chksm=bd49ae4a8a3e275c2bd13d64983385748aa783321b98e2d98d2dda508127c90906903ea2ddb5&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1121ZEDSvG9GXWCr22ho8UGo#rd&quot;&gt;2016 JavaScript 发展现状大调查&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;一旦临近年底，各种总结，各种评选颁奖。那么作为有点“乱”的前端界，也不能少。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
     
   </entry>
   
@@ -1141,132 +1172,6 @@ export {Slider};
 &lt;li&gt;新技术&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;我之前写过一个经验详情页的改版分享——《&lt;a href=&quot;http://yanhaijing.com/program/2016/04/14/how-to-reconstruct-a-large-historical-project/&quot;&gt;如何重构一个大型历史项目——百度经验改版总结&lt;/a&gt;》，很多和上次一样的东西这次就没做分享，有兴趣的同学可以看下（移动端或开模拟器）。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="program" scheme="https://exp-team.github.io/categories/program/"/>
-    
-    
-      <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JavaScript事件章分享</title>
-    <link href="https://exp-team.github.io/blog/2016/09/04/program/event/"/>
-    <id>https://exp-team.github.io/blog/2016/09/04/program/event/</id>
-    <published>2016-09-03T16:00:00.000Z</published>
-    <updated>2017-01-13T08:09:51.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>最近做了一个启明星计划的分享，至于为什么叫启明星呢，这个得问我偶像，我们是一个造星平台，欢迎大家踊跃报名~</p>
-<p>本文是我整理的一些关于原生事件的东西。</p>
-<a id="more"></a>
-<h2 id="DOM事件流"><a href="#DOM事件流" class="headerlink" title="DOM事件流"></a>DOM事件流</h2><p>DOM事件流主要分为:事件捕获阶段-&gt;处于目标阶段-&gt;事件冒泡阶段，但是IE的事件流里没有捕获阶段。<br><img src="/bimg/b425.png" alt=""></p>
-<blockquote>
-<p>在一个事件完成了所有阶段的传播路径后，它的event.currentTarget会被设置为null并且event.eventPhase会被设为0。event的所有其他属性都不会改变（包括指向事件目标的Event.target属性）</p>
-</blockquote>
-<h2 id="事件处理程序"><a href="#事件处理程序" class="headerlink" title="事件处理程序"></a>事件处理程序</h2><p>事件处理程序主要分为以下三种：</p>
-<p><img src="/bimg/b426.png" alt=""></p>
-<p>ddEventListener是W3C工作组在DOM Level 2开始引入的一个注册事件监听器的方法；而在此之前，传统的事件监听方法是通过element[‘on’ + type]的方式来注册的。</p>
-<p>它们两之间的主要区别是，element[‘on’ + type]的方式无法使用事件捕获,attachEvent也不会支持捕获。</p>
-<p><strong>注：</strong>element[‘on’ + type]不支持对同一个元素的同一个事件注册多个事件监听器;<br>后面注册的事件处理程序会覆盖前面的事件处理事件程序。</p>
-<h3 id="原生事件对象："><a href="#原生事件对象：" class="headerlink" title="原生事件对象："></a>原生事件对象：</h3><p>window.event是IE支持的原生事件对象，event是其他浏览器是原生事件对象，这里列举的是事件对象的常用属性。</p>
-<p><img src="/bimg/b427.png" alt=""></p>
-<p>-&gt;其实在DOM中的事件对象也有bubbles和defaultPrevented属性可以赋值来表示冒泡和默认事件。</p>
-<h3 id="原生事件类型"><a href="#原生事件类型" class="headerlink" title="原生事件类型"></a>原生事件类型</h3><ul>
-<li>UI事件</li>
-<li>焦点事件</li>
-<li>鼠标事件</li>
-<li>滚动事件</li>
-<li>文本事件</li>
-<li>键盘事件</li>
-<li>HTML5事件</li>
-</ul>
-<h3 id="UI事件：用户与页面交互"><a href="#UI事件：用户与页面交互" class="headerlink" title="UI事件：用户与页面交互"></a>UI事件：用户与页面交互</h3><ul>
-<li>load：加载页面的时候触发</li>
-<li>unload：卸载页面的时候触发</li>
-<li>abort：加载被终止的时候被触发</li>
-<li>error：js错误、无法加载图像或者其他内容</li>
-<li>select：当用户选择文本框中的一个或者多个字符时触发</li>
-<li>resize：窗口或者框架的大小发生变化</li>
-<li>scroll：滚动带滚动条的元素</li>
-</ul>
-<p><strong>注：</strong>select在IE8之前不必释放鼠标就可以触发，resize在初始化页面的时候不会被触发。</p>
-<h3 id="焦点事件：获取或者失去焦点"><a href="#焦点事件：获取或者失去焦点" class="headerlink" title="焦点事件：获取或者失去焦点"></a>焦点事件：获取或者失去焦点</h3><ul>
-<li>blur：失去焦点</li>
-<li>focus：获得焦点</li>
-<li>focusin：与focus等价，冒泡</li>
-<li>focusout：与blur等价，冒泡</li>
-</ul>
-<p>Blur和focus在JavaScript早期就得到了所有浏览器的支持，后来IE出了focusout和focusin支持冒泡，Opera的DOMFocusout以及DOMFocusin也支持冒泡，但是后来DOM3采用了IE的作为标准，当页面从一个元素移动到另外一个页面的时候依次会触发：focusout-focusin-blur-focus，</p>
-<p>###鼠标和滚动事件：通过鼠标滚动发生</p>
-<ul>
-<li>click：单击</li>
-<li>dbclick ：双击</li>
-<li>mousedown：鼠标按下</li>
-<li>mouseup：鼠标释放</li>
-<li>mouseenter：首次移动到目标元素，并且在子元素上不会重复触发，不冒泡</li>
-<li>mouseleave：与mouseenter对应</li>
-<li>mousemove：当鼠标移动时触发</li>
-<li>mouseout：鼠标从一个元素移动到另一个元素时触发，这个可以是其子元素</li>
-<li>mouseover：与mouseout对应 </li>
-</ul>
-<p><strong>注：</strong>我们在执行双击操作的时候会经过mousedown-&gt;mouseup-&gt;click-&gt;mousedown-&gt;mouseup-&gt;dbclick，但是IE8之前会省略第二个mousedown；<br>鼠标事件event.button的值一共分为以下8个值：</p>
-<ul>
-<li>0：表示没有按下按钮</li>
-<li>1：按下了主鼠标</li>
-<li>2：按下次鼠标</li>
-<li>3：按下次鼠标</li>
-<li>4：同时按下主次鼠标</li>
-<li>5：主和中</li>
-<li>6：次和中</li>
-<li>7：三个键一起<br><strong>注：</strong>IE中7会返回0,6返回2,4返回1。</li>
-</ul>
-<p>这里主要区别以下mouseenter与mouseover的区别，来看一下以下这个图：</p>
-<p><img src="/bimg/b428.png" alt=""></p>
-<p>从这个图可以看到，当我们的鼠标从C元素移动到B元素的时候，会在B元素上触发mouseenter和mouseover，在C元素上触发mouseout和mouseleave，当鼠标从B元素移动到A元素上的时候，在B元素上会触发mouseout但是不会触发mouseleave，因为A元素是B元素的子元素。</p>
-<p>AB元素互为相对元素，BC互为相对元素，在IE中相对元素是保存在FromElement，和toElement属性中，其他浏览器则保存在relateTarget。</p>
-<h3 id="滚动鼠标事件"><a href="#滚动鼠标事件" class="headerlink" title="滚动鼠标事件"></a>滚动鼠标事件</h3><p><img src="/bimg/b429.png" alt=""></p>
-<p><strong>注：</strong>正常的值应该是120的倍数，Opera的wheelDelta的值的正负号是颠倒的，Firefox的detail值是3的倍数</p>
-<p>###键盘与文本事件：在文档中输入文本以及通过键盘在<br>页面上执行操作时</p>
-<ul>
-<li>keydown：键盘任意键按下</li>
-<li>keyup：键盘任意键释放</li>
-<li>keypress：按住键盘任意键不放会重复触发</li>
-<li>textInput：在文本插入文本框之前触发</li>
-<li>even.keyCode:键码，发生在keydown和keyup事件</li>
-<li>Event.charcode:字符编码，发生在keypress事件</li>
-<li>DOM3：key || keyIdentifier / char</li>
-</ul>
-<p>前三个事件所有浏览器都支持，textInput是对keypress的补充，用意在于将文本显示给用户之前更容易拦截文本，按下键盘时能影响到文本的显示的时候会触发keypress，<br>如果用户按下了一个非字符的键，则会一直触发keydown，不会触发keypress。<br>键盘每个键都对应一个keyCode，DOM3在字符键按下的时候key和char一样，在非字符键按下char返回null。</p>
-<h3 id="HTML5事件："><a href="#HTML5事件：" class="headerlink" title="HTML5事件："></a>HTML5事件：</h3><ul>
-<li>contextmenu：可以取消默认的上下文菜单</li>
-<li>beforeunload：在页面被卸载前触发</li>
-<li>DOMcontentLoaded：在形成完整的dom树之后就会触发</li>
-<li>readystatechange：提供文档或者元素的加载状态</li>
-<li>Pageshow:页面被打开时触发（document上触发）</li>
-<li>Pagehide：在浏览器卸载时触发，在unload之前</li>
-<li>Hashchange:url的参数列表发生变化时触发</li>
-</ul>
-<p><strong>注：</strong>每个窗口都会保存着用户的浏览记录，包括页面的DOM和js的状态，如果不关闭窗口我们都可以在左上角那里来返回或者前进历史的浏览记录，如果页面来至于bfcache，不会触发load事件，但是会触发Pageshow和Pagehide</p>
-<h3 id="jquery的事件绑定"><a href="#jquery的事件绑定" class="headerlink" title="jquery的事件绑定"></a>jquery的事件绑定</h3><ul>
-<li>bind()  不能给创建的元素添加事件</li>
-<li>delegate() 通过事件委托加在祖先元素上</li>
-<li>live() 通过事件委托加在document上，比较消耗性能</li>
-<li>on() bind和delegate函数最终都是调用了on函数，只是改变了传参方式，让其更语义化一点</li>
-</ul>
-<h3 id="jquery-on所做的事情"><a href="#jquery-on所做的事情" class="headerlink" title="jquery.on所做的事情"></a>jquery.on所做的事情</h3><ul>
-<li>兼容地实现了addEventListener的全部功能，包括多事件绑定事件函数按绑定顺序执行</li>
-<li>动态事件绑定</li>
-<li>自定义事件，自定义事件还能冒泡</li>
-<li>事件函数分组，方便事件函数解绑</li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;最近做了一个启明星计划的分享，至于为什么叫启明星呢，这个得问我偶像，我们是一个造星平台，欢迎大家踊跃报名~&lt;/p&gt;
-&lt;p&gt;本文是我整理的一些关于原生事件的东西。&lt;/p&gt;
     
     </summary>
     
