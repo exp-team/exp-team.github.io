@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://exp-team.github.io/"/>
-  <updated>2017-01-13T10:11:31.000Z</updated>
+  <updated>2017-01-13T10:19:58.000Z</updated>
   <id>https://exp-team.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://exp-team.github.io/blog/2017/01/12/program/babel-class/"/>
     <id>https://exp-team.github.io/blog/2017/01/12/program/babel-class/</id>
     <published>2017-01-11T16:00:00.000Z</published>
-    <updated>2017-01-13T10:11:31.000Z</updated>
+    <updated>2017-01-13T10:19:58.000Z</updated>
     
     <content type="html"><![CDATA[<p>2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？</p>
 <p>这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以<a href="https://babeljs.io/repl/" target="_blank" rel="external">在线测试编译结果</a>，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。</p>
@@ -81,7 +81,7 @@ julien.fn(); //Uncaught TypeError: julien.fn is not a function
 var Person = function Person() {
     _classCallCheck(this, Person);
 };
-</code></pre><p>你可能会一头雾水,_classCallCheck是什么？其实很简单，它是为了保证调用的安全性。<br>比如我们这用调用</p>
+</code></pre><p>你可能会一头雾水,_classCallCheck是什么？其实很简单，它是为了保证调用的安全性。<br>比如我们这么调用：</p>
 <pre><code>// ok
 new p = new Person();
 </code></pre><p>是没有问题的，但是直接调用：</p>
@@ -89,7 +89,7 @@ new p = new Person();
 Person();
 </code></pre><p>就会报错，这就是_classCallCheck所起的作用。具体原理自己看代码就好了，很好理解。</p>
 <p>我们发现，Class关键字会被编译成构造函数，于是我们便可以通过new来实现实例的生成。</p>
-<p>Step2：Constructor探秘<br>我们这次尝试加入constructor,再来看看编译结果</p>
+<p>Step2：Constructor探秘<br>我们这次尝试加入constructor,再来看看编译结果：</p>
 <pre><code>class Person() {
     constructor(name) {  
         this.name = name;
