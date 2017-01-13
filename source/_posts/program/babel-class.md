@@ -92,7 +92,7 @@ Step1: 定义
     };
 
 你可能会一头雾水,_classCallCheck是什么？其实很简单，它是为了保证调用的安全性。
-比如我们这用调用
+比如我们这么调用：
 
     // ok
     new p = new Person();
@@ -108,7 +108,7 @@ Step1: 定义
 我们发现，Class关键字会被编译成构造函数，于是我们便可以通过new来实现实例的生成。
 
 Step2：Constructor探秘
-我们这次尝试加入constructor,再来看看编译结果
+我们这次尝试加入constructor,再来看看编译结果：
 
     class Person() {
         constructor(name) {  
