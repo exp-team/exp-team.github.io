@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>js原生事件总结 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="最近把自己学习js原生事件的学习总结了一下，可供大家参考一下下，哪里有不对的地方还请大家指正哦~">
+<meta property="og:type" content="article">
+<meta property="og:title" content="js原生事件总结">
+<meta property="og:url" content="https://exp-team.github.io/blog/2016/08/21/js/event/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="最近把自己学习js原生事件的学习总结了一下，可供大家参考一下下，哪里有不对的地方还请大家指正哦~">
+<meta property="og:image" content="https://exp-team.github.io/bimg/b2.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/b3.png">
+<meta property="og:updated_time" content="2017-01-13T08:09:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="js原生事件总结">
+<meta name="twitter:description" content="最近把自己学习js原生事件的学习总结了一下，可供大家参考一下下，哪里有不对的地方还请大家指正哦~">
+<meta name="twitter:image" content="https://exp-team.github.io/bimg/b2.png">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/event" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2016/08/21/js/event/" class="article-date">
+  <time datetime="2016-08-20T16:00:00.000Z" itemprop="datePublished">2016-08-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      js原生事件总结
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近把自己学习js原生事件的学习总结了一下，可供大家参考一下下，哪里有不对的地方还请大家指正哦~</p>
+<a id="more"></a>
+<p>事件的第一个概念就是事件流，所谓的事件流就是页面接受事件的顺序。IE的事件流叫冒泡事件，Netscape Communicator提出了另一个事件流叫事件捕获，一下两张图就能很直观的理解这两种事件流<br>冒泡：</p>
+<p><img src="/bimg/b2.png" alt=""></p>
+<p>捕获：</p>
+<p><img src="/bimg/b3.png" alt=""></p>
+<p>所有的浏览器都支持冒泡，但是具体实现还是有一些差别，有的会跳过<html>直接从body到文档，有的是会冒泡到window对象</html></p>
+<p>事件捕获呢是不太具体的节点应该更早的接收到事件，而最具体的节点应该最后接受到事件，事件的捕获在于事件达到预期目标之前捕获它。</p>
+<p>事件流包括三个阶段：事件捕获阶段，处于目标阶段，和冒泡阶段，<br>target在事件流的目标阶段；currentTarget在事件流的捕获，目标及冒泡阶段。只有当事件流处在目标阶段的时候，两个的指向才是一样的， 而当处于捕获和冒泡阶段的时候，target指向被单击的对象而currentTarget指向当前事件活动的对象（一般为父级）。这里不知道大家有没有理解，简单来说，就是一个点击事件会先从document一级一级的往下响应，此过程会经过目标元素的父元素、祖先元素，这个currentTarget就是事件流被某个dom响应时的那个标签元素，而target仅指的是目标元素。</p>
+<p>原生的事件绑定是这样的：btn.addEventListener(“click”,function(event){}, false);<br>IE浏览器提供的是btn.attachEvent(“click”,function(event){}, false)<br>相应的移除事件绑定这是removeEventListener和detachEvent<br>true:表示捕获阶段调用事件处理程序；<br>false表示冒泡阶段调用事件处理程序。<br>大多数情况下我们将事件处理程序添加到事件流的冒泡阶段，这样可以最大限度的兼容各个浏览器，每个事件都有一个event对象，IE下则是window.event这个对象里面包含了很多关于这个事件的对象，例如target、type等等，这里我就不一一列举了，其中常用的是preventDefault()以及stopPropagation()两个函数，前者则是取消事件的默认行为，后者即是取消事件的进一步取消或者冒泡；<br>event对象包含的eventPhase的值：1,2,3分别代表事件处于捕获、目标和冒泡阶段的<br>相关元素。</p>
+<p>UI事件：<br>load, unload,abord,error,select,resize,scroll，事件的具体触发条件我就不一一解释了，顾名思义，看事件名就可以知道，嘿嘿~<br>检测是否支持DOM3级事件：document.implementation.hasFeature(‘UIEvent’, “3.0”);</p>
+<p>焦点事件：<br>blur、DOMfocusOut、focusout是事件目标是失去焦点的元素<br>focus、DOMfocusIn、focusin是事件获取到焦点的元素</p>
+<p>鼠标与滚动事件：<br>DOM3事件级定义了9个鼠标事件：click，dbclick,mousedown，mouseenter、mouseleave、mousemove、mouseout、mouseover、mouseup<br>其中mouseout与mouseleave都是鼠标离开元素时触发，但是mouseout是将鼠标还在元素内只是移动到他的子元素都会触发，然而mouseleave只要鼠标还在元素范围内就不会再次触发，不管鼠标在该元素的哪个子元素上，其中mouseover与mouseout对应，mouseleave与mouseenter对应；<br>只有mouseover和mouseout事件，会获取相关元素，（非IE浏览器：eventTarget  IE：fromElement）所谓相关元素是鼠标从A区域移动到B区域，则A是B的相对元素，B是A的相对元素。</p>
+<p>鼠标按钮：<br>event对象存在一个button的属性，用来判断用户是按下了左键还是右键还是中间建或者其中的组合。</p>
+<p>鼠标滚动事件：<br>mousewheel，即当用户通过鼠标滚轮与页面交互的时候会触发，最终会冒泡到document或者window上，它包含的event对象包含鼠标事件的所有标准信息外，还包含一个特殊的wheelData属性，wheelDelta是120的倍数，向前滚动是120x，向后滚动是-120x</p>
+<p>键盘事件：<br>1、keydown：用户按下键盘上的任意键时候出发，而且如果按住不放的话就会一直触发，会重复触发这个事件，<br>2、keypress：当用户按下键盘上的字符键时触发，<br>3、keyup：用户释放键盘上的键时触发<br>4、textInput:是keypress的补充，在文本显示给用户之前更容易拦截文本，在文本插入文本框之前会触发该事件，该event对象包含一个data属性，这个属性是值就是用户输入的字符，event对象的inputMethod属性会判断用户输入到文本框的方式，一共有0~7个值，其中常用的就是0和1；<br>0：表示浏览器不知道怎么输入的，<br>1：表示用户使用键盘输入的，2表示用户是粘贴进来的<br>keyCode的值可以用来表示键盘值，DOM3之后就不再包含charCode了，新增key和char，兼容：keyIdentifier</p>
+<p>变动事件：DOM2级的变动事件能再DOM中的某一部分发生变化时触发。<br>包括：DOMSubtreeModified、DomNodeInserted、DomNodeRemove、DomNodeInsertIntoDocument等。<br>1、删除节点：removeChild，replaceChild，目标事件：event.target（被删除的节点）；event.relateNode(相关节点)会触发DOMNodeRemoved事件，会冒泡<br>2、插入节点：appendChild、repalceChild、insertBefore</p>
+<p>HTML5事件：<br>1、contextmenu事件<br>冒泡，这个事件的目标是发生用户操作的元素。通常使用contextmenu事件来显示自定义的上下文菜单，而使用onclick事件处理程序来隐藏该菜单，<br>2、beforeunloaded事件<br>为了让开发人员有可能在页面卸载前阻止这一操作。<br>3、DOMContent事件<br>在window的load事件会在页面中的一切都加载完毕时候触发，但是这个事件在形成DOM树的时候就会触发，这个事件会冒泡到window但它的目标实际上是document，它不会提供任何额外的信息（其target属性是document）。<br>4、pageShow、pagehide(Firefox,Opera)<br>pageShow会在load事件触发后触发，当页面离开并且点击返回时候，返回到上一个页面的时候会触发，event事件的persisted为true的时候页面会保存在bfchache中，<br>pagehide事件，该事件会在浏览器卸载的时候触发，会在unload事件之前触发，和pageShow一样在document上触发，<br>5、haschange事件<br>当URL的参数列表发生变化的时候触发，（#后面的所有字符）</p>
+<p>设备事件<br>1、orientationchange事件<br>Safari浏览器，用户是否横屏<br>window.orientation属性包含三个值，0表示肖像模式，90表示向左旋转的横向模式，-90表示向右旋转的横向模式。<br>2、MozOrientation事件<br>Fiefox为检测设备的方向引入一个名为MozOrientation的新事件。<br>3、deviceorientation事件，<br>它是在加速计检测到设备方向变化时在window上触发的，该事件是告诉开发人员设备在空间中朝向哪儿，而不是如何移动，设备的三维空间是靠X,Y,Z轴来定位的。<br>4、devicemotion事件<br>告诉开发人员设备怎么时候移动而不仅仅是设备方向如何改变。例如：是不是手机正在往下掉，或者是不是被人拿在行走的人的手里。<br>触摸与手势事件</p>
+<p>触摸事件<br>touchstart：当手指触摸屏幕时触发，即使已经有一个手指放在屏幕上也会触发<br>touchmove：当手指在屏幕上滑动时连续的触发，在这个事件的发生期间，调用preventDefault（）可以组织滚动，<br>touchend：当手指从屏幕移开的时候会触发<br>touchcancel：当系统停止跟踪触摸时触发。<br>除了常见的DOM属性外，触摸事件还包含下列三个用于跟踪触摸的属性<br>touchs：表示当前跟踪的触摸操作Touch对象的数组<br>targetTouchs:特定于事件目标Touch对象的数组。<br>changeTouches:表示自上次触摸以来发生了什么改变的Touch对象的数组<br>每个Touch对象包含以下属性：<br>clientX:触摸目标在市口的X坐标<br>clientY:触摸目标在市口中的Y坐标<br>identifier:表示触摸的唯一ID<br>pageX:触摸目标在页面中的X坐标<br>pageY：触摸目标在页面中的y坐标<br>screenX:触摸目标在屏幕中的x坐标<br>screenY:触摸目标在屏幕中的y目标<br>target:触摸的DOM节点目标<br>手势事件<br>当两个手指头触摸屏幕时就会产生手势。有三个手势事件：<br>gesturestart：当一个手指头已经按在屏幕上，而另一个手指又触摸屏幕的时候触发。<br>gesturechange：当触摸屏幕的任何一个手指头的位置发生变化时触发<br>gestureend：当任何一个手指从屏幕上面移开时触发<br>只有两个手指头都触摸到事件的接受容器时才会触发这些事件。<br>比触摸事件多了两个属性：<br>rotation：手指变化引起的旋转角度。<br>scale：表示两个手指间距离的变化情况。这个值从1开始并且随着距离的拉大而增长，随着距离的缩小而缩小<br>内存和性能</p>
+<p>事件委托<br>对事件处理程序过多问题的解决方案就是事件委托。事件委托利用了事件冒泡，只指定一个事件处理程序，就可以管理某一类型的所有事件。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2016/08/21/js/event/" data-id="cixvlr6fs002la9wgp498qkhd" class="article-share-link">Share</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2016/08/21/js/event/" data-title="js原生事件总结" data-url="https://exp-team.github.io/blog/2016/08/21/js/event/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2016/08/27/weekly/weekly-100/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          expfe技术周刊第100期
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2016/08/21/linux/how-to-install-linux-on-vm/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">手把手教你在虚拟机里安装linux</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/program/" style="font-size: 16.67px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/tool/" style="font-size: 13.33px;">tool</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/01/12/program/babel-class/">揭秘babel的魔法之class魔法处理</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/31/weekly/weekly-10010/">expfe技术周刊第10010期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/24/weekly/weekly-10001/">expfe技术周刊第10001期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/17/weekly/weekly-10000/">expfe技术周刊第10000期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/10/weekly/weekly-1111/">expfe技术周刊第1111期</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>揭秘babel的魔法之class魔法处理 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？
+这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以在线测试编译结果，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。
+另外，这篇文章">
+<meta property="og:type" content="article">
+<meta property="og:title" content="揭秘babel的魔法之class魔法处理">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/01/12/program/babel-class/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？
+这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以在线测试编译结果，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。
+另外，这篇文章">
+<meta property="og:updated_time" content="2017-01-13T09:19:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="揭秘babel的魔法之class魔法处理">
+<meta name="twitter:description" content="2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？
+这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以在线测试编译结果，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。
+另外，这篇文章">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-program/babel-class" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/01/12/program/babel-class/" class="article-date">
+  <time datetime="2017-01-11T16:00:00.000Z" itemprop="datePublished">2017-01-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/program/">program</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      揭秘babel的魔法之class魔法处理
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？</p>
+<p>这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以<a href="https://babeljs.io/repl/" target="_blank" rel="external">在线测试编译结果</a>，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。</p>
+<p>另外，这篇文章并不适合初学者阅读。如果你还不明白JS中原型链等OOP相关知识，建议出门左转找到经典的《JS高级程序设计<br>》来补课；如果你对JS中，通过原型链来实现继承一直云里雾里，安利一下<a href="http://yanhaijing.com/javascript/2014/11/09/object-inherit-of-js/" target="_blank" rel="external">颜海镜大大的文章</a></p>
+<a id="more"></a>
+<h2 id="为什么使用选择Babel"><a href="#为什么使用选择Babel" class="headerlink" title="为什么使用选择Babel"></a>为什么使用选择Babel</h2><p>我们知道，现在大部分浏览器或者类似NodeJS的javascript引擎还不能直接支持Babel。但这并不是障碍，比如Babel的出现，使得在生产环境中书写ES6代码成为了现实，它工作原理是编译ES6的新特性为老版本的ES5，从而得到宿主环境的支持。</p>
+<h2 id="Class例子"><a href="#Class例子" class="headerlink" title="Class例子"></a>Class例子</h2><p>在这篇文章中，我会讲解Babel如何处理ES6新特性：Class，这其实是一系列语法糖的实现。</p>
+<h3 id="Old-school方式实现继承"><a href="#Old-school方式实现继承" class="headerlink" title="Old school方式实现继承"></a>Old school方式实现继承</h3><p>在探究ES6之前，我们先来回顾一下ES5环境下，我们如何实现类的继承：</p>
+<pre><code>// Person是一个构造器
+function Person(name) {
+    this.type = &apos;Person&apos;;
+    this.name = name;
+}
+
+// 我们可以通过prototype的方式来加一条实例方法
+Person.prototype.hello = function() {
+    console.log(&apos;hello &apos; + this.name);
+}
+
+// 对于私有属性(Static method)，我们当然不能放在原型链上了。我们可以直接放在构造函数上面
+Person.fn = function() {
+    console.log(&apos;static&apos;);
+};
+</code></pre><p>我们可以这么应用：</p>
+<pre><code>var julien = new Person(&apos;julien&apos;);
+var darul = new Person(&apos;darul&apos;);
+julien.hello(); // &apos;hello julien&apos;
+darul.hello(); // &apos;hello darul&apos;
+Person.fn(); // &apos;static&apos;
+
+// 这样会报错，因为fn是一个私有属性
+julien.fn(); //Uncaught TypeError: julien.fn is not a function
+</code></pre><h3 id="New-school方式-ES6-实现继承"><a href="#New-school方式-ES6-实现继承" class="headerlink" title="New school方式(ES6)实现继承"></a>New school方式(ES6)实现继承</h3><p>在ES6环境下，我们当然迫不及待地试一试Class</p>
+<pre><code>class Person {
+    constructor(name) {
+        this.name = name;
+        this.type=&quot;person&quot;
+    }
+    hello() {
+        console.log(&apos;hello &apos; + this.name);
+    }
+    static fn() {
+        console.log(&apos;static&apos;);
+    };
+}
+</code></pre><p>这样写起来当然很cool，但是经过Babel编译，我们的代码是什么样呢？</p>
+<h3 id="Babel-transformation"><a href="#Babel-transformation" class="headerlink" title="Babel transformation"></a>Babel transformation</h3><p>我们一步一步来看，</p>
+<p>Step1: 定义<br>我们从最简单开始，试试不加任何方法和属性的情况下，</p>
+<pre><code>Class Person{}
+</code></pre><p>被编译为：</p>
+<pre><code>function _classCallCheck(instance, Constructor) {
+    // 检查是否成功创建了一个对象
+    if (!(instance instanceof Constructor)) {  
+        throw new TypeError(&quot;Cannot call a class as a function&quot;); 
+    } 
+}
+
+var Person = function Person() {
+    _classCallCheck(this, Person);
+};
+</code></pre><p>你可能会一头雾水,_classCallCheck是什么？其实很简单，它是为了保证调用的安全性。<br>比如我们这用调用</p>
+<pre><code>// ok
+new p = new Person();
+</code></pre><p>是没有问题的，但是直接调用：</p>
+<pre><code>// Uncaught TypeError: Cannot call a class as a function
+Person();
+</code></pre><p>就会报错，这就是_classCallCheck所起的作用。具体原理自己看代码就好了，很好理解。</p>
+<p>我们发现，Class关键字会被编译成构造函数，于是我们便可以通过new来实现实例的生成。</p>
+<p>Step2：Constructor探秘<br>我们这次尝试加入constructor,再来看看编译结果</p>
+<pre><code>class Person() {
+    constructor(name) {  
+        this.name = name;
+        this.type = &apos;person&apos;
+    }
+}
+</code></pre><p>编译结果：</p>
+<pre><code>var Person = function Person(name) {
+    _classCallCheck(this, Person);
+    this.type = &apos;person&apos;;
+    this.name = name;
+};
+</code></pre><p>看上去棒极了，我们继续探索。</p>
+<p>Step3：增加方法<br>我们尝试给Person类添加一个方法：hello</p>
+<pre><code>class Person {
+    constructor(name) {
+        this.name = name;
+        this.type = &apos;person&apos;
+    }
+
+    hello() {
+        console.log(&apos;hello &apos; + this.name);
+    }
+}
+</code></pre><p>编译结果(已做适当省略)：</p>
+<pre><code>// 如上，已经解释过
+function _classCallCheck.... 
+
+// MAIN FUNCTION
+var _createClass = (function () { 
+    function defineProperties(target, props) { 
+        for (var i = 0; i &lt; props.length; i++) { 
+            var descriptor = props[i]; 
+            descriptor.enumerable = descriptor.enumerable || false; 
+            descriptor.configurable = true; 
+            if (&apos;value&apos; in descriptor) 
+            descriptor.writable = true; 
+            Object.defineProperty(target, descriptor.key, descriptor); 
+        } 
+    } 
+    return function (Constructor, protoProps, staticProps) { 
+        if (protoProps) 
+            defineProperties(Constructor.prototype, protoProps); 
+        if (staticProps) 
+            defineProperties(Constructor, staticProps); 
+        return Constructor; 
+    }; 
+})();
+
+var Person = (function () {
+    function Person(name) {
+        _classCallCheck(this, Person);
+
+        this.name = name;
+    }
+
+    _createClass(Person, [{
+        key: &apos;hello&apos;,
+        value: function hello() {
+            console.log(&apos;hello &apos; + this.name);
+        }
+    }]);
+
+    return Person;
+})();
+</code></pre><p>Oh…no,看上去有很多需要消化!不要急，我尝试先把他精简一下，并加上注释，你就会明白核心思路：</p>
+<pre><code>var _createClass = (function () {   
+    function defineProperties(target, props) { 
+        // 对于每一个定义的属性props，都要完全拷贝它的descriptor,并扩展到target上
+    }  
+    return defineProperties(Constructor.prototype, protoProps);    
+})();
+
+var Person = (function () {
+    function Person(name) { // 同之前... }
+
+    _createClass(Person, [{
+        key: &apos;hello&apos;,
+        value: function hello() {
+            console.log(&apos;hello &apos; + this.name);
+        }
+    }]);
+
+    return Person;
+})();
+</code></pre><p>如果你不明白defineProperty方法, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty" target="_blank" rel="external">请参考这里</a></p>
+<p>现在，我们知道我们添加的方法</p>
+<pre><code>hello() {
+    console.log(&apos;hello &apos; + this.name);
+}
+</code></pre><p>被编译为：</p>
+<pre><code>_createClass(
+    Person, [{
+    key: &apos;hello&apos;,
+    value: function hello() {
+        console.log(&apos;hello &apos; + this.name);
+    }
+}]);
+</code></pre><p>而_createClass接受2个－3个参数，分别表示：</p>
+<pre><code>参数1 =&gt; 我们要扩展属性的目标对象，这里其实就是我们的Person
+参数2 =&gt; 需要在目标对象原型链上添加的属性，这是一个数组
+参数3 =&gt; 需要在目标对象上添加的属性，这是一个数组
+</code></pre><p>这样，Babel的魔法就一步一步被揭穿了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>希望这篇文章能够让你了解到Babel是如何初步把我们ES6 Class语法编译成ES5的。下一篇文章我会继续介绍Babel出和处理Super(), 并会通过一段函数桥梁，使得ES5环境下也能够继承ES6定义的Class</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/01/12/program/babel-class/" data-id="cixvlr6d0000ga9wgz5lyp9b7" class="article-share-link">Share</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/01/12/program/babel-class/" data-title="揭秘babel的魔法之class魔法处理" data-url="https://exp-team.github.io/blog/2017/01/12/program/babel-class/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/program/">program</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/blog/2016/12/31/weekly/weekly-10010/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">expfe技术周刊第10010期</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/program/" style="font-size: 16.67px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/tool/" style="font-size: 13.33px;">tool</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/01/12/program/babel-class/">揭秘babel的魔法之class魔法处理</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/31/weekly/weekly-10010/">expfe技术周刊第10010期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/24/weekly/weekly-10001/">expfe技术周刊第10001期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/17/weekly/weekly-10000/">expfe技术周刊第10000期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/10/weekly/weekly-1111/">expfe技术周刊第1111期</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

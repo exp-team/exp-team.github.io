@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>调研webp图片格式 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="最近在调研为经验引入webp的可能性，下面总结一下最近的调研成果。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="调研webp图片格式">
+<meta property="og:url" content="https://exp-team.github.io/blog/2016/10/19/web/study-webp/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="最近在调研为经验引入webp的可能性，下面总结一下最近的调研成果。">
+<meta property="og:image" content="https://exp-team.github.io/bimg/443.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/445.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/444.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/446.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/447.png">
+<meta property="og:updated_time" content="2017-01-13T08:09:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="调研webp图片格式">
+<meta name="twitter:description" content="最近在调研为经验引入webp的可能性，下面总结一下最近的调研成果。">
+<meta name="twitter:image" content="https://exp-team.github.io/bimg/443.png">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-web/study-webp" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2016/10/19/web/study-webp/" class="article-date">
+  <time datetime="2016-10-18T16:00:00.000Z" itemprop="datePublished">2016-10-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/web/">web</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      调研webp图片格式
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近在调研为经验引入webp的可能性，下面总结一下最近的调研成果。</p>
+<a id="more"></a>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>webp是谷歌在2010年开源的一种新的图片格式，目前在谷歌浏览器（9+）和安卓（4.0+）里面都有很好的兼容性。</p>
+<p>根据谷歌官方给出的数据，无损压缩webp图片比png图片小26%，有损压缩的webp可以比jpeg小25-34%，下面测试案例中有具体的demo，大家可以亲眼查看效果。</p>
+<p>鉴于webp的优点，推荐引入webp格式。</p>
+<p><strong>注意：webp格式会增加解码时间，是png的4-5倍（毫秒级）</strong></p>
+<p>谷歌官方给了几种向后兼容使用webp的方案：</p>
+<ul>
+<li>服务器端检测</li>
+<li>js监测</li>
+<li>html5 picture</li>
+</ul>
+<h2 id="PC端方案"><a href="#PC端方案" class="headerlink" title="PC端方案"></a>PC端方案</h2><p>通过<a href="http://caniuse.com/#search=webp" target="_blank" rel="external">caniuse</a>，我们可以看到opera(11+)和chrome(9+)支持webp格式，但其他浏览器几乎全军覆没。</p>
+<p><img src="/bimg/443.png" alt=""></p>
+<p>通过百度流量研究院给出的<a href="http://tongji.baidu.com/data/browser" target="_blank" rel="external">浏览器数据</a>看，chrome占比非常高，你应该根据自己网站的流量统计作出具体决定。</p>
+<p><img src="/bimg/445.png" alt=""></p>
+<p>pc端建议的方案是html5的<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/picture" target="_blank" rel="external">picture</a>，<a href="http://caniuse.com/#search=picture" target="_blank" rel="external">caniuse</a>显示picture和webp兼容性（在chrome上）几乎是一样的。</p>
+<p><img src="/bimg/444.png" alt=""></p>
+<p>一个picture的简单demo如下：</p>
+<pre><code>&lt;picture&gt;
+    &lt;source srcset=&quot;xxx.webp&quot; type=&quot;image/webp&quot;&gt;
+    &lt;img src=&quot;xxx.png&quot; alt=&quot;test&quot;&gt;
+&lt;/picture&gt;
+</code></pre><h2 id="移动端方案"><a href="#移动端方案" class="headerlink" title="移动端方案"></a>移动端方案</h2><p>webp在安卓上的兼容性非常好，但ios完全不支持，<a href="http://caniuse.com/#search=webp" target="_blank" rel="external">caniuse</a>显示兼容安卓4.0以上版本</p>
+<p><img src="/bimg/446.png" alt=""></p>
+<p>通过百度统计出来的流量看，移动端安卓占比为70%+，你应该根据自己网站的流量统计作出具体决定。</p>
+<p><img src="/bimg/447.png" alt=""></p>
+<p>由于picture在移动端兼容性不好，所以这种方案不太可取，可以采用js监测方案，js方案要求图片必须是异步加载，下面是谷歌官方给出的代码示例</p>
+<pre><code>// check_webp_feature:
+//   &apos;feature&apos; can be one of &apos;lossy&apos;, &apos;lossless&apos;, &apos;alpha&apos; or &apos;animation&apos;.
+//   &apos;callback(feature, result)&apos; will be passed back the detection result (in an asynchronous way!)
+function check_webp_feature(feature, callback) {
+    var kTestImages = {
+        lossy: &quot;UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA&quot;,
+        lossless: &quot;UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==&quot;,
+        alpha: &quot;UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAARBxAR/Q9ERP8DAABWUDggGAAAABQBAJ0BKgEAAQAAAP4AAA3AAP7mtQAAAA==&quot;,
+        animation: &quot;UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA&quot;
+    };
+    var img = new Image();
+    img.onload = function () {
+        var result = (img.width &gt; 0) &amp;&amp; (img.height &gt; 0);
+        callback(feature, result);
+    };
+    img.onerror = function () {
+        callback(feature, false);
+    };
+    img.src = &quot;data:image/webp;base64,&quot; + kTestImages[feature];
+}
+</code></pre><p>目前是基于回调，可以封装成promise。</p>
+<h2 id="相关工具"><a href="#相关工具" class="headerlink" title="相关工具"></a>相关工具</h2><ul>
+<li><a href="https://isparta.github.io/" target="_blank" rel="external">iSparta 图片压缩与格式转换工具</a></li>
+<li><a href="http://zhitu.isux.us/" target="_blank" rel="external">智图 高效优质的图片优化平台</a></li>
+</ul>
+<h2 id="测试案例"><a href="#测试案例" class="headerlink" title="测试案例"></a>测试案例</h2><ul>
+<li><a href="https://developers.google.com/speed/webp/gallery" target="_blank" rel="external">官方demo</a></li>
+<li><a href="https://isparta.github.io/compare-webp/index.html#12345" target="_blank" rel="external">isparta静态图片</a></li>
+<li><a href="https://isparta.github.io/compare-webp/index_a.html#12" target="_blank" rel="external">isparta动图</a></li>
+</ul>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a href="https://developers.google.com/speed/webp/" target="_blank" rel="external">webp官网</a></li>
+<li><a href="https://isux.tencent.com/introduction-of-webp.html" target="_blank" rel="external">WebP 探寻之路</a></li>
+<li><a href="http://zhitu.isux.us/index.php/preview/webp" target="_blank" rel="external">WebP使用方案</a>   </li>
+</ul>
+<p>原文地址：<a href="http://yanhaijing.com/web/2016/10/19/study-webp/" target="_blank" rel="external">http://yanhaijing.com/web/2016/10/19/study-webp/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2016/10/19/web/study-webp/" data-id="cixvlr6d8000na9wg1pweub4w" class="article-share-link">Share</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2016/10/19/web/study-webp/" data-title="调研webp图片格式" data-url="https://exp-team.github.io/blog/2016/10/19/web/study-webp/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/web/">web</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2016/10/22/weekly/weekly-1001/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          expfe技术周刊第1001期
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2016/10/13/weekly/weekly-1000/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">expfe技术周刊第1000期</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/program/" style="font-size: 16.67px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/tool/" style="font-size: 13.33px;">tool</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/01/12/program/babel-class/">揭秘babel的魔法之class魔法处理</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/31/weekly/weekly-10010/">expfe技术周刊第10010期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/24/weekly/weekly-10001/">expfe技术周刊第10001期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/17/weekly/weekly-10000/">expfe技术周刊第10000期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/10/weekly/weekly-1111/">expfe技术周刊第1111期</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

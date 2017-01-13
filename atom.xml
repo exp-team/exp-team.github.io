@@ -1,0 +1,1427 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>exp team</title>
+  <subtitle>together, stronger</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://exp-team.github.io/"/>
+  <updated>2017-01-13T09:19:51.000Z</updated>
+  <id>https://exp-team.github.io/</id>
+  
+  <author>
+    <name>exp developer</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>揭秘babel的魔法之class魔法处理</title>
+    <link href="https://exp-team.github.io/blog/2017/01/12/program/babel-class/"/>
+    <id>https://exp-team.github.io/blog/2017/01/12/program/babel-class/</id>
+    <published>2017-01-11T16:00:00.000Z</published>
+    <updated>2017-01-13T09:19:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？</p>
+<p>这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以<a href="https://babeljs.io/repl/" target="_blank" rel="external">在线测试编译结果</a>，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。</p>
+<p>另外，这篇文章并不适合初学者阅读。如果你还不明白JS中原型链等OOP相关知识，建议出门左转找到经典的《JS高级程序设计<br>》来补课；如果你对JS中，通过原型链来实现继承一直云里雾里，安利一下<a href="http://yanhaijing.com/javascript/2014/11/09/object-inherit-of-js/" target="_blank" rel="external">颜海镜大大的文章</a></p>
+<a id="more"></a>
+<h2 id="为什么使用选择Babel"><a href="#为什么使用选择Babel" class="headerlink" title="为什么使用选择Babel"></a>为什么使用选择Babel</h2><p>我们知道，现在大部分浏览器或者类似NodeJS的javascript引擎还不能直接支持Babel。但这并不是障碍，比如Babel的出现，使得在生产环境中书写ES6代码成为了现实，它工作原理是编译ES6的新特性为老版本的ES5，从而得到宿主环境的支持。</p>
+<h2 id="Class例子"><a href="#Class例子" class="headerlink" title="Class例子"></a>Class例子</h2><p>在这篇文章中，我会讲解Babel如何处理ES6新特性：Class，这其实是一系列语法糖的实现。</p>
+<h3 id="Old-school方式实现继承"><a href="#Old-school方式实现继承" class="headerlink" title="Old school方式实现继承"></a>Old school方式实现继承</h3><p>在探究ES6之前，我们先来回顾一下ES5环境下，我们如何实现类的继承：</p>
+<pre><code>// Person是一个构造器
+function Person(name) {
+    this.type = &apos;Person&apos;;
+    this.name = name;
+}
+
+// 我们可以通过prototype的方式来加一条实例方法
+Person.prototype.hello = function() {
+    console.log(&apos;hello &apos; + this.name);
+}
+
+// 对于私有属性(Static method)，我们当然不能放在原型链上了。我们可以直接放在构造函数上面
+Person.fn = function() {
+    console.log(&apos;static&apos;);
+};
+</code></pre><p>我们可以这么应用：</p>
+<pre><code>var julien = new Person(&apos;julien&apos;);
+var darul = new Person(&apos;darul&apos;);
+julien.hello(); // &apos;hello julien&apos;
+darul.hello(); // &apos;hello darul&apos;
+Person.fn(); // &apos;static&apos;
+
+// 这样会报错，因为fn是一个私有属性
+julien.fn(); //Uncaught TypeError: julien.fn is not a function
+</code></pre><h3 id="New-school方式-ES6-实现继承"><a href="#New-school方式-ES6-实现继承" class="headerlink" title="New school方式(ES6)实现继承"></a>New school方式(ES6)实现继承</h3><p>在ES6环境下，我们当然迫不及待地试一试Class</p>
+<pre><code>class Person {
+    constructor(name) {
+        this.name = name;
+        this.type=&quot;person&quot;
+    }
+    hello() {
+        console.log(&apos;hello &apos; + this.name);
+    }
+    static fn() {
+        console.log(&apos;static&apos;);
+    };
+}
+</code></pre><p>这样写起来当然很cool，但是经过Babel编译，我们的代码是什么样呢？</p>
+<h3 id="Babel-transformation"><a href="#Babel-transformation" class="headerlink" title="Babel transformation"></a>Babel transformation</h3><p>我们一步一步来看，</p>
+<p>Step1: 定义<br>我们从最简单开始，试试不加任何方法和属性的情况下，</p>
+<pre><code>Class Person{}
+</code></pre><p>被编译为：</p>
+<pre><code>function _classCallCheck(instance, Constructor) {
+    // 检查是否成功创建了一个对象
+    if (!(instance instanceof Constructor)) {  
+        throw new TypeError(&quot;Cannot call a class as a function&quot;); 
+    } 
+}
+
+var Person = function Person() {
+    _classCallCheck(this, Person);
+};
+</code></pre><p>你可能会一头雾水,_classCallCheck是什么？其实很简单，它是为了保证调用的安全性。<br>比如我们这用调用</p>
+<pre><code>// ok
+new p = new Person();
+</code></pre><p>是没有问题的，但是直接调用：</p>
+<pre><code>// Uncaught TypeError: Cannot call a class as a function
+Person();
+</code></pre><p>就会报错，这就是_classCallCheck所起的作用。具体原理自己看代码就好了，很好理解。</p>
+<p>我们发现，Class关键字会被编译成构造函数，于是我们便可以通过new来实现实例的生成。</p>
+<p>Step2：Constructor探秘<br>我们这次尝试加入constructor,再来看看编译结果</p>
+<pre><code>class Person() {
+    constructor(name) {  
+        this.name = name;
+        this.type = &apos;person&apos;
+    }
+}
+</code></pre><p>编译结果：</p>
+<pre><code>var Person = function Person(name) {
+    _classCallCheck(this, Person);
+    this.type = &apos;person&apos;;
+    this.name = name;
+};
+</code></pre><p>看上去棒极了，我们继续探索。</p>
+<p>Step3：增加方法<br>我们尝试给Person类添加一个方法：hello</p>
+<pre><code>class Person {
+    constructor(name) {
+        this.name = name;
+        this.type = &apos;person&apos;
+    }
+
+    hello() {
+        console.log(&apos;hello &apos; + this.name);
+    }
+}
+</code></pre><p>编译结果(已做适当省略)：</p>
+<pre><code>// 如上，已经解释过
+function _classCallCheck.... 
+
+// MAIN FUNCTION
+var _createClass = (function () { 
+    function defineProperties(target, props) { 
+        for (var i = 0; i &lt; props.length; i++) { 
+            var descriptor = props[i]; 
+            descriptor.enumerable = descriptor.enumerable || false; 
+            descriptor.configurable = true; 
+            if (&apos;value&apos; in descriptor) 
+            descriptor.writable = true; 
+            Object.defineProperty(target, descriptor.key, descriptor); 
+        } 
+    } 
+    return function (Constructor, protoProps, staticProps) { 
+        if (protoProps) 
+            defineProperties(Constructor.prototype, protoProps); 
+        if (staticProps) 
+            defineProperties(Constructor, staticProps); 
+        return Constructor; 
+    }; 
+})();
+
+var Person = (function () {
+    function Person(name) {
+        _classCallCheck(this, Person);
+
+        this.name = name;
+    }
+
+    _createClass(Person, [{
+        key: &apos;hello&apos;,
+        value: function hello() {
+            console.log(&apos;hello &apos; + this.name);
+        }
+    }]);
+
+    return Person;
+})();
+</code></pre><p>Oh…no,看上去有很多需要消化!不要急，我尝试先把他精简一下，并加上注释，你就会明白核心思路：</p>
+<pre><code>var _createClass = (function () {   
+    function defineProperties(target, props) { 
+        // 对于每一个定义的属性props，都要完全拷贝它的descriptor,并扩展到target上
+    }  
+    return defineProperties(Constructor.prototype, protoProps);    
+})();
+
+var Person = (function () {
+    function Person(name) { // 同之前... }
+
+    _createClass(Person, [{
+        key: &apos;hello&apos;,
+        value: function hello() {
+            console.log(&apos;hello &apos; + this.name);
+        }
+    }]);
+
+    return Person;
+})();
+</code></pre><p>如果你不明白defineProperty方法, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty" target="_blank" rel="external">请参考这里</a></p>
+<p>现在，我们知道我们添加的方法</p>
+<pre><code>hello() {
+    console.log(&apos;hello &apos; + this.name);
+}
+</code></pre><p>被编译为：</p>
+<pre><code>_createClass(
+    Person, [{
+    key: &apos;hello&apos;,
+    value: function hello() {
+        console.log(&apos;hello &apos; + this.name);
+    }
+}]);
+</code></pre><p>而_createClass接受2个－3个参数，分别表示：</p>
+<pre><code>参数1 =&gt; 我们要扩展属性的目标对象，这里其实就是我们的Person
+参数2 =&gt; 需要在目标对象原型链上添加的属性，这是一个数组
+参数3 =&gt; 需要在目标对象上添加的属性，这是一个数组
+</code></pre><p>这样，Babel的魔法就一步一步被揭穿了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>希望这篇文章能够让你了解到Babel是如何初步把我们ES6 Class语法编译成ES5的。下一篇文章我会继续介绍Babel出和处理Super(), 并会通过一段函数桥梁，使得ES5环境下也能够继承ES6定义的Class</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？&lt;/p&gt;
+&lt;p&gt;这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以&lt;a href=&quot;https://babeljs.io/repl/&quot;&gt;在线测试编译结果&lt;/a&gt;，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。&lt;/p&gt;
+&lt;p&gt;另外，这篇文章并不适合初学者阅读。如果你还不明白JS中原型链等OOP相关知识，建议出门左转找到经典的《JS高级程序设计&lt;br&gt;》来补课；如果你对JS中，通过原型链来实现继承一直云里雾里，安利一下&lt;a href=&quot;http://yanhaijing.com/javascript/2014/11/09/object-inherit-of-js/&quot;&gt;颜海镜大大的文章&lt;/a&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="program" scheme="https://exp-team.github.io/categories/program/"/>
+    
+    
+      <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第10010期</title>
+    <link href="https://exp-team.github.io/blog/2016/12/31/weekly/weekly-10010/"/>
+    <id>https://exp-team.github.io/blog/2016/12/31/weekly/weekly-10010/</id>
+    <published>2016-12-30T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>12.26-12.31，2016年最后一期了，2016你有什么后悔的事吗？2017你有什么想去做的事吗？欢迎在评论区留言。</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="2016，你有什么后悔的事吗？"><a href="#2016，你有什么后悔的事吗？" class="headerlink" title="2016，你有什么后悔的事吗？"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5ODQ2MDIyMA==&amp;mid=2650712946&amp;idx=1&amp;sn=b34c2783ebda8a16722d18d5cc542adc&amp;chksm=bec0652189b7ec377b7da8b7e5baffc1f9c535f6ed4178cf88b6eb5b1cde21a3212c73c7668a&amp;mpshare=1&amp;scene=1&amp;srcid=1228MrSq7al4EQSvvud9dZad#rd" target="_blank" rel="external">2016，你有什么后悔的事吗？</a></h3><p>欢迎大家在评论区留言讨论。</p>
+<h3 id="2016前端开发技术巡礼"><a href="#2016前端开发技术巡礼" class="headerlink" title="2016前端开发技术巡礼"></a><a href="http://www.infoq.com/cn/articles/2016-review-frontend" target="_blank" rel="external">2016前端开发技术巡礼</a></h3><p>本文才算是真正的16年前端总结，蜻蜓点水的提到了各种前端新技术，看得人热血沸腾，感叹技术发展太快了。</p>
+<h3 id="张小龙首次全面阐述小程序，定档1月9日上线（内附演讲全文）"><a href="#张小龙首次全面阐述小程序，定档1月9日上线（内附演讲全文）" class="headerlink" title="张小龙首次全面阐述小程序，定档1月9日上线（内附演讲全文）"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5NTE4Njc4NQ==&amp;mid=2657611912&amp;idx=1&amp;sn=f91c228764f9a3b4ed696276fae1ee1b&amp;chksm=bd6f01868a188890c72c32e3082f2bc36d7f79efab345a9a58595a4a19c9fa39f522e9981b2d&amp;mpshare=1&amp;scene=1&amp;srcid=1228p1Ap3ZKbPl1Lwsajn0Cy#rd" target="_blank" rel="external">张小龙首次全面阐述小程序，定档1月9日上线（内附演讲全文）</a></h3><p>小程序在微信没有入口，没有流量，小程序的入口在无处无在的二维码，这终将是一个伟大的平台。</p>
+<a id="more"></a>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="为什么总有人黑-JavaScript？"><a href="#为什么总有人黑-JavaScript？" class="headerlink" title="为什么总有人黑 JavaScript？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzAxODE2MjM1MA==&amp;mid=2651551609&amp;idx=1&amp;sn=7396635dddfb6ebe6949aa2ee8b38132&amp;chksm=8025a0b8b75229aef34f72ec0c5fed8ccc46a0553e4002b395485e8db89213e84aa52c6d0df3&amp;mpshare=1&amp;scene=1&amp;srcid=1230e73LuUspDg41MwU0OaKY#rd" target="_blank" rel="external">为什么总有人黑 JavaScript？</a></h3><p>因为火呗，用的人多才会有人黑，不过每一门语言都不是完美的，js作为领域语言，肯定是有一些槽点的。</p>
+<h3 id="ES6-新特性汇总（一图全览）"><a href="#ES6-新特性汇总（一图全览）" class="headerlink" title="ES6 新特性汇总（一图全览）"></a><a href="https://zhuanlan.zhihu.com/p/24570791" target="_blank" rel="external">ES6 新特性汇总（一图全览）</a></h3><h3 id="为什么这样也能运行-concat-1-2-3"><a href="#为什么这样也能运行-concat-1-2-3" class="headerlink" title="为什么这样也能运行? [ ].concat[1,2,3]"></a><a href="http://mp.weixin.qq.com/s?__biz=MzI0NTAyNjE0NQ==&amp;mid=2675577402&amp;idx=1&amp;sn=ca14e15fc6255f133fcf48fd6cd5f64f&amp;chksm=f3da6e34c4ade722e5b81ca75ffcf899e7d82c16add6510cf164de5dc0f6c0916dbe8c5d5628&amp;mpshare=1&amp;scene=1&amp;srcid=1227FMaDJKLPEhwS0b4ZEywu#rd" target="_blank" rel="external">为什么这样也能运行? [ ].concat[1,2,3]</a></h3><h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="我的效率工具箱"><a href="#我的效率工具箱" class="headerlink" title="我的效率工具箱"></a><a href="http://mp.weixin.qq.com/s?__biz=MzAxODE1MDYwMQ==&amp;mid=2650898818&amp;idx=1&amp;sn=9ad15d6a89fd7ac39887d2abc86fefb6&amp;chksm=802f8424b7580d323d78b3853dbf9d7bc5ed90cd951c7cae28fae18b460b22e87c5f54e1fcb5&amp;mpshare=1&amp;scene=1&amp;srcid=1227ezYVN9AGExsE4uYYOnPr#rd" target="_blank" rel="external">我的效率工具箱</a></h3><p>工欲善其事必先利其器，也欢迎大家积极分享自己的工具。</p>
+<h3 id="前端疲劳"><a href="#前端疲劳" class="headerlink" title="前端疲劳"></a><a href="http://www.jianshu.com/p/a2eff3d721cb" target="_blank" rel="external">前端疲劳</a></h3><p>看完上面的2016前端开发技术巡礼，你一定会感叹前端的繁荣，或者如果你是一个关注新技术的前端，一定会有疲劳的感觉，那不妨看看这篇文章，也许对你有帮助。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;12.26-12.31，2016年最后一期了，2016你有什么后悔的事吗？2017你有什么想去做的事吗？欢迎在评论区留言。&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;2016，你有什么后悔的事吗？&quot;&gt;&lt;a href=&quot;#2016，你有什么后悔的事吗？&quot; class=&quot;headerlink&quot; title=&quot;2016，你有什么后悔的事吗？&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MjM5ODQ2MDIyMA==&amp;amp;mid=2650712946&amp;amp;idx=1&amp;amp;sn=b34c2783ebda8a16722d18d5cc542adc&amp;amp;chksm=bec0652189b7ec377b7da8b7e5baffc1f9c535f6ed4178cf88b6eb5b1cde21a3212c73c7668a&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1228MrSq7al4EQSvvud9dZad#rd&quot;&gt;2016，你有什么后悔的事吗？&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;欢迎大家在评论区留言讨论。&lt;/p&gt;
+&lt;h3 id=&quot;2016前端开发技术巡礼&quot;&gt;&lt;a href=&quot;#2016前端开发技术巡礼&quot; class=&quot;headerlink&quot; title=&quot;2016前端开发技术巡礼&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.infoq.com/cn/articles/2016-review-frontend&quot;&gt;2016前端开发技术巡礼&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;本文才算是真正的16年前端总结，蜻蜓点水的提到了各种前端新技术，看得人热血沸腾，感叹技术发展太快了。&lt;/p&gt;
+&lt;h3 id=&quot;张小龙首次全面阐述小程序，定档1月9日上线（内附演讲全文）&quot;&gt;&lt;a href=&quot;#张小龙首次全面阐述小程序，定档1月9日上线（内附演讲全文）&quot; class=&quot;headerlink&quot; title=&quot;张小龙首次全面阐述小程序，定档1月9日上线（内附演讲全文）&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MjM5NTE4Njc4NQ==&amp;amp;mid=2657611912&amp;amp;idx=1&amp;amp;sn=f91c228764f9a3b4ed696276fae1ee1b&amp;amp;chksm=bd6f01868a188890c72c32e3082f2bc36d7f79efab345a9a58595a4a19c9fa39f522e9981b2d&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1228p1Ap3ZKbPl1Lwsajn0Cy#rd&quot;&gt;张小龙首次全面阐述小程序，定档1月9日上线（内附演讲全文）&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;小程序在微信没有入口，没有流量，小程序的入口在无处无在的二维码，这终将是一个伟大的平台。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第10001期</title>
+    <link href="https://exp-team.github.io/blog/2016/12/24/weekly/weekly-10001/"/>
+    <id>https://exp-team.github.io/blog/2016/12/24/weekly/weekly-10001/</id>
+    <published>2016-12-23T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>12.18-12.24，本期的主题是你认为你的核心竞争力在哪？。</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="若你已做多年前端（5年-），你觉得你目前的核心竞争力在哪？"><a href="#若你已做多年前端（5年-），你觉得你目前的核心竞争力在哪？" class="headerlink" title="若你已做多年前端（5年+），你觉得你目前的核心竞争力在哪？"></a><a href="https://www.zhihu.com/question/53542412/answer/137031732?utm_source=wechat_timeline&amp;utm_medium=social&amp;from=groupmessage&amp;isappinstalled=0" target="_blank" rel="external">若你已做多年前端（5年+），你觉得你目前的核心竞争力在哪？</a></h3><p>我觉得大概在知识，经验，软素质等方面。</p>
+<h3 id="不管你在哪里上班，至少记住这个字！"><a href="#不管你在哪里上班，至少记住这个字！" class="headerlink" title="不管你在哪里上班，至少记住这个字！"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5OTU0NDA4Nw==&amp;mid=2655455671&amp;idx=1&amp;sn=ee93cea6da065486ebdd5b5f42004511&amp;chksm=bc8a7dcf8bfdf4d9b4eda79b07a76c5f3be24636a6622100ed5407cce51c2b85c44c7be6a8b0&amp;mpshare=1&amp;scene=1&amp;srcid=1220ANjVrdaoTRU3L9m99ql8#rd" target="_blank" rel="external">不管你在哪里上班，至少记住这个字！</a></h3><p>你也许认为本文是鸡汤文，但我不这么认为，我其实很希望自己能早点看到这篇文章，不管你做什么工作，如果你做到本文提到的点，那你应该不会太差。</p>
+<h3 id="React-组件间通讯"><a href="#React-组件间通讯" class="headerlink" title="React 组件间通讯"></a><a href="http://taobaofed.org/blog/2016/11/17/react-components-communication/" target="_blank" rel="external">React 组件间通讯</a></h3><p>最近面试了很多人，发现能把这个问题讲清楚的，真没有几个人。。。很尴尬。实在不能想象是怎么用react做东西的。</p>
+<a id="more"></a>
+<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="构建稳固的、可升缩的CSS框架的八大原则"><a href="#构建稳固的、可升缩的CSS框架的八大原则" class="headerlink" title="构建稳固的、可升缩的CSS框架的八大原则"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224670&amp;idx=1&amp;sn=e16a0b2da4b9a3f9bb55fcd5fe603e70&amp;chksm=bd49a3da8a3e2acca118d85fb0fa88faf78e96cc0f08453ae6c23121f0fc026fad0683455e27&amp;mpshare=1&amp;scene=1&amp;srcid=1223bBlXwr3WWFNjdQsaSIGh#rd" target="_blank" rel="external">构建稳固的、可升缩的CSS框架的八大原则</a></h3><h3 id="移动前端自适应解决方案和比较"><a href="#移动前端自适应解决方案和比较" class="headerlink" title="移动前端自适应解决方案和比较"></a><a href="http://caibaojian.com/mobile-responsive-example.html" target="_blank" rel="external">移动前端自适应解决方案和比较</a></h3><p>其实大部分文章对rem布局的原理介绍都够详细，只是告诉大家就是这么算，而没讲清楚原理，其实rem布局的原理是百分比，后面我会写一篇博文来介绍这个。</p>
+<h3 id="移动端页面开发适配-rem布局原理"><a href="#移动端页面开发适配-rem布局原理" class="headerlink" title="移动端页面开发适配 rem布局原理"></a><a href="https://segmentfault.com/a/1190000007526917" target="_blank" rel="external">移动端页面开发适配 rem布局原理</a></h3><h3 id="CSS技巧——rgba函数的妙用"><a href="#CSS技巧——rgba函数的妙用" class="headerlink" title="CSS技巧——rgba函数的妙用"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964048&amp;idx=1&amp;sn=4aa86d29933d97712fc5d0e9759c6d1e&amp;chksm=843aec36b34d652035357816d5a7b915cb0edf4f10bbe66297a263ed0111de5b422f4c88f29f&amp;mpshare=1&amp;scene=1&amp;srcid=1220EgDbzJA2TWxwqPZHEih4" target="_blank" rel="external">CSS技巧——rgba函数的妙用</a></h3><p>本文巧妙通过透明度实现了只改父元素的背景色，就能更改子元素的背景的功能。</p>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="230行实现一个简单的MVVM"><a href="#230行实现一个简单的MVVM" class="headerlink" title="230行实现一个简单的MVVM"></a><a href="https://zhuanlan.zhihu.com/p/24475845" target="_blank" rel="external">230行实现一个简单的MVVM</a></h3><h3 id="用React、Redux、Immutable做俄罗斯方块-掘金技术征文"><a href="#用React、Redux、Immutable做俄罗斯方块-掘金技术征文" class="headerlink" title="用React、Redux、Immutable做俄罗斯方块 | 掘金技术征文"></a><a href="https://gold.xitu.io/post/585a3e151b69e60056fe44fb" target="_blank" rel="external">用React、Redux、Immutable做俄罗斯方块 | 掘金技术征文</a></h3><h3 id="在-ECMAScript-2016-中被忽视的一个小变化"><a href="#在-ECMAScript-2016-中被忽视的一个小变化" class="headerlink" title="在 ECMAScript 2016 中被忽视的一个小变化"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964027&amp;idx=1&amp;sn=9f53a1ed65ec4ef7e724aaccd4defba6&amp;chksm=843aec5db34d654b6527673369a7194650ee37eed6da82f4a5dd9d6baaaa996e151061337dc2&amp;mpshare=1&amp;scene=1&amp;srcid=1220PrBGzLB0Ar5B2byuSTuq" target="_blank" rel="external">在 ECMAScript 2016 中被忽视的一个小变化</a></h3><p>ES62016种严格模式不能再es6函数中显示开始了，会报语法错误。</p>
+<h3 id="JavaScript函数式编程（一）"><a href="#JavaScript函数式编程（一）" class="headerlink" title="JavaScript函数式编程（一）"></a><a href="https://zhuanlan.zhihu.com/p/21714695" target="_blank" rel="external">JavaScript函数式编程（一）</a></h3><p>本文和相面的一篇文章介绍和函数式编程的相关知识。</p>
+<h3 id="JavaScript函数式编程（二）"><a href="#JavaScript函数式编程（二）" class="headerlink" title="JavaScript函数式编程（二）"></a><a href="https://segmentfault.com/a/1190000006219749" target="_blank" rel="external">JavaScript函数式编程（二）</a></h3><h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="从培训班出来之后找工作的经历，教会了我这五件事"><a href="#从培训班出来之后找工作的经历，教会了我这五件事" class="headerlink" title="从培训班出来之后找工作的经历，教会了我这五件事"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224587&amp;idx=1&amp;sn=43b51b0a5f1e1c86cf0fb9ea7f6bb588&amp;chksm=bd49a38f8a3e2a9994a656260d7d6b8d08949b43a35d8aae6950b3eb4aac3d8b05b699fe2d35&amp;mpshare=1&amp;scene=1&amp;srcid=1220pmS2Q9AQ7ua05gMy4e8L#rd" target="_blank" rel="external">从培训班出来之后找工作的经历，教会了我这五件事</a></h3><p>本文作者通过自己亲身经历诉说了自己参加培训后出来找工作的经历，作者统计了自己的50多次面试情况，告诉大家面试的技巧。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;12.18-12.24，本期的主题是你认为你的核心竞争力在哪？。&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;若你已做多年前端（5年-），你觉得你目前的核心竞争力在哪？&quot;&gt;&lt;a href=&quot;#若你已做多年前端（5年-），你觉得你目前的核心竞争力在哪？&quot; class=&quot;headerlink&quot; title=&quot;若你已做多年前端（5年+），你觉得你目前的核心竞争力在哪？&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://www.zhihu.com/question/53542412/answer/137031732?utm_source=wechat_timeline&amp;amp;utm_medium=social&amp;amp;from=groupmessage&amp;amp;isappinstalled=0&quot;&gt;若你已做多年前端（5年+），你觉得你目前的核心竞争力在哪？&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;我觉得大概在知识，经验，软素质等方面。&lt;/p&gt;
+&lt;h3 id=&quot;不管你在哪里上班，至少记住这个字！&quot;&gt;&lt;a href=&quot;#不管你在哪里上班，至少记住这个字！&quot; class=&quot;headerlink&quot; title=&quot;不管你在哪里上班，至少记住这个字！&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MjM5OTU0NDA4Nw==&amp;amp;mid=2655455671&amp;amp;idx=1&amp;amp;sn=ee93cea6da065486ebdd5b5f42004511&amp;amp;chksm=bc8a7dcf8bfdf4d9b4eda79b07a76c5f3be24636a6622100ed5407cce51c2b85c44c7be6a8b0&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1220ANjVrdaoTRU3L9m99ql8#rd&quot;&gt;不管你在哪里上班，至少记住这个字！&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;你也许认为本文是鸡汤文，但我不这么认为，我其实很希望自己能早点看到这篇文章，不管你做什么工作，如果你做到本文提到的点，那你应该不会太差。&lt;/p&gt;
+&lt;h3 id=&quot;React-组件间通讯&quot;&gt;&lt;a href=&quot;#React-组件间通讯&quot; class=&quot;headerlink&quot; title=&quot;React 组件间通讯&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://taobaofed.org/blog/2016/11/17/react-components-communication/&quot;&gt;React 组件间通讯&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;最近面试了很多人，发现能把这个问题讲清楚的，真没有几个人。。。很尴尬。实在不能想象是怎么用react做东西的。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第10000期</title>
+    <link href="https://exp-team.github.io/blog/2016/12/17/weekly/weekly-10000/"/>
+    <id>https://exp-team.github.io/blog/2016/12/17/weekly/weekly-10000/</id>
+    <published>2016-12-16T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>12.11-12.17，合抱之木生于毫末，九层之台起于垒土。</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="资深Web技术专家曹刘阳：2016年前端技术观察"><a href="#资深Web技术专家曹刘阳：2016年前端技术观察" class="headerlink" title="资深Web技术专家曹刘阳：2016年前端技术观察"></a><a href="http://geek.csdn.net/news/detail/128912" target="_blank" rel="external">资深Web技术专家曹刘阳：2016年前端技术观察</a></h3><p>合抱之木生于毫末，九层之台起于垒土，万丈高楼平地起。万里长城非一日而成，冰冻三尺非一日之寒。旧雨三年精化碧，孤灯午夜眼常青。不积跬步无以至千里，不积小流无以成江河。决定你速度的是智商，决定你高度的是基础。偷的懒迟早要补上，切记赶早不赶晚。</p>
+<h3 id="开源大神-James-Kyle-写给-JavaScript-的一封信"><a href="#开源大神-James-Kyle-写给-JavaScript-的一封信" class="headerlink" title="开源大神 James Kyle 写给 JavaScript 的一封信"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963957&amp;idx=1&amp;sn=d39eda3548256310ddcc249ce29af42a&amp;chksm=843a1393b34d9a85d08139aa53d6d885efbf117a3e6320a52433f5784d606bd20d14101f6928&amp;mpshare=1&amp;scene=1&amp;srcid=1213wlqwX0Q6DkZD9Wqn8Wb4#rd" target="_blank" rel="external">开源大神 James Kyle 写给 JavaScript 的一封信</a></h3><p>请尊重开源的人，他们是最无私的，向开源致敬。</p>
+<h3 id="五个典型的-JavaScript-面试题"><a href="#五个典型的-JavaScript-面试题" class="headerlink" title="五个典型的 JavaScript 面试题"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963939&amp;idx=1&amp;sn=ffa0ce59fc3a5691ee5be7520d1692d2&amp;chksm=843a1385b34d9a932f11138f3332231b26c71067b2ebc59e31f27faedb7a40c9b960bb4330a2&amp;mpshare=1&amp;scene=1&amp;srcid=1212E8wJvLX84dWuLLgI0PLy#rd" target="_blank" rel="external">五个典型的 JavaScript 面试题</a></h3><p>你一定知道我们最近在招人吧，如果你对这五个题都能看懂，那么快快发你的简历发给我吧。</p>
+<a id="more"></a>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="JavaScript-中-console-的用法"><a href="#JavaScript-中-console-的用法" class="headerlink" title="JavaScript 中 console 的用法"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224517&amp;idx=2&amp;sn=a2a36361fa8010e8f041055192f5313c&amp;chksm=bd49a0418a3e2957e453a28c918988fcb27ccf998ce57fc733dcc8a282d6626e6db08bcc4e22&amp;mpshare=1&amp;scene=1&amp;srcid=1212zJeB8tKpRMpNNo0BkSZa#rd" target="_blank" rel="external">JavaScript 中 console 的用法</a></h3><p>用了这么久的console，你一定还有很多技巧不知道，来看看这篇文章，一定不会让你失望的。</p>
+<h3 id="ES-5-新增特性汇总"><a href="#ES-5-新增特性汇总" class="headerlink" title="ES 5 新增特性汇总"></a><a href="https://zhuanlan.zhihu.com/p/24336831" target="_blank" rel="external">ES 5 新增特性汇总</a></h3><p>最近面试了不少人，发现大家的基础都不太好，快来补习补习基础吧。</p>
+<h3 id="你可能不需要Redux"><a href="#你可能不需要Redux" class="headerlink" title="你可能不需要Redux"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963909&amp;idx=1&amp;sn=e70000f256e6f53eedf077cd3c8cc19e&amp;chksm=843a13a3b34d9ab51b3231385a8c28f6fb2e7b45181c30ddd6fd0c525dfdbf8f97e7d7f83e66&amp;mpshare=1&amp;scene=1&amp;srcid=1212gEm4QOfQ9G7SfY1rTSjM#rd" target="_blank" rel="external">你可能不需要Redux</a></h3><p>在你犹豫要不要使用redux是，那就选择不用。</p>
+<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="浅析渲染引擎与前端优化"><a href="#浅析渲染引擎与前端优化" class="headerlink" title="浅析渲染引擎与前端优化"></a><a href="http://jdc.jd.com/archives/2806" target="_blank" rel="external">浅析渲染引擎与前端优化</a></h3><h3 id="雅虎这35条前端优化规则，你值得拥有！"><a href="#雅虎这35条前端优化规则，你值得拥有！" class="headerlink" title="雅虎这35条前端优化规则，你值得拥有！"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5ODI5Njc2MA==&amp;mid=2655808361&amp;idx=1&amp;sn=93826ac350683dbdc42e35b94d546be9&amp;chksm=bd7426be8a03afa80e13f5dcaa5e66337196453ae540fc829d983d9e0a04ad1a0f96fa3c8a9a&amp;mpshare=1&amp;scene=1&amp;srcid=1213FExvfbWRj2D2zRqjEovI#rd" target="_blank" rel="external">雅虎这35条前端优化规则，你值得拥有！</a></h3><p>曾几何时还是雅虎14条原则，现在都35条了，快来看看你掌握几条。</p>
+<h3 id="FIS-与-FIS-PLUS-的渊源"><a href="#FIS-与-FIS-PLUS-的渊源" class="headerlink" title="FIS 与 FIS-PLUS 的渊源"></a><a href="http://fex.baidu.com/blog/2014/03/fis-plus/" target="_blank" rel="external">FIS 与 FIS-PLUS 的渊源</a></h3><p>对于刚刚入门的同学，傻傻的分不清楚fis和fisp的关系</p>
+<h3 id="在-2017-年将会更加流行的-6-个-Web-开发趋势"><a href="#在-2017-年将会更加流行的-6-个-Web-开发趋势" class="headerlink" title="在 2017 年将会更加流行的 6 个 Web 开发趋势"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963966&amp;idx=1&amp;sn=0295680af559dc286ec5fa9c9b0a4d7e&amp;chksm=843a1398b34d9a8e63b8b8f3b5af14f85dfc52977ace0c6069c4d0aac5ea7abaef47f76319fc&amp;mpshare=1&amp;scene=1&amp;srcid=1216yXoFXdS5jg9DDEwq8HnG#rd" target="_blank" rel="external">在 2017 年将会更加流行的 6 个 Web 开发趋势</a></h3><p>值此辞旧迎新之际，如果你是一个弄潮儿，可以看看这篇文章，内容很超前。</p>
+<h3 id="魔法哥-2013-前端笔试题曝光（附完整解答）"><a href="#魔法哥-2013-前端笔试题曝光（附完整解答）" class="headerlink" title="魔法哥 2013 前端笔试题曝光（附完整解答）"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIyMjE0ODQ0OQ==&amp;mid=2651552755&amp;idx=1&amp;sn=d89fd543a549d53678ae984a93e759ba&amp;chksm=f3ce39fdc4b9b0eb379b050925721e1add3ac4223cd5294cbac591440320e17fedd0203382a5&amp;mpshare=1&amp;scene=1&amp;srcid=1216S8oDe9CPuyaRIHLuvKLb#rd" target="_blank" rel="external">魔法哥 2013 前端笔试题曝光（附完整解答）</a></h3><p>这是魔法哥在 2013 年整理的一套笔试题，显然，其中有些内容已经过时了。尽管如此，我相信这套题还是有一定的参考价值，每道题后面都有出题意图、解题思路、参考答案或评分标准</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;12.11-12.17，合抱之木生于毫末，九层之台起于垒土。&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;资深Web技术专家曹刘阳：2016年前端技术观察&quot;&gt;&lt;a href=&quot;#资深Web技术专家曹刘阳：2016年前端技术观察&quot; class=&quot;headerlink&quot; title=&quot;资深Web技术专家曹刘阳：2016年前端技术观察&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://geek.csdn.net/news/detail/128912&quot;&gt;资深Web技术专家曹刘阳：2016年前端技术观察&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;合抱之木生于毫末，九层之台起于垒土，万丈高楼平地起。万里长城非一日而成，冰冻三尺非一日之寒。旧雨三年精化碧，孤灯午夜眼常青。不积跬步无以至千里，不积小流无以成江河。决定你速度的是智商，决定你高度的是基础。偷的懒迟早要补上，切记赶早不赶晚。&lt;/p&gt;
+&lt;h3 id=&quot;开源大神-James-Kyle-写给-JavaScript-的一封信&quot;&gt;&lt;a href=&quot;#开源大神-James-Kyle-写给-JavaScript-的一封信&quot; class=&quot;headerlink&quot; title=&quot;开源大神 James Kyle 写给 JavaScript 的一封信&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;amp;mid=2650963957&amp;amp;idx=1&amp;amp;sn=d39eda3548256310ddcc249ce29af42a&amp;amp;chksm=843a1393b34d9a85d08139aa53d6d885efbf117a3e6320a52433f5784d606bd20d14101f6928&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1213wlqwX0Q6DkZD9Wqn8Wb4#rd&quot;&gt;开源大神 James Kyle 写给 JavaScript 的一封信&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;请尊重开源的人，他们是最无私的，向开源致敬。&lt;/p&gt;
+&lt;h3 id=&quot;五个典型的-JavaScript-面试题&quot;&gt;&lt;a href=&quot;#五个典型的-JavaScript-面试题&quot; class=&quot;headerlink&quot; title=&quot;五个典型的 JavaScript 面试题&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;amp;mid=2650963939&amp;amp;idx=1&amp;amp;sn=ffa0ce59fc3a5691ee5be7520d1692d2&amp;amp;chksm=843a1385b34d9a932f11138f3332231b26c71067b2ebc59e31f27faedb7a40c9b960bb4330a2&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1212E8wJvLX84dWuLLgI0PLy#rd&quot;&gt;五个典型的 JavaScript 面试题&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;你一定知道我们最近在招人吧，如果你对这五个题都能看懂，那么快快发你的简历发给我吧。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第1111期</title>
+    <link href="https://exp-team.github.io/blog/2016/12/10/weekly/weekly-1111/"/>
+    <id>https://exp-team.github.io/blog/2016/12/10/weekly/weekly-1111/</id>
+    <published>2016-12-09T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>12.4-12.10，这一期的数字听应景，水满则溢，月盈则亏，或升华，或迷失，进步永无止境。</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="Firebug-宣布停止开发更新"><a href="#Firebug-宣布停止开发更新" class="headerlink" title="Firebug 宣布停止开发更新"></a><a href="http://mp.weixin.qq.com/s?__biz=MzAxODE2MjM1MA==&amp;mid=2651551544&amp;idx=1&amp;sn=5df9d76d2aab4bf82cc685f17af6aec9&amp;chksm=8025a0f9b75229ef349dd3507f16e7faf74cca0639af7a2b67bd894611f45abd28fd57810be2&amp;mpshare=1&amp;scene=1&amp;srcid=1207aEhoIUyh4RiyNQACrmj3#rd" target="_blank" rel="external">Firebug 宣布停止开发更新</a></h3><p>一石激起千层浪，这真是一个重磅消息，曾几何时，是你挽救了无数页面仔宝贵的青春，是你让前端调试工具迈进了一个新时代，急流勇退，智者也，缅怀，致敬。</p>
+<h3 id="阅读-NodeJS-文档，我学到了这-19-件事情"><a href="#阅读-NodeJS-文档，我学到了这-19-件事情" class="headerlink" title="阅读 NodeJS 文档，我学到了这 19 件事情"></a><a href="https://zhuanlan.zhihu.com/p/24210807" target="_blank" rel="external">阅读 NodeJS 文档，我学到了这 19 件事情</a></h3><p>最近学了点node的东西，用node做了几个小工具，突然发现，一下子打开了一扇新大门，原来有了权力确实感觉不一样，有权限的人想要更大的权限，向着未来出发，即便你写了很久的nodejs，也未必知道这19件事。</p>
+<h3 id="前端-MVC-已死吗？"><a href="#前端-MVC-已死吗？" class="headerlink" title="前端 MVC 已死吗？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963905&amp;idx=1&amp;sn=70019642c4cbaaca657706ad20585934&amp;chksm=843a13a7b34d9ab1abb85b611daae44af0d0616bde0e686029c04c25840df62bd2d18c134937&amp;mpshare=1&amp;scene=1&amp;srcid=1209dJSy76l94Ea4lMrGzJk4#rd" target="_blank" rel="external">前端 MVC 已死吗？</a></h3><p>还未学过，就以死去吗？我并不这么认为，无数陈旧项目还在使用者mvc，无数历史项目都是mvc撑起来的，即便技术已不在流行，但还是值得学习的，道理不会变的，我们的目的只有一个，提升效率，有些东西死了，他还活着，永远。</p>
+<a id="more"></a>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="理解-Babel-插件"><a href="#理解-Babel-插件" class="headerlink" title="理解 Babel 插件"></a><a href="http://taobaofed.org/blog/2016/09/29/babel-plugins/" target="_blank" rel="external">理解 Babel 插件</a></h3><h3 id="React-实践心得：key-属性的原理和用法"><a href="#React-实践心得：key-属性的原理和用法" class="headerlink" title="React 实践心得：key 属性的原理和用法"></a><a href="http://taobaofed.org/blog/2016/08/24/react-key/" target="_blank" rel="external">React 实践心得：key 属性的原理和用法</a></h3><h3 id="深入了解-JavaScript-中的-for-循环"><a href="#深入了解-JavaScript-中的-for-循环" class="headerlink" title="深入了解 JavaScript 中的 for 循环"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224371&amp;idx=1&amp;sn=54771d5420daf8f5554605c16023dc64&amp;chksm=bd49a0b78a3e29a10b45dae92a5668c5895bdb35d03b78f491cdbc68b8ba87ea511c8dc33cb5&amp;mpshare=1&amp;scene=1&amp;srcid=1207VugbcGhtGVIUNRVLR0FM#rd" target="_blank" rel="external">深入了解 JavaScript 中的 for 循环</a></h3><p>很久没有一篇文章能够打动我的心了，而这就是难得的一篇，即便你是个geek，也未必知道的如此透彻。</p>
+<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="使用CSS3-REM-和-VW-打造等比例响应式页面的便捷工作流"><a href="#使用CSS3-REM-和-VW-打造等比例响应式页面的便捷工作流" class="headerlink" title="使用CSS3 REM 和 VW 打造等比例响应式页面的便捷工作流"></a><a href="https://zhuanlan.zhihu.com/p/23968868" target="_blank" rel="external">使用CSS3 REM 和 VW 打造等比例响应式页面的便捷工作流</a></h3><h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="淘宝首页性能优化实践"><a href="#淘宝首页性能优化实践" class="headerlink" title="淘宝首页性能优化实践"></a><a href="http://taobaofed.org/blog/2016/04/05/optimize-in-tbhome/" target="_blank" rel="external">淘宝首页性能优化实践</a></h3><h3 id="“一天精通-Chrome-开发”"><a href="#“一天精通-Chrome-开发”" class="headerlink" title="“一天精通 Chrome 开发”"></a><a href="https://zhuanlan.zhihu.com/p/24225644" target="_blank" rel="external">“一天精通 Chrome 开发”</a></h3><h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="技术的成长曲线"><a href="#技术的成长曲线" class="headerlink" title="技术的成长曲线"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NTg1MjM0Mg==&amp;mid=2657261460&amp;idx=1&amp;sn=9c4decdffe54e0705ee0b468bebd59f8&amp;chksm=84479e4db330175b0f9ed87040768ed20e929fad6097b8a16b5fb431ea33c9cf5b51e9cf8234&amp;mpshare=1&amp;scene=1&amp;srcid=1129s7MEHAkjL0S5hg8KAlG6#rd" target="_blank" rel="external">技术的成长曲线</a></h3><p>技术成长，永无止境，你我共勉，加油。</p>
+<h3 id="程序员练级指北"><a href="#程序员练级指北" class="headerlink" title="程序员练级指北"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224332&amp;idx=1&amp;sn=99bcc28e0e4d65e62d9aa86bdae55f4d&amp;chksm=bd49a0888a3e299ea4b6b4f0fe4370ea3cd54e8db46b56448b282d5e405fa2f50f0c595199e3&amp;mpshare=1&amp;scene=1&amp;srcid=1206a2tYXT8PHyyGHy1FE3We#rd" target="_blank" rel="external">程序员练级指北</a></h3><p>欲穷千里目，更上一层楼，这也是我创建expfe周刊的目的，1+1&gt;2，进步我们要一起。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;12.4-12.10，这一期的数字听应景，水满则溢，月盈则亏，或升华，或迷失，进步永无止境。&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;Firebug-宣布停止开发更新&quot;&gt;&lt;a href=&quot;#Firebug-宣布停止开发更新&quot; class=&quot;headerlink&quot; title=&quot;Firebug 宣布停止开发更新&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzAxODE2MjM1MA==&amp;amp;mid=2651551544&amp;amp;idx=1&amp;amp;sn=5df9d76d2aab4bf82cc685f17af6aec9&amp;amp;chksm=8025a0f9b75229ef349dd3507f16e7faf74cca0639af7a2b67bd894611f45abd28fd57810be2&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1207aEhoIUyh4RiyNQACrmj3#rd&quot;&gt;Firebug 宣布停止开发更新&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;一石激起千层浪，这真是一个重磅消息，曾几何时，是你挽救了无数页面仔宝贵的青春，是你让前端调试工具迈进了一个新时代，急流勇退，智者也，缅怀，致敬。&lt;/p&gt;
+&lt;h3 id=&quot;阅读-NodeJS-文档，我学到了这-19-件事情&quot;&gt;&lt;a href=&quot;#阅读-NodeJS-文档，我学到了这-19-件事情&quot; class=&quot;headerlink&quot; title=&quot;阅读 NodeJS 文档，我学到了这 19 件事情&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/24210807&quot;&gt;阅读 NodeJS 文档，我学到了这 19 件事情&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;最近学了点node的东西，用node做了几个小工具，突然发现，一下子打开了一扇新大门，原来有了权力确实感觉不一样，有权限的人想要更大的权限，向着未来出发，即便你写了很久的nodejs，也未必知道这19件事。&lt;/p&gt;
+&lt;h3 id=&quot;前端-MVC-已死吗？&quot;&gt;&lt;a href=&quot;#前端-MVC-已死吗？&quot; class=&quot;headerlink&quot; title=&quot;前端 MVC 已死吗？&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;amp;mid=2650963905&amp;amp;idx=1&amp;amp;sn=70019642c4cbaaca657706ad20585934&amp;amp;chksm=843a13a7b34d9ab1abb85b611daae44af0d0616bde0e686029c04c25840df62bd2d18c134937&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1209dJSy76l94Ea4lMrGzJk4#rd&quot;&gt;前端 MVC 已死吗？&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;还未学过，就以死去吗？我并不这么认为，无数陈旧项目还在使用者mvc，无数历史项目都是mvc撑起来的，即便技术已不在流行，但还是值得学习的，道理不会变的，我们的目的只有一个，提升效率，有些东西死了，他还活着，永远。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第1110期</title>
+    <link href="https://exp-team.github.io/blog/2016/12/04/weekly/weekly-1110/"/>
+    <id>https://exp-team.github.io/blog/2016/12/04/weekly/weekly-1110/</id>
+    <published>2016-12-03T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>11.28-12.04，“时光飞逝，来不及说再见”。</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="ES6-的模块系统"><a href="#ES6-的模块系统" class="headerlink" title="ES6 的模块系统"></a><a href="https://segmentfault.com/a/1190000003410285" target="_blank" rel="external">ES6 的模块系统</a></h3><p>在任何发型项目中，模块化都是非常常见，也是非常有必要的，es6为JavaScript带来了模块特性，对比JavaScript模块系统的现状，es的模块系统在规范上与其他的模块系统衔接得非常好，以至于大家对他的学习成本很低，这篇文章不但在语法上讲得非常详细透彻，在原理上也分析得浅显易懂，没有很多晦涩的语法个名词，对于理解ES6模块化非常有帮助。</p>
+<h3 id="CSS-方法论的选择"><a href="#CSS-方法论的选择" class="headerlink" title="CSS 方法论的选择"></a><a href="http://zcfy.cc/article/when-to-use-which-css-methodology-1828.html" target="_blank" rel="external">CSS 方法论的选择</a></h3><p>相信各路前端大神对css方法论的选择都有自己的想法，对于我个人而言，没有最好的，只有最适合自己的，去争论其中的好坏并没有什么意义，还不如脚踏实地的做好自己技术选型。</p>
+<h3 id="美团点评酒旅前端的技术体系"><a href="#美团点评酒旅前端的技术体系" class="headerlink" title="美团点评酒旅前端的技术体系"></a><a href="https://zhuanlan.zhihu.com/p/23976121" target="_blank" rel="external">美团点评酒旅前端的技术体系</a></h3><p>当我们沉浸在自己所在团队的技术体系下的同时也要多看看外面的世界，对比自己所在的技术体系，或许有相似之处，也有很多值得我们学习和思考的point~<br><a id="more"></a></p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="天猫即将不支持IE8"><a href="#天猫即将不支持IE8" class="headerlink" title="天猫即将不支持IE8"></a><a href="https://zhuanlan.zhihu.com/p/24091492" target="_blank" rel="external">天猫即将不支持IE8</a></h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;11.28-12.04，“时光飞逝，来不及说再见”。&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;ES6-的模块系统&quot;&gt;&lt;a href=&quot;#ES6-的模块系统&quot; class=&quot;headerlink&quot; title=&quot;ES6 的模块系统&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://segmentfault.com/a/1190000003410285&quot;&gt;ES6 的模块系统&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;在任何发型项目中，模块化都是非常常见，也是非常有必要的，es6为JavaScript带来了模块特性，对比JavaScript模块系统的现状，es的模块系统在规范上与其他的模块系统衔接得非常好，以至于大家对他的学习成本很低，这篇文章不但在语法上讲得非常详细透彻，在原理上也分析得浅显易懂，没有很多晦涩的语法个名词，对于理解ES6模块化非常有帮助。&lt;/p&gt;
+&lt;h3 id=&quot;CSS-方法论的选择&quot;&gt;&lt;a href=&quot;#CSS-方法论的选择&quot; class=&quot;headerlink&quot; title=&quot;CSS 方法论的选择&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://zcfy.cc/article/when-to-use-which-css-methodology-1828.html&quot;&gt;CSS 方法论的选择&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;相信各路前端大神对css方法论的选择都有自己的想法，对于我个人而言，没有最好的，只有最适合自己的，去争论其中的好坏并没有什么意义，还不如脚踏实地的做好自己技术选型。&lt;/p&gt;
+&lt;h3 id=&quot;美团点评酒旅前端的技术体系&quot;&gt;&lt;a href=&quot;#美团点评酒旅前端的技术体系&quot; class=&quot;headerlink&quot; title=&quot;美团点评酒旅前端的技术体系&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/23976121&quot;&gt;美团点评酒旅前端的技术体系&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;当我们沉浸在自己所在团队的技术体系下的同时也要多看看外面的世界，对比自己所在的技术体系，或许有相似之处，也有很多值得我们学习和思考的point~&lt;br&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第1101期</title>
+    <link href="https://exp-team.github.io/blog/2016/11/26/weekly/weekly-1101/"/>
+    <id>https://exp-team.github.io/blog/2016/11/26/weekly/weekly-1101/</id>
+    <published>2016-11-25T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>11.7-11.26，“宫城团回凛严光，白天碎碎堕琼芳”。<br>本周帝都迎来了入冬初雪：四季变换如若总让人猝不及防，那么技术更迭却总能够如约而至。</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="JS-5种不同的方法实现装饰者模式（译）"><a href="#JS-5种不同的方法实现装饰者模式（译）" class="headerlink" title="JS 5种不同的方法实现装饰者模式（译）"></a><a href="https://zhuanlan.zhihu.com/p/20743493?from=singlemessage&amp;isappinstalled=0" target="_blank" rel="external">JS 5种不同的方法实现装饰者模式（译）</a></h3><p>不错的一篇文章，为了自身乐趣和加强理解使用闭包、猴子补丁、原型、代理和中间件5种不同方式在 javascript 中实现装饰者模式。</p>
+<h3 id="2016-JavaScript-发展现状大调查"><a href="#2016-JavaScript-发展现状大调查" class="headerlink" title="2016 JavaScript 发展现状大调查"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224014&amp;idx=1&amp;sn=25ee1479f8c00fda80afae6fa5413ef1&amp;chksm=bd49ae4a8a3e275c2bd13d64983385748aa783321b98e2d98d2dda508127c90906903ea2ddb5&amp;mpshare=1&amp;scene=1&amp;srcid=1121ZEDSvG9GXWCr22ho8UGo#rd" target="_blank" rel="external">2016 JavaScript 发展现状大调查</a></h3><p>一旦临近年底，各种总结，各种评选颁奖。那么作为有点“乱”的前端界，也不能少。</p>
+<a id="more"></a>
+<h2 id="前端新潮"><a href="#前端新潮" class="headerlink" title="前端新潮"></a>前端新潮</h2><h3 id="组件化——前端编程的选择"><a href="#组件化——前端编程的选择" class="headerlink" title="组件化——前端编程的选择"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224143&amp;idx=2&amp;sn=b2f3457ee7fc5f81858886efb7be0374&amp;chksm=bd49a1cb8a3e28dd1dcebea92d0ac6aa61aa4df2061b47f0b00956aa0111f838dfa29e4f3a1e&amp;mpshare=1&amp;scene=1&amp;srcid=1125IIjmzOrdk0m7t3HpYkuy#rd" target="_blank" rel="external">组件化——前端编程的选择</a></h3><p>不管是迭代型产品还是日常的运营活动页，总会遇到蛮多重复的工作，如果能站在比业务层高一点的角度来看的话，就很有必要做到”服务”，这样不管是对项目还是自身来说都是利大于弊。对自己来说意义更大，有沉淀，有影响力。今天的文章由EAII企业架构创新研究院@郭怀成带来授权分享。</p>
+<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="既然写-CSS-很容易，那为什么大家还是把-CSS-写的那么烂呢？"><a href="#既然写-CSS-很容易，那为什么大家还是把-CSS-写的那么烂呢？" class="headerlink" title="既然写 CSS 很容易，那为什么大家还是把 CSS 写的那么烂呢？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963848&amp;idx=1&amp;sn=946969566285d2023b3dc1e49721a03b&amp;chksm=843a13eeb34d9af8afed798ef742d937e07ee35b4a65182786a27d758cb45e488ab2505ec194&amp;mpshare=1&amp;scene=1&amp;srcid=1122XbVzsEaIA8HN8RIiUVxm#rd" target="_blank" rel="external">既然写 CSS 很容易，那为什么大家还是把 CSS 写的那么烂呢？</a></h3><p>Why CSS still sucks in 2016???</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="程序员提交代码的-emoji-指南"><a href="#程序员提交代码的-emoji-指南" class="headerlink" title="程序员提交代码的 emoji 指南"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963837&amp;idx=1&amp;sn=6417ad5d02622fb2b4f765170e95dfa7&amp;chksm=843a131bb34d9a0d5c05eac862140d1b6fb564705f429c04130e76665565219ec901b80b5dbf&amp;mpshare=1&amp;scene=1&amp;srcid=1119QJckFwjEboCtC0mGYyzK#rd" target="_blank" rel="external">程序员提交代码的 emoji 指南</a></h3><h3 id="谈谈主动工作"><a href="#谈谈主动工作" class="headerlink" title="谈谈主动工作"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651223990&amp;idx=1&amp;sn=bd8613aa2a6d088ff1b9dc290bccef3d&amp;chksm=bd49ae328a3e27249a2da8b06737be5f28df53edca946e041c17788c70763c35cb817bf465db&amp;mpshare=1&amp;scene=1&amp;srcid=1119aU3KMPedMEwelSDQZvJb#rd" target="_blank" rel="external">谈谈主动工作</a></h3><h3 id="各种编程语言都是什么星座？"><a href="#各种编程语言都是什么星座？" class="headerlink" title="各种编程语言都是什么星座？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963854&amp;idx=1&amp;sn=2ff451c6638da8be0dff5f3cbdc88a29&amp;chksm=843a13e8b34d9afe84d23accc9a75cdc31df611b80c7be6cba21b5f7c17d2f7c5572743ba4ea&amp;mpshare=1&amp;scene=1&amp;srcid=11248LjhWF3vScFZKDscmjWM#rd" target="_blank" rel="external">各种编程语言都是什么星座？</a></h3><h3 id="我们应该先学习哪种语言-ʇdiɹosavaɾ-ɹeʍsua"><a href="#我们应该先学习哪种语言-ʇdiɹosavaɾ-ɹeʍsua" class="headerlink" title="我们应该先学习哪种语言 ʇdıɹɔsɐʌɐɾ :ɹǝʍsuɐ"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963827&amp;idx=1&amp;sn=2a327830a340d5efdfbf43135b5f495d&amp;chksm=843a1315b34d9a031832b37e7c1a3d90a84631b0bcf7749e06f413c903cc4fa9f348ebaeba95&amp;mpshare=1&amp;scene=1&amp;srcid=1124xQOI9SRb5TGicdbsxS3L#rd" target="_blank" rel="external">我们应该先学习哪种语言 ʇdıɹɔsɐʌɐɾ :ɹǝʍsuɐ</a></h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;11.7-11.26，“宫城团回凛严光，白天碎碎堕琼芳”。&lt;br&gt;本周帝都迎来了入冬初雪：四季变换如若总让人猝不及防，那么技术更迭却总能够如约而至。&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;JS-5种不同的方法实现装饰者模式（译）&quot;&gt;&lt;a href=&quot;#JS-5种不同的方法实现装饰者模式（译）&quot; class=&quot;headerlink&quot; title=&quot;JS 5种不同的方法实现装饰者模式（译）&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/20743493?from=singlemessage&amp;amp;isappinstalled=0&quot;&gt;JS 5种不同的方法实现装饰者模式（译）&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;不错的一篇文章，为了自身乐趣和加强理解使用闭包、猴子补丁、原型、代理和中间件5种不同方式在 javascript 中实现装饰者模式。&lt;/p&gt;
+&lt;h3 id=&quot;2016-JavaScript-发展现状大调查&quot;&gt;&lt;a href=&quot;#2016-JavaScript-发展现状大调查&quot; class=&quot;headerlink&quot; title=&quot;2016 JavaScript 发展现状大调查&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;amp;mid=2651224014&amp;amp;idx=1&amp;amp;sn=25ee1479f8c00fda80afae6fa5413ef1&amp;amp;chksm=bd49ae4a8a3e275c2bd13d64983385748aa783321b98e2d98d2dda508127c90906903ea2ddb5&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1121ZEDSvG9GXWCr22ho8UGo#rd&quot;&gt;2016 JavaScript 发展现状大调查&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;一旦临近年底，各种总结，各种评选颁奖。那么作为有点“乱”的前端界，也不能少。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>一个简单的react+redux工程实例</title>
+    <link href="https://exp-team.github.io/blog/2016/11/26/program/react-redux-1/"/>
+    <id>https://exp-team.github.io/blog/2016/11/26/program/react-redux-1/</id>
+    <published>2016-11-25T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近一直在学习研究react.js。前前后后做了几次分享。并在我参与的百度经验私信项目也使用了这套技术栈 ，目前也进入了最后提测上线阶段。</p>
+<p>学习过程期间，感觉react+redux初级DEMO不多，社区上多是用烂了的todolist教程，未免乏味。<br>这篇文章主要实现一个简单的例子（并不是百度经验私信项目），难度不大，但是贯穿了react+redux基本思想。</p>
+<p>他将会是一个连续教程，这只是第一篇，不涉及redux中间件，redux处理异步等内容，也不涉及react性能优化，不可变数据immutable.js等内容。读者可以根据自己的层次来选读。但这些不涉及到的内容，都会随着这个demo复杂度一步一步提升，在后续章节有分析和使用。<br>另外，他并不适合初学者阅读，如果你还不太清楚react.js、ES6、redux相关知识，建议先做了解。</p>
+<a id="more"></a>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>百度经验个人中心（WAP端）是经验流量较多的页面群，其中的个人定制页面是重要的页面之一，请用手机<a href="http://jingyan.baidu.com/user/nuc/feed" target="_blank" rel="external">点击这里</a>查看效果，页面的截图如下：</p>
+<p><img src="/bimg/c1.png" alt=""></p>
+<p>页面大体上功能一目了然。主要分为两大块：<br>1）可以在『选择分类』区块中选择自己喜欢的经验分类条目来订阅。在该区块中，我们可以点击『换一换』按钮来切换分类条目。<br>2）已选结果会再『已选分类』区块里面展示。在『已选分类』区块里，我们可以点击相关经验分类条目来取消订阅。</p>
+<p><img src="/bimg/c5.png" alt=""></p>
+<p>在现在线上版本中，我们采用了传统的操作DOM方式（zepto类库）来实现这一系列交互。顺便提一下，对于前端不断更迭的框架或者技术，本人的态度是不盲目跟风吹捧。建议理性地看待前端技术，重要的是学习新框架、新技术的思想。没有必要大刀阔斧地采用新技术框架重构。一定要分清适合不适合以及合理不合理。窃以为，其实这个页面采用传统技术来开发也是不错的。但是使用react，又是一种全新的思想。孰优孰劣，可以在结尾处大家自己总结。<br>好了，废话不多说，我们马上进入正题。</p>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>整体目录如截图，为了和我们线上代码保持一致，我采用了fisp来做工程化组织。现在社区上大多都是采用webpack，其实这些工具用哪个都一样，解决的问题也都类似，这里不再展开。即使你不懂FIS，可不妨碍继续阅读。</p>
+<p><img src="/bimg/c2.png" alt=""></p>
+<h3 id="app-app文件夹下"><a href="#app-app文件夹下" class="headerlink" title="app/ app文件夹下"></a>app/ app文件夹下</h3><p>action.es定义了页面交互中dispatch的所有action；</p>
+<p><img src="/bimg/c6.png" alt=""></p>
+<p>app.jsx是页面入口脚本；</p>
+<p><img src="/bimg/c8.png" alt=""></p>
+<p>component.jsx定义了页面的组件；</p>
+<p><img src="/bimg/c7.png" alt=""></p>
+<p>reducer.jsx接收action，该文件定义了所有用到的reducer。</p>
+<h3 id="lib-lib-nomod-文件夹下"><a href="#lib-lib-nomod-文件夹下" class="headerlink" title="lib + lib-nomod 文件夹下"></a>lib + lib-nomod 文件夹下</h3><p>这两个文件夹是我们要用的框架源码，比如react.js+redux.js等等；<br>该项目用到的是react15.3.1版本未压缩版，<br>这个版本比较稳定。采用未压缩版的原因是想使用react addons 的perf，在后续章节中，会有性能优化部分的分析；<br>我们知道，react和redux其实独立存在，我们使用流行的react-redux.js库来实现两者的连接。</p>
+<h3 id="其他相关文件"><a href="#其他相关文件" class="headerlink" title="其他相关文件"></a>其他相关文件</h3><p>其他还有 fis-conf.js文件：这是用来做fis配置的，比如打包规则，发布规则，编译配置等；<br>同时，我们配置了babel来编译es6和jsx等，还配置了autoprefixer；<br>server.conf是fis的附属文件，用来做数据mock；<br>build.sh和BCLOUD是上线脚本相关，这里我们并不上线，只是学习react的用法。</p>
+<h2 id="页面数据"><a href="#页面数据" class="headerlink" title="页面数据"></a>页面数据</h2><p>我们部门后端是PHP，采用Smarty模板。这个页面会在请求时同步给出一些数据，比如用户信息等。项目里，我们的同步数据如截图：</p>
+<p><img src="/bimg/c3.png" alt=""></p>
+<p>我们关心selectList和likedList：<br>1）likedList给出当前用户已经选则的订阅分类条目；<br>2）selectList给出所有可选的分类条目，一共从1-127，数据格式如上。<br>我们的脚本里使用F.context(‘likedList’)，和F.context(‘selectList’)取出相应同步数据，用于页面初始化展示。<br>F.context()没有什么可神奇的，其实就是一个全局的数据中心，实现就是在window.F下存取数据。</p>
+<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><p>说了这么多，终于可以进入具体代码层面了。如果上边的内容你似懂非懂，也没有关系。因为涉及了一些项目组织上的内容。下边的内容，就是具体的代码分析了。</p>
+<h3 id="数据设计"><a href="#数据设计" class="headerlink" title="数据设计"></a>数据设计</h3><p>react+redux开发前端的思想是页面由数据驱动。<br>上边已经分析到，这里再赘述一下。我们的页面主要由两种数据：<br>1）一个是F.context(‘selectList’)，我们姑且叫做选择池数据；<br>2）另一个是已选数据F.context(‘likedList’)。<br>这两处数据初始由reducer拿到，设置为容器组件的初始状态，并由容器组件传递给相应展示组件。</p>
+<h3 id="组件设计"><a href="#组件设计" class="headerlink" title="组件设计"></a>组件设计</h3><p>组件设计如下截图：</p>
+<p><img src="/bimg/c4.jpg" alt=""></p>
+<p>按照react-redux思想，组件分为<br>1）容器组件，负责接收数据；<br>2）展示（木偶）组件负责向上接收数据，根据数据展现组件UI。</p>
+<p>其实很明显，我们主要就是两个展示组件：<br>1）一个SelectedBlock，<br>2）一个SelectListBlock。<br>前者负责展示用户已选已订阅内容，后者展示页面选择池可供选择的内容。他们一起被套在叫做DemoApp的父组件里面。</p>
+<p>有了以上划分，我们可以想到：<br>SelectedBlock组件需要关心已选数据；<br>SelectListBlock则选择池数据和已选数据都需要关心。你可能会问『SelectListBlock<br>关心选择池数据不就够了吗？』但是，产品经理要求在选择池里，当渲染用户已选条目时，需要样式置灰，并且在点击已选分类条目时不在触发action。所以选择池SelectListBlock组件也要依赖已选数据，进而来做出相应的变化。</p>
+<p>这两项数据有react-redux派分给容器组件，并由容器组件按需分给展示组件；也就是说：F.context(‘likedList’)向下传递给SelectedBlock；F.context(‘likedList’)和F.context(‘selectList’)向下传递给SelectListBlock</p>
+<p>有了以上基础，我们看最外层的DemoApp组件全部代码：</p>
+<pre><code>class DemoApp extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        const { dispatch } = this.props;
+        return (
+            &lt;div&gt;
+                &lt;SelectedBlock 
+                    likedList={this.props.likedList} 
+                    onDeleteLikeItem={(item)=&gt;{dispatch(action.deleteLikeItem(item))}}&gt;
+                &lt;/SelectedBlock&gt;
+
+                &lt;SelectListBlock 
+                    selectList={this.props.selectList} 
+                    likedList={this.props.likedList} 
+                    onAddLikeItem={(index, item) =&gt;{dispatch(action.addLikeItem(index, item))}}&gt;
+                &lt;/SelectListBlock&gt;
+            &lt;/div&gt;
+        )
+    }
+}
+</code></pre><p>我们看他的render()部分，很明显，他平行嵌套了<br>1）SelectedBlock组件，并把likedList数据作为属性向其传递；<br>2）同时，包含了SelectListBlock，并把selectList，likedList数据作为属性向其传递。</p>
+<p>那么SelectedBlock设计如下：</p>
+<pre><code>class SelectedBlock extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    deleteItem(event, index) {
+        this.props.onDeleteLikeItem(index);
+    }
+    render() {
+        let likedList = this.props.likedList;
+        let likedListArray = [];
+        let likedListKey = Object.keys(likedList);
+        likedListKey.forEach(function(index){
+            likedListArray.push(likedList[index]);
+        })
+        return (
+            &lt;div&gt;
+                &lt;h2&gt;已选分类(&lt;em id=&quot;f-num&quot;&gt;{likedListArray.length}&lt;/em&gt;)&lt;/h2&gt;
+                &lt;div className=&quot;selected-list&quot; style={{overflow: 'auto'}}&gt;
+                    &lt;ul className=&quot;feed-list&quot;&gt;
+                        {
+                            likedListArray.length &gt; 0 ?
+                            likedListArray.map((item, index) =&gt; {
+                                return (
+                                    &lt;li style={{position: 'relative'}}&gt;
+                                        &lt;span&gt;{item}&lt;/span&gt;
+                                        &lt;a style={deleteIconStyle} 
+                                            onClick={event=&gt;{this.deleteItem(event, likedListKey[index])}}&gt;
+                                        &lt;/a&gt;
+                                    &lt;/li&gt;
+                                )
+                            })
+                            :
+                            &lt;li className=&quot;empty-list&quot;&gt;还没有任何订阅&lt;br /&gt;请从下方选择订阅&lt;/li&gt;
+                        }
+                    &lt;/ul&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        )
+    }
+}
+</code></pre><p>因为likedList我们获取到的是个对象，我们需要使用：</p>
+<pre><code>let likedList = this.props.likedList;
+let likedListArray = [];
+let likedListKey = Object.keys(likedList);
+likedListKey.forEach(function(index){
+    likedListArray.push(likedList[index]);
+})
+</code></pre><p>来把likedList转换成likedListArray数组，在render()里面，直接使用map循环输出；<br>当用户删除某一条目时，触发deleteItem(event, index)方法，该方法向上传递。并在DemoApp父组件中，触发相应action。这个删除过程并不是一个组件内行为，因为这个action会使得已选数据发生变化，进而影响SelectListBlock组件。所以一系列逻辑需要在组件外，即reducer中处理，处理完后重置已选数据，进而页面更新。</p>
+<p>SelectListBlock组件也很好理解：</p>
+<pre><code>class SelectListBlock extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            flag: 0
+        }
+    }
+    onChangeGroup(event) {
+        event.stopPropagation();
+        let flagNow = this.state.flag;
+        if (flagNow == 117) {
+            this.setState({
+                flag: 0
+            });
+        }
+        else {
+            this.setState({
+                flag: flagNow + 9
+            });
+        }
+    }
+    onSelectItem(index, item) {
+        var likedList = this.props.likedList;
+        var likedListKey = Object.keys(likedList);
+        if ( likedListKey.indexOf(index.toString()) &gt;= 0 ) {
+            return;
+        }
+        this.props.onAddLikeItem(index, item);
+    }
+    render() {
+        let selectListArray = [];
+        for (var i in this.props.selectList) {
+            selectListArray.push(this.props.selectList[i])
+        }
+        let likedList = this.props.likedList;
+        let likedListKey = Object.keys(likedList);
+        return (
+            &lt;div&gt;
+                &lt;h2 className=&quot;clr&quot;&gt;
+                    &lt;span onClick={event=&gt;{this.onChangeGroup(event)}}&gt;换一换&lt;/span&gt;
+                选择分类&lt;/h2&gt;
+                &lt;ul className=&quot;feed-list clr&quot;&gt;
+                    {
+                        selectListArray.slice(this.state.flag, this.state.flag+9).map((item, index)=&gt;{
+                            return (
+                                &lt;li onClick={event=&gt;{this.onSelectItem((index + this.state.flag), item)}} 
+                                    key={index + this.state.flag}&gt;
+                                    {(likedListKey.indexOf((index + this.state.flag).toString()) &gt;= 0 ?
+                                        &lt;span className=&apos;disable&apos;&gt;{item}&lt;/span&gt;
+                                        :
+                                        &lt;span&gt;{item}&lt;/span&gt;
+                                    )}
+                                &lt;/li&gt;
+                            )
+                        })
+                    }
+                &lt;/ul&gt;
+            &lt;/div&gt;
+        )
+    }
+}
+</code></pre><p>我们首先把后端打过来的127条可供选择的数据转换为selectListArray数组。这127个分类内容都对应一个index（1-127）。之后我们获得用户已经选择喜欢条目的index，将这些index组成likedListKey数组，用于存储当前用户已选条目。在render()时候，因为页面一次只展示9项待选项，所以我们把selectListArray用slice方法按顺序切割出来9项输出。点击『换一换』按钮时，触发onChangeGroup（）方法，这个方法是个组件内方法，他负责将slice参数+9，当到127（一共127项分类）时，还原回0。如下：</p>
+<pre><code>onChangeGroup(event) {
+    event.stopPropagation();
+    let flagNow = this.state.flag;
+    if (flagNow == 117) {
+        this.setState({
+            flag: 0
+        });
+    }
+    else {
+        this.setState({
+            flag: flagNow + 9
+        });
+    }
+}
+</code></pre><p>我们知道，点击『换一换』触发的onChangeGroup方法改变flag时候，因为flag为该组件内部state。他的变化，将会引起该组件重新render()，所以数据池就会毫无压力的切换了。<br>同时，我们给数据池里每一项分类都绑定onSelectItem方法，该方法会向上传递给父组件，由父组件发出相应action。因为这个动作将会改变已选数据，影响平行的SelectedBlock组件。需要在reducer中处理。<br>关于onSelectItem参数做的调整，我想聪明的你一定看得出来是因为什么。其实是因为map遍历时每一项index都是依次递增的，永远是从1-9。而当我们传递用户选中的参数时，要传递的是要添加的某一项所对应的index时，他会是1-127某一数字。</p>
+<h3 id="action设计"><a href="#action设计" class="headerlink" title="action设计"></a>action设计</h3><p>有了以上组件的设计，很明显我们需要定义两个action：<br>1）第一个是添加某一条目到已选分类</p>
+<pre><code>export const ADD_LIKE_ITEM = &apos;ADD_LIKE_ITEM&apos;;
+</code></pre><p>对应action creator:</p>
+<pre><code>export function addLikeItem (index, item) {
+    return {
+        type: ADD_LIKE_ITEM,
+        obj: {
+            index: index,
+            item: item
+        }
+    }
+}
+</code></pre><p>返回action对象，包括type命名为ADD_LIKE_ITEM和负载数据：条目名item及其index。</p>
+<p>另一个是在已选分类删除某一条目：</p>
+<pre><code>export const DELETE_LIKE_ITEM = &apos;DELETE_LIKE_ITEM&apos;;
+</code></pre><p>对应action creator:</p>
+<pre><code>export function deleteLikeItem (index) {
+    return {
+        type: DELETE_LIKE_ITEM,
+        index
+    }
+}
+</code></pre><p>返回action对象，包括type和负载数据。<br>到此为止，action脚本只需要定义action，不需要进一步处理，对所有action的处理都会由reducer接受。</p>
+<h3 id="reducer设计"><a href="#reducer设计" class="headerlink" title="reducer设计"></a>reducer设计</h3><p>再次强调reducer是一个纯函数，他接受两个参数，一个是state，一个是action；并对相应的action，返回一个新的state，从而促使页面里订阅相关state的组件再次render（）；<br>我们把同步模板数据initialLikeBlockState设为初始state</p>
+<pre><code>var initialLikeBlockState = F.context(&apos;likedList&apos;);
+function likeBlockReducer (state = initialLikeBlockState, action) {
+    switch (action.type) {
+        case actionType.ADD_LIKE_ITEM: {
+            var addIndex = action.obj.index;
+            var newLikedList = Object.assign({}, state, {
+                [addIndex]: action.obj.item
+            })
+            return newLikedList;
+        }
+        case actionType.DELETE_LIKE_ITEM: {
+            var newLikedList =  {};
+            for (var key in state) {  
+                var val = state[key];  
+                newLikedList[key] = val;  
+            }  
+            var index = action.index;
+            delete newLikedList[index];
+            return newLikedList;
+        }
+        default: {
+            return state;
+        }
+    }
+}
+</code></pre><p>当匹配ADD_LIKE_ITEM action时，我们把当前的state和action带来的数据（item，index）进行merge，从而return 一个新的已选数据状态，即添加了新分类item的state；<br>当匹配DELETE_LIKE_ITEM action时，我们把action负载带来要删除item的index删除掉。返回删除该条目之后的新state。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>截至目前，我们介绍了基本设计和开发思路。教程里面已经基本包含了全部代码。</p>
+<h3 id="对比线上已有代码"><a href="#对比线上已有代码" class="headerlink" title="对比线上已有代码"></a>对比线上已有代码</h3><p>1）和线上的zepto实现对比完全是两种思路，经过比较，用react设计的代码代码量上有着明显的优势。<br>2）开发思路上，是个萝卜青菜各有所爱的问题。但是对于写惯了$()的我来说，这种全新的开发方式还是带来了极大的惊喜。<br>3）线上实现这一套逻辑，可能一个简单的UI交互我们需要选取很多dom元素，进行处理。整体上看，比较复杂且凌乱，不是很容易进行维护。</p>
+<h3 id="接下来…"><a href="#接下来…" class="headerlink" title="接下来…"></a>接下来…</h3><p>当然，这只是第一步。后边还有更多的路要走。比如：<br>1）我们在选择或删除一个条目时，按道理讲真正实战上，如何给后端发异步请求并没有涉及。因此，redux异步流程并没有展现。后续章节会进一步讲解。<br>2）我们的数据都是后端模板通过同步的方式传递过来的，数据量也不大，结构也不复杂，因此这一章为了简单并未使用immutable.js。当然，后续章节会进一步讲解。<br>3）这里我并没有介绍使用redux dev tool，这真的是一个很漂亮的利器。尤其在数据复杂时候，对于调试能帮上很大作用。后面我会单独介绍一下关于这个工具的使用。<br>4）最后，这么简单的交互还并不会涉及页面性能的问题。在后续章节，我会构造出极端CASE进行一些边缘测试，并使用一些方法结合chrome dev tool进行性能优化，请进一步关注。</p>
+<p>author: LucasHC</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近一直在学习研究react.js。前前后后做了几次分享。并在我参与的百度经验私信项目也使用了这套技术栈 ，目前也进入了最后提测上线阶段。&lt;/p&gt;
+&lt;p&gt;学习过程期间，感觉react+redux初级DEMO不多，社区上多是用烂了的todolist教程，未免乏味。&lt;br&gt;这篇文章主要实现一个简单的例子（并不是百度经验私信项目），难度不大，但是贯穿了react+redux基本思想。&lt;/p&gt;
+&lt;p&gt;他将会是一个连续教程，这只是第一篇，不涉及redux中间件，redux处理异步等内容，也不涉及react性能优化，不可变数据immutable.js等内容。读者可以根据自己的层次来选读。但这些不涉及到的内容，都会随着这个demo复杂度一步一步提升，在后续章节有分析和使用。&lt;br&gt;另外，他并不适合初学者阅读，如果你还不太清楚react.js、ES6、redux相关知识，建议先做了解。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="program" scheme="https://exp-team.github.io/categories/program/"/>
+    
+    
+      <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第1100期</title>
+    <link href="https://exp-team.github.io/blog/2016/11/12/weekly/weekly-1100/"/>
+    <id>https://exp-team.github.io/blog/2016/11/12/weekly/weekly-1100/</id>
+    <published>2016-11-11T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>11.7-11.12，本期收集了那么多如何学习前端的文章，你应该猜到团队了来了位新同学，所以本期主题就是前端入门。</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="在2016年如何学习JavaScript？"><a href="#在2016年如何学习JavaScript？" class="headerlink" title="在2016年如何学习JavaScript？"></a><a href="https://zhuanlan.zhihu.com/p/23334342" target="_blank" rel="external">在2016年如何学习JavaScript？</a></h3><p>前段时间有一篇文章很有感触，就是《在2016年学习js是怎样一种体验》，我其实深有体会，前端发展速度太快了，特别是最近几年，新名词太多太多，仿佛记住这些词都很困难，前端对新人来说上手难度越来越大，这篇文章介绍了在2016年如何一步一步去学习前端。</p>
+<h3 id="6周学习计划，攻克JavaScript难关"><a href="#6周学习计划，攻克JavaScript难关" class="headerlink" title="6周学习计划，攻克JavaScript难关"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651223880&amp;idx=1&amp;sn=9d59b9f4a399a75e98950e162cb89398&amp;chksm=bd49aecc8a3e27da998d1448fa4370c77d702e1e7a918f998e4fa9cec101f046decee64ac172&amp;mpshare=1&amp;scene=1&amp;srcid=1112cSLwvdvgtt7PMhOw2YiO#rd" target="_blank" rel="external">6周学习计划，攻克JavaScript难关</a></h3><p>这其实是讲如何学习react，通过6周时间，6个阶段，学会6个技术，按照本文一步一步走下去，react就不在话下了，也建议老司机关注一下react，这个技术有点意思。</p>
+<h3 id="前端的学习"><a href="#前端的学习" class="headerlink" title="前端的学习"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651223798&amp;idx=1&amp;sn=4d84d3dd80d44264b2b3794977e09c66&amp;chksm=bd49af728a3e2664d8bda1337516a1a7846f8047942663f30e7af644205350da497359f91ab7&amp;mpshare=1&amp;scene=1&amp;srcid=1109Htuolk6iWEhdmBUWwan3#rd" target="_blank" rel="external">前端的学习</a></h3><p>@大漠 老师通过亲身经历，现身说法，将你如何学好前端，特别是在如今技术发展的速度超过我们学习速度的情况下，如何在信息爆炸，信息过载的情况下，学好前端呢。</p>
+<a id="more"></a>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="理解-Javascript-的-async-await"><a href="#理解-Javascript-的-async-await" class="headerlink" title="理解 Javascript 的 async await"></a><a href="http://zcfy.cc/article/understanding--s-async-await-1586.html" target="_blank" rel="external">理解 Javascript 的 async await</a></h3><p>虽然你们在吹捧，但我始终觉得generator不适合用来做异步，非常蹩脚的感觉，就像我们用float做多列一样，社区也意识到了这个问题，所以异步函数来了，就是ES2017，就在2017年6月的那个夜晚。</p>
+<h3 id="Angular-3-is-hot-on-the-heels-of-Angular-2"><a href="#Angular-3-is-hot-on-the-heels-of-Angular-2" class="headerlink" title="Angular 3 is hot on the heels of Angular 2"></a><a href="http://www.infoworld.com/article/3139891/javascript/angular-3-is-hot-on-the-heels-of-angular-2.html" target="_blank" rel="external">Angular 3 is hot on the heels of Angular 2</a></h3><p>啥也不想说，jq都出3.0了，我们还在用1.0，ng都出3了，我还没学会1.x，蓝瘦香菇。</p>
+<h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="Git-的工作原理"><a href="#Git-的工作原理" class="headerlink" title="Git 的工作原理"></a><a href="http://gold.xitu.io/entry/581efecb2f301e005c1d2251" target="_blank" rel="external">Git 的工作原理</a></h3><p>我们马上就要迁到git了，这篇文章刚好应景，如果你不懂git或者只是会用几个命令，那么看看这篇文章吧，让我们一探git内部的神秘。</p>
+<h3 id="从2016年11月期《技术雷达》看前端的未来"><a href="#从2016年11月期《技术雷达》看前端的未来" class="headerlink" title="从2016年11月期《技术雷达》看前端的未来"></a><a href="https://zhuanlan.zhihu.com/p/23492610" target="_blank" rel="external">从2016年11月期《技术雷达》看前端的未来</a></h3><p>@Phodal 大大预测2020年的前端是什么样子，js真是无所不能，快来围观。</p>
+<h3 id="大话程序猿VS产品狗"><a href="#大话程序猿VS产品狗" class="headerlink" title="大话程序猿VS产品狗"></a><a href="http://blog.thankbabe.com/2016/06/26/cpgandcxy/?from=sf8" target="_blank" rel="external">大话程序猿VS产品狗</a></h3><p>peace or war</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;11.7-11.12，本期收集了那么多如何学习前端的文章，你应该猜到团队了来了位新同学，所以本期主题就是前端入门。&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;在2016年如何学习JavaScript？&quot;&gt;&lt;a href=&quot;#在2016年如何学习JavaScript？&quot; class=&quot;headerlink&quot; title=&quot;在2016年如何学习JavaScript？&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/23334342&quot;&gt;在2016年如何学习JavaScript？&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;前段时间有一篇文章很有感触，就是《在2016年学习js是怎样一种体验》，我其实深有体会，前端发展速度太快了，特别是最近几年，新名词太多太多，仿佛记住这些词都很困难，前端对新人来说上手难度越来越大，这篇文章介绍了在2016年如何一步一步去学习前端。&lt;/p&gt;
+&lt;h3 id=&quot;6周学习计划，攻克JavaScript难关&quot;&gt;&lt;a href=&quot;#6周学习计划，攻克JavaScript难关&quot; class=&quot;headerlink&quot; title=&quot;6周学习计划，攻克JavaScript难关&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;amp;mid=2651223880&amp;amp;idx=1&amp;amp;sn=9d59b9f4a399a75e98950e162cb89398&amp;amp;chksm=bd49aecc8a3e27da998d1448fa4370c77d702e1e7a918f998e4fa9cec101f046decee64ac172&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1112cSLwvdvgtt7PMhOw2YiO#rd&quot;&gt;6周学习计划，攻克JavaScript难关&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;这其实是讲如何学习react，通过6周时间，6个阶段，学会6个技术，按照本文一步一步走下去，react就不在话下了，也建议老司机关注一下react，这个技术有点意思。&lt;/p&gt;
+&lt;h3 id=&quot;前端的学习&quot;&gt;&lt;a href=&quot;#前端的学习&quot; class=&quot;headerlink&quot; title=&quot;前端的学习&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;amp;mid=2651223798&amp;amp;idx=1&amp;amp;sn=4d84d3dd80d44264b2b3794977e09c66&amp;amp;chksm=bd49af728a3e2664d8bda1337516a1a7846f8047942663f30e7af644205350da497359f91ab7&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1109Htuolk6iWEhdmBUWwan3#rd&quot;&gt;前端的学习&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;@大漠 老师通过亲身经历，现身说法，将你如何学好前端，特别是在如今技术发展的速度超过我们学习速度的情况下，如何在信息爆炸，信息过载的情况下，学好前端呢。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第1011期</title>
+    <link href="https://exp-team.github.io/blog/2016/11/06/weekly/weekly-1011/"/>
+    <id>https://exp-team.github.io/blog/2016/11/06/weekly/weekly-1011/</id>
+    <published>2016-11-05T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>10.31-11.6，雾霾这么大，我们快看不清这个世界了，但是一定要来这里看一看~</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="写一个符合-Promises-A-规范并可配合-ES7-async-await-使用的-Promise"><a href="#写一个符合-Promises-A-规范并可配合-ES7-async-await-使用的-Promise" class="headerlink" title="写一个符合 Promises/A+ 规范并可配合 ES7 async/await 使用的 Promise"></a><a href="https://www.ftandy.com/2016/10/30/mimi-promise/" target="_blank" rel="external">写一个符合 Promises/A+ 规范并可配合 ES7 async/await 使用的 Promise</a></h3><p>如今promise已经被广泛的接受并使用，大多数人对它的api已经非常熟悉了，所以这里分享的就不是使用篇了，这篇文章主要是深入原理，里面讲的microtask还是比较生硬难懂，讲得比较复杂；但是整个promise从构造到回调的整个过程都讲的非常想起，要是再加上一些图文讲解会更完美了。</p>
+<h3 id="jQuery还有意义吗"><a href="#jQuery还有意义吗" class="headerlink" title="jQuery还有意义吗"></a><a href="http://www.zcfy.cc/article/is-jquery-still-relevant-1442.html" target="_blank" rel="external">jQuery还有意义吗</a></h3><p>不管jquery是否还有意义，它都是前端开发史上的经典，“write less,do more”， 这是至今大多类库和框架应该都在遵循的理念。</p>
+<a id="more"></a>
+<h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="Web-的阅读体验如何时变得那么差？"><a href="#Web-的阅读体验如何时变得那么差？" class="headerlink" title="Web 的阅读体验如何时变得那么差？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963784&amp;idx=1&amp;sn=7b084d2c32d031b3989ba96bec48b897&amp;chksm=843a132eb34d9a38f2bfed665f65e2926a861468f5a29c716bc70752d896525648e6cc2f2e41&amp;mpshare=1&amp;scene=1&amp;srcid=1103WbcdmlDy7aXDD7X31nrE#rd" target="_blank" rel="external">Web 的阅读体验如何时变得那么差？</a></h3><p>这里不得不说现在的web设计师设计的页面都非常吸引眼球，但是也越来越偏离初衷；任何无视对比度以时尚为基础，满足于“在我完美的办公室的完美显示器上看起来完美”的设计者，其实忘记了他们是在给谁设计。</p>
+<h3 id="微信小程序的想象力与不可想象域"><a href="#微信小程序的想象力与不可想象域" class="headerlink" title="微信小程序的想象力与不可想象域"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5ODQwMjA4MA==&amp;mid=2649293661&amp;idx=1&amp;sn=cfa57f34aee709690f70993a3942e8f1&amp;chksm=bed6e21289a16b04806dcdc22065d682deb3cf26719ca3c607ad9e7a4d053b761402abe8a8dd&amp;mpshare=1&amp;scene=1&amp;srcid=1103viKFAo2p9hvpYuMwjnN8#rd" target="_blank" rel="external">微信小程序的想象力与不可想象域</a></h3><p>对于微信小程序的看法，大家都众说纷纭，关于它的好与坏，利与弊，网上也分析了很多，所以这里也就不做过多的解释，感兴趣的就戳进去了解一下~</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;10.31-11.6，雾霾这么大，我们快看不清这个世界了，但是一定要来这里看一看~&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;写一个符合-Promises-A-规范并可配合-ES7-async-await-使用的-Promise&quot;&gt;&lt;a href=&quot;#写一个符合-Promises-A-规范并可配合-ES7-async-await-使用的-Promise&quot; class=&quot;headerlink&quot; title=&quot;写一个符合 Promises/A+ 规范并可配合 ES7 async/await 使用的 Promise&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://www.ftandy.com/2016/10/30/mimi-promise/&quot;&gt;写一个符合 Promises/A+ 规范并可配合 ES7 async/await 使用的 Promise&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;如今promise已经被广泛的接受并使用，大多数人对它的api已经非常熟悉了，所以这里分享的就不是使用篇了，这篇文章主要是深入原理，里面讲的microtask还是比较生硬难懂，讲得比较复杂；但是整个promise从构造到回调的整个过程都讲的非常想起，要是再加上一些图文讲解会更完美了。&lt;/p&gt;
+&lt;h3 id=&quot;jQuery还有意义吗&quot;&gt;&lt;a href=&quot;#jQuery还有意义吗&quot; class=&quot;headerlink&quot; title=&quot;jQuery还有意义吗&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.zcfy.cc/article/is-jquery-still-relevant-1442.html&quot;&gt;jQuery还有意义吗&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;不管jquery是否还有意义，它都是前端开发史上的经典，“write less,do more”， 这是至今大多类库和框架应该都在遵循的理念。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第1010期</title>
+    <link href="https://exp-team.github.io/blog/2016/10/31/weekly/weekly-1010/"/>
+    <id>https://exp-team.github.io/blog/2016/10/31/weekly/weekly-1010/</id>
+    <published>2016-10-30T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>10.23-10.31，天寒色青苍，北风叫枯桑。天气渐凉，转眼入冬。冬季是存储收获能量的季节，所谓严冬不肃杀，何以见阳春？这期的主题是：博观而约取，厚积而薄发</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="Immutable-详解及-React-中实践"><a href="#Immutable-详解及-React-中实践" class="headerlink" title="Immutable 详解及 React 中实践"></a><a href="https://segmentfault.com/a/1190000003910357" target="_blank" rel="external">Immutable 详解及 React 中实践</a></h3><p>逝者如斯，而未尝往也；盈虚者如彼，而卒莫消长也。盖将自其变者而观之，则天地曾不能以一瞬；自其不变者而观之，则物与我皆无尽也，而又何羡乎！且看这篇文章，对于不可变对象的理解。</p>
+<h3 id="Vue作者尤雨溪：以匠人的态度不断打磨完善Vue"><a href="#Vue作者尤雨溪：以匠人的态度不断打磨完善Vue" class="headerlink" title="Vue作者尤雨溪：以匠人的态度不断打磨完善Vue"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651223644&amp;idx=1&amp;sn=638d227113b840528b9500f724925f28&amp;chksm=bd49afd88a3e26ce3af5d52f0c2bd33470eb06dea809568019b6abf19556fb6138bc02952e17&amp;mpshare=1&amp;scene=1&amp;srcid=1030AU17YAOQvw8cHD6iTOsE&amp;from=groupmessage&amp;isappinstalled=0#wechat_redirect" target="_blank" rel="external">Vue作者尤雨溪：以匠人的态度不断打磨完善Vue</a></h3><p>微妙在智，触类而长；玄通阴阳，巧夺造化。工匠精神对待自己的程序、设计，想必代码必然巧夺天工。</p>
+<a id="more"></a>
+<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="What-is-CSS"><a href="#What-is-CSS" class="headerlink" title="What is CSS?"></a><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Getting_Started/What_is_CSS" target="_blank" rel="external">What is CSS?</a></h3><p>Cascading Style Sheets (CSS) is a language for specifying how documents are presented to users. These documents are written in a markup language such as HTML.<br>A document is a collection of information that is structured using a markup language.</p>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="京东前端：PhantomJS-和NodeJS在京东网站前端监控平台的最佳实践"><a href="#京东前端：PhantomJS-和NodeJS在京东网站前端监控平台的最佳实践" class="headerlink" title="京东前端：PhantomJS 和NodeJS在京东网站前端监控平台的最佳实践"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIwNjQwMzUwMQ==&amp;mid=2247484138&amp;idx=1&amp;sn=431702ee926dd3a92403bb58417d88d4&amp;mpshare=1&amp;scene=1&amp;srcid=1026hH6mKC5fDhRf7wkKvkNa&amp;from=groupmessage&amp;isappinstalled=0#wechat_redirect" target="_blank" rel="external">京东前端：PhantomJS 和NodeJS在京东网站前端监控平台的最佳实践</a></h3><p>非常喜欢PhantomJS的命名，更喜欢这样的实践。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="前端进阶之路：如何高质量完成产品需求开发"><a href="#前端进阶之路：如何高质量完成产品需求开发" class="headerlink" title="前端进阶之路：如何高质量完成产品需求开发"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651223581&amp;idx=1&amp;sn=dc336bab4ddbd7ee4c3d979971566725&amp;chksm=bd49af998a3e268ff9c8052b0cc2d05b548c7f8c645bec1bb6de3082df5407e61a4cdf05abe5&amp;scene=0&amp;from=groupmessage&amp;isappinstalled=0#wechat_redirect" target="_blank" rel="external">前端进阶之路：如何高质量完成产品需求开发</a></h3><h3 id="一个炫酷的H5"><a href="#一个炫酷的H5" class="headerlink" title="一个炫酷的H5"></a><a href="http://invite.jeejoy.com/pc.html" target="_blank" rel="external">一个炫酷的H5</a></h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;10.23-10.31，天寒色青苍，北风叫枯桑。天气渐凉，转眼入冬。冬季是存储收获能量的季节，所谓严冬不肃杀，何以见阳春？这期的主题是：博观而约取，厚积而薄发&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;Immutable-详解及-React-中实践&quot;&gt;&lt;a href=&quot;#Immutable-详解及-React-中实践&quot; class=&quot;headerlink&quot; title=&quot;Immutable 详解及 React 中实践&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://segmentfault.com/a/1190000003910357&quot;&gt;Immutable 详解及 React 中实践&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;逝者如斯，而未尝往也；盈虚者如彼，而卒莫消长也。盖将自其变者而观之，则天地曾不能以一瞬；自其不变者而观之，则物与我皆无尽也，而又何羡乎！且看这篇文章，对于不可变对象的理解。&lt;/p&gt;
+&lt;h3 id=&quot;Vue作者尤雨溪：以匠人的态度不断打磨完善Vue&quot;&gt;&lt;a href=&quot;#Vue作者尤雨溪：以匠人的态度不断打磨完善Vue&quot; class=&quot;headerlink&quot; title=&quot;Vue作者尤雨溪：以匠人的态度不断打磨完善Vue&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;amp;mid=2651223644&amp;amp;idx=1&amp;amp;sn=638d227113b840528b9500f724925f28&amp;amp;chksm=bd49afd88a3e26ce3af5d52f0c2bd33470eb06dea809568019b6abf19556fb6138bc02952e17&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1030AU17YAOQvw8cHD6iTOsE&amp;amp;from=groupmessage&amp;amp;isappinstalled=0#wechat_redirect&quot;&gt;Vue作者尤雨溪：以匠人的态度不断打磨完善Vue&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;微妙在智，触类而长；玄通阴阳，巧夺造化。工匠精神对待自己的程序、设计，想必代码必然巧夺天工。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第1001期</title>
+    <link href="https://exp-team.github.io/blog/2016/10/22/weekly/weekly-1001/"/>
+    <id>https://exp-team.github.io/blog/2016/10/22/weekly/weekly-1001/</id>
+    <published>2016-10-21T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>10.16-10.22，本期的主题是不忘初心，还记得你当初为什么选择前端吗？</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="清蒸HTML"><a href="#清蒸HTML" class="headerlink" title="清蒸HTML"></a><a href="https://zhuanlan.zhihu.com/p/22909445" target="_blank" rel="external">清蒸HTML</a></h3><p>烹饪方法有数十种，而我独爱清蒸与白煮，因为能够尝到食物本来的味道，如今我们太多人追逐新东西，却忽略了最原本的东西，我再次忠告大家，切勿舍本逐末，这篇文章就像你讲述了原汁原味的HTML的味道，那么快来品尝吧。</p>
+<h3 id="JavaScript世界万物诞生记"><a href="#JavaScript世界万物诞生记" class="headerlink" title="JavaScript世界万物诞生记"></a><a href="https://zhuanlan.zhihu.com/p/22989691" target="_blank" rel="external">JavaScript世界万物诞生记</a></h3><p>易有太极，是生两仪，两仪生四象，四象生八卦，八卦生万物，极力向大家推荐此文，本文从null开篇，循序渐进的介绍js的方方面面，文笔流畅，一定是搞易经的跨界来搞js了，^_^。</p>
+<h3 id="我终于弄懂了各种前端build工具"><a href="#我终于弄懂了各种前端build工具" class="headerlink" title="我终于弄懂了各种前端build工具"></a><a href="https://www.sdk.cn/news/5412" target="_blank" rel="external">我终于弄懂了各种前端build工具</a></h3><p>如果你在为如今层出不穷的新工具而苦恼，那么不妨来看看这篇文章，其将工具分为安装和辅助两类，工具是加快工作效率的，切勿为了工具而工具，找到自己工作的痛点，选择合适的工具，正所谓工欲善其事必先利其器，一文读懂前端各种工具。</p>
+<a id="more"></a>
+<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="原来css中的border还可以这样玩"><a href="#原来css中的border还可以这样玩" class="headerlink" title="原来css中的border还可以这样玩"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDA2MTI1MA==&amp;mid=2649084262&amp;idx=1&amp;sn=e331ee87cd8fee60d33bdc2c1d7c4bb7&amp;chksm=be5bf6cb892c7fdd2369df2fee6b5e414e371a9458627f6d4efc25c0a8f3705f9f909f73cf3b&amp;mpshare=1&amp;scene=1&amp;srcid=1020QApMwzfUUYa3GYAVcaeT#rd" target="_blank" rel="external">原来css中的border还可以这样玩</a></h3><p>只有你想不到，没有我做不到，最简单的border也能玩出这么多新花样，快来阅读这篇文章，学会如何用border绘制各种形状。</p>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="有了-async-await-我们和-Promise-还能像从前一样两小无猜吗"><a href="#有了-async-await-我们和-Promise-还能像从前一样两小无猜吗" class="headerlink" title="有了 async/await, 我们和 Promise 还能像从前一样两小无猜吗?"></a><a href="https://zhuanlan.zhihu.com/p/22938062" target="_blank" rel="external">有了 async/await, 我们和 Promise 还能像从前一样两小无猜吗?</a></h3><p>generator用来做异步，总是给人一种别叫的感觉，就像我们把float用来做多列一样，有一种hack的感觉，但ES2018将会引入的async/await带来了全新的异步函数，快来先睹为快吧。</p>
+<h3 id="这个API很“迷人”——-新的Fetch-API"><a href="#这个API很“迷人”——-新的Fetch-API" class="headerlink" title="这个API很“迷人”——(新的Fetch API)"></a><a href="https://www.w3ctech.com/topic/854" target="_blank" rel="external">这个API很“迷人”——(新的Fetch API)</a></h3><p>HTML5带来了一个新的获取资源的api，比起xhr蹩脚的设计，这个api迷人的多，但目前兼容性可能还有问题，持续关注ing。</p>
+<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="Chrome-54终结YouTube的Flash内嵌技术"><a href="#Chrome-54终结YouTube的Flash内嵌技术" class="headerlink" title="Chrome 54终结YouTube的Flash内嵌技术"></a><a href="https://www.infoq.com/news/2016/10/chrome54-youtube" target="_blank" rel="external">Chrome 54终结YouTube的Flash内嵌技术</a></h3><h3 id="响应式图像"><a href="#响应式图像" class="headerlink" title="响应式图像"></a><a href="https://isux.tencent.com/responsive-image.html" target="_blank" rel="external">响应式图像</a></h3><h3 id="被解放的GPU"><a href="#被解放的GPU" class="headerlink" title="被解放的GPU"></a><a href="https://isux.tencent.com/emancipate-gpu.html" target="_blank" rel="external">被解放的GPU</a></h3><h3 id="WEB-安全：JSONP-沙箱技术实现"><a href="#WEB-安全：JSONP-沙箱技术实现" class="headerlink" title="WEB 安全：JSONP 沙箱技术实现"></a><a href="https://github.com/aui/jsonp-sandbox/issues/13" target="_blank" rel="external">WEB 安全：JSONP 沙箱技术实现</a></h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;10.16-10.22，本期的主题是不忘初心，还记得你当初为什么选择前端吗？&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;清蒸HTML&quot;&gt;&lt;a href=&quot;#清蒸HTML&quot; class=&quot;headerlink&quot; title=&quot;清蒸HTML&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/22909445&quot;&gt;清蒸HTML&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;烹饪方法有数十种，而我独爱清蒸与白煮，因为能够尝到食物本来的味道，如今我们太多人追逐新东西，却忽略了最原本的东西，我再次忠告大家，切勿舍本逐末，这篇文章就像你讲述了原汁原味的HTML的味道，那么快来品尝吧。&lt;/p&gt;
+&lt;h3 id=&quot;JavaScript世界万物诞生记&quot;&gt;&lt;a href=&quot;#JavaScript世界万物诞生记&quot; class=&quot;headerlink&quot; title=&quot;JavaScript世界万物诞生记&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/22989691&quot;&gt;JavaScript世界万物诞生记&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;易有太极，是生两仪，两仪生四象，四象生八卦，八卦生万物，极力向大家推荐此文，本文从null开篇，循序渐进的介绍js的方方面面，文笔流畅，一定是搞易经的跨界来搞js了，^_^。&lt;/p&gt;
+&lt;h3 id=&quot;我终于弄懂了各种前端build工具&quot;&gt;&lt;a href=&quot;#我终于弄懂了各种前端build工具&quot; class=&quot;headerlink&quot; title=&quot;我终于弄懂了各种前端build工具&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://www.sdk.cn/news/5412&quot;&gt;我终于弄懂了各种前端build工具&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;如果你在为如今层出不穷的新工具而苦恼，那么不妨来看看这篇文章，其将工具分为安装和辅助两类，工具是加快工作效率的，切勿为了工具而工具，找到自己工作的痛点，选择合适的工具，正所谓工欲善其事必先利其器，一文读懂前端各种工具。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>调研webp图片格式</title>
+    <link href="https://exp-team.github.io/blog/2016/10/19/web/study-webp/"/>
+    <id>https://exp-team.github.io/blog/2016/10/19/web/study-webp/</id>
+    <published>2016-10-18T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近在调研为经验引入webp的可能性，下面总结一下最近的调研成果。</p>
+<a id="more"></a>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>webp是谷歌在2010年开源的一种新的图片格式，目前在谷歌浏览器（9+）和安卓（4.0+）里面都有很好的兼容性。</p>
+<p>根据谷歌官方给出的数据，无损压缩webp图片比png图片小26%，有损压缩的webp可以比jpeg小25-34%，下面测试案例中有具体的demo，大家可以亲眼查看效果。</p>
+<p>鉴于webp的优点，推荐引入webp格式。</p>
+<p><strong>注意：webp格式会增加解码时间，是png的4-5倍（毫秒级）</strong></p>
+<p>谷歌官方给了几种向后兼容使用webp的方案：</p>
+<ul>
+<li>服务器端检测</li>
+<li>js监测</li>
+<li>html5 picture</li>
+</ul>
+<h2 id="PC端方案"><a href="#PC端方案" class="headerlink" title="PC端方案"></a>PC端方案</h2><p>通过<a href="http://caniuse.com/#search=webp" target="_blank" rel="external">caniuse</a>，我们可以看到opera(11+)和chrome(9+)支持webp格式，但其他浏览器几乎全军覆没。</p>
+<p><img src="/bimg/443.png" alt=""></p>
+<p>通过百度流量研究院给出的<a href="http://tongji.baidu.com/data/browser" target="_blank" rel="external">浏览器数据</a>看，chrome占比非常高，你应该根据自己网站的流量统计作出具体决定。</p>
+<p><img src="/bimg/445.png" alt=""></p>
+<p>pc端建议的方案是html5的<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/picture" target="_blank" rel="external">picture</a>，<a href="http://caniuse.com/#search=picture" target="_blank" rel="external">caniuse</a>显示picture和webp兼容性（在chrome上）几乎是一样的。</p>
+<p><img src="/bimg/444.png" alt=""></p>
+<p>一个picture的简单demo如下：</p>
+<pre><code>&lt;picture&gt;
+    &lt;source srcset=&quot;xxx.webp&quot; type=&quot;image/webp&quot;&gt;
+    &lt;img src=&quot;xxx.png&quot; alt=&quot;test&quot;&gt;
+&lt;/picture&gt;
+</code></pre><h2 id="移动端方案"><a href="#移动端方案" class="headerlink" title="移动端方案"></a>移动端方案</h2><p>webp在安卓上的兼容性非常好，但ios完全不支持，<a href="http://caniuse.com/#search=webp" target="_blank" rel="external">caniuse</a>显示兼容安卓4.0以上版本</p>
+<p><img src="/bimg/446.png" alt=""></p>
+<p>通过百度统计出来的流量看，移动端安卓占比为70%+，你应该根据自己网站的流量统计作出具体决定。</p>
+<p><img src="/bimg/447.png" alt=""></p>
+<p>由于picture在移动端兼容性不好，所以这种方案不太可取，可以采用js监测方案，js方案要求图片必须是异步加载，下面是谷歌官方给出的代码示例</p>
+<pre><code>// check_webp_feature:
+//   &apos;feature&apos; can be one of &apos;lossy&apos;, &apos;lossless&apos;, &apos;alpha&apos; or &apos;animation&apos;.
+//   &apos;callback(feature, result)&apos; will be passed back the detection result (in an asynchronous way!)
+function check_webp_feature(feature, callback) {
+    var kTestImages = {
+        lossy: &quot;UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA&quot;,
+        lossless: &quot;UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==&quot;,
+        alpha: &quot;UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAARBxAR/Q9ERP8DAABWUDggGAAAABQBAJ0BKgEAAQAAAP4AAA3AAP7mtQAAAA==&quot;,
+        animation: &quot;UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA&quot;
+    };
+    var img = new Image();
+    img.onload = function () {
+        var result = (img.width &gt; 0) &amp;&amp; (img.height &gt; 0);
+        callback(feature, result);
+    };
+    img.onerror = function () {
+        callback(feature, false);
+    };
+    img.src = &quot;data:image/webp;base64,&quot; + kTestImages[feature];
+}
+</code></pre><p>目前是基于回调，可以封装成promise。</p>
+<h2 id="相关工具"><a href="#相关工具" class="headerlink" title="相关工具"></a>相关工具</h2><ul>
+<li><a href="https://isparta.github.io/" target="_blank" rel="external">iSparta 图片压缩与格式转换工具</a></li>
+<li><a href="http://zhitu.isux.us/" target="_blank" rel="external">智图 高效优质的图片优化平台</a></li>
+</ul>
+<h2 id="测试案例"><a href="#测试案例" class="headerlink" title="测试案例"></a>测试案例</h2><ul>
+<li><a href="https://developers.google.com/speed/webp/gallery" target="_blank" rel="external">官方demo</a></li>
+<li><a href="https://isparta.github.io/compare-webp/index.html#12345" target="_blank" rel="external">isparta静态图片</a></li>
+<li><a href="https://isparta.github.io/compare-webp/index_a.html#12" target="_blank" rel="external">isparta动图</a></li>
+</ul>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a href="https://developers.google.com/speed/webp/" target="_blank" rel="external">webp官网</a></li>
+<li><a href="https://isux.tencent.com/introduction-of-webp.html" target="_blank" rel="external">WebP 探寻之路</a></li>
+<li><a href="http://zhitu.isux.us/index.php/preview/webp" target="_blank" rel="external">WebP使用方案</a>   </li>
+</ul>
+<p>原文地址：<a href="http://yanhaijing.com/web/2016/10/19/study-webp/" target="_blank" rel="external">http://yanhaijing.com/web/2016/10/19/study-webp/</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近在调研为经验引入webp的可能性，下面总结一下最近的调研成果。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="web" scheme="https://exp-team.github.io/categories/web/"/>
+    
+    
+      <category term="web" scheme="https://exp-team.github.io/tags/web/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第1000期</title>
+    <link href="https://exp-team.github.io/blog/2016/10/13/weekly/weekly-1000/"/>
+    <id>https://exp-team.github.io/blog/2016/10/13/weekly/weekly-1000/</id>
+    <published>2016-10-12T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>10.7-10.13 知识和能力是一点一点积累起来的，要留意有扎实的基础，要留意温习和巩固，不能急于求成。</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="php-smarty模板引擎"><a href="#php-smarty模板引擎" class="headerlink" title="php-smarty模板引擎"></a><a href="http://www.jianshu.com/p/32e08dec123a" target="_blank" rel="external">php-smarty模板引擎</a></h3><p>这篇文章对于smarty模板的讲解非常全面，由浅到深，从smarty的简介到api到设计都有介绍到，个人觉得讲的内容有点多，有点不好消化，感兴趣的也可以去看一下smarty的官方文档。<a href="http://www.smarty.net/docs/zh_CN/" target="_blank" rel="external">Smarty3 手册 | Smarty</a>    </p>
+<h3 id="回调地狱的今生前世-JavaScript"><a href="#回调地狱的今生前世-JavaScript" class="headerlink" title="回调地狱的今生前世@JavaScript"></a><a href="https://github.com/rccoder/blog/issues/17" target="_blank" rel="external">回调地狱的今生前世@JavaScript</a></h3><p>一想到回调，大家都会想到异步，因为JavaScript一门单线程的语言，在执行过程中线程不能被阻塞，所以在js编程的时候我们都会采用回调的方式来实现异步，异步编程就是在执行一个指令之后不是马上得到结果，而是继续执行后面的指令，等到特定的事件触发后，才得到结果。这篇文章只是对比性的介绍了四种异步编程的方式：回调、promise、Generator、await/async；个人觉得并不够详细，更多细节还得单独的去找相关的知识点，以前开发过程中用得最多的就是回调，但是es6推出的promise引领了新的潮流，promise是一个对返回结果具有占位符意义的对象，函数的调用者注册回调函数，一旦结果运算完毕就通知promis。Generrator以及await/async暂时还没有尝试过，待我大师兄分享完过后再补充；</p>
+<h3 id="JavaScript生态圈现状：初学者地图"><a href="#JavaScript生态圈现状：初学者地图" class="headerlink" title="JavaScript生态圈现状：初学者地图"></a><a href="http://www.infoq.com/cn/articles/state-of-javascript-2016" target="_blank" rel="external">JavaScript生态圈现状：初学者地图</a></h3><p>这篇文章读完后非常有感触，作为一个前端新手来说，刚入门等待你的就是从零到一个成熟的生态圈的进化史，你在这个过程中没有丰富的经验和实战的话你就很容易迷茫，一系列的框架、专业术语、构建工具也很容易让你混淆，此时最重要的就是点进来看看，这篇文章写得非常清晰明了，或许会让你找到自己方向。</p>
+<a id="more"></a>
+<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="京东单品页前端开发那些不得不说的事儿"><a href="#京东单品页前端开发那些不得不说的事儿" class="headerlink" title="京东单品页前端开发那些不得不说的事儿"></a><a href="https://keelii.github.io/2016/07/31/something-have-to-say-with-JD-item/" target="_blank" rel="external">京东单品页前端开发那些不得不说的事儿</a></h3><h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="说说浏览器端缓存的那点事儿-扑朔迷离的-etag-与-last-modified"><a href="#说说浏览器端缓存的那点事儿-扑朔迷离的-etag-与-last-modified" class="headerlink" title="说说浏览器端缓存的那点事儿-扑朔迷离的 etag 与 last-modified "></a><a href="https://github.com/rccoder/blog/issues/12" target="_blank" rel="external">说说浏览器端缓存的那点事儿-扑朔迷离的 etag 与 last-modified </a></h3><p>照目前来看，有关前端性能已经是一个老生常谈的话题了，学习前端不只是会制作一张酷炫吊炸天的页面呈现在用户面前，而是在开发过程中也要实时关注你开发的东西会付出什么样的代价，并且要学会取舍，这篇文章只针对前段缓存，对http头部的几个参数进行讲解，这里大家可以去看看《图解http》可以全面的了解http的头部参数，比较有意思。</p>
+<h3 id="H5-视频直播那些事"><a href="#H5-视频直播那些事" class="headerlink" title="H5 视频直播那些事"></a><a href="http://dev.qq.com/topic/57a42ee6503dfcb22007ede8" target="_blank" rel="external">H5 视频直播那些事</a></h3><h3 id="什么时候不该使用es6箭头函数"><a href="#什么时候不该使用es6箭头函数" class="headerlink" title="什么时候不该使用es6箭头函数"></a><a href="https://segmentfault.com/a/1190000007074846" target="_blank" rel="external">什么时候不该使用es6箭头函数</a></h3><h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="技术的执念"><a href="#技术的执念" class="headerlink" title="技术的执念"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA5Njc3Njk5NA==&amp;mid=2650528962&amp;idx=1&amp;sn=425a166af78f17f25187a9b547da9fc8&amp;chksm=88a59a8fbfd213992b553945fe9de7138abb07c61da9fb15b3d3d7e6e19534763b786915c143&amp;mpshare=1&amp;scene=1&amp;srcid=1008IqSQZLPuEwhw6JySffO0#rd" target="_blank" rel="external">技术的执念</a></h3><p>其实这篇文章与《JavaScript生态圈现状：初学者地图》和下面的这篇文章比较类似，都是有关于怎么筛选学习的，大家可以对比起来阅读以下</p>
+<h3 id="找到适合自己的前端发展方向"><a href="#找到适合自己的前端发展方向" class="headerlink" title="找到适合自己的前端发展方向"></a><a href="http://www.zhangxinxu.com/wordpress/2016/08/find-own-frontend-direction/" target="_blank" rel="external">找到适合自己的前端发展方向</a></h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;10.7-10.13 知识和能力是一点一点积累起来的，要留意有扎实的基础，要留意温习和巩固，不能急于求成。&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;php-smarty模板引擎&quot;&gt;&lt;a href=&quot;#php-smarty模板引擎&quot; class=&quot;headerlink&quot; title=&quot;php-smarty模板引擎&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.jianshu.com/p/32e08dec123a&quot;&gt;php-smarty模板引擎&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;这篇文章对于smarty模板的讲解非常全面，由浅到深，从smarty的简介到api到设计都有介绍到，个人觉得讲的内容有点多，有点不好消化，感兴趣的也可以去看一下smarty的官方文档。&lt;a href=&quot;http://www.smarty.net/docs/zh_CN/&quot;&gt;Smarty3 手册 | Smarty&lt;/a&gt;    &lt;/p&gt;
+&lt;h3 id=&quot;回调地狱的今生前世-JavaScript&quot;&gt;&lt;a href=&quot;#回调地狱的今生前世-JavaScript&quot; class=&quot;headerlink&quot; title=&quot;回调地狱的今生前世@JavaScript&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://github.com/rccoder/blog/issues/17&quot;&gt;回调地狱的今生前世@JavaScript&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;一想到回调，大家都会想到异步，因为JavaScript一门单线程的语言，在执行过程中线程不能被阻塞，所以在js编程的时候我们都会采用回调的方式来实现异步，异步编程就是在执行一个指令之后不是马上得到结果，而是继续执行后面的指令，等到特定的事件触发后，才得到结果。这篇文章只是对比性的介绍了四种异步编程的方式：回调、promise、Generator、await/async；个人觉得并不够详细，更多细节还得单独的去找相关的知识点，以前开发过程中用得最多的就是回调，但是es6推出的promise引领了新的潮流，promise是一个对返回结果具有占位符意义的对象，函数的调用者注册回调函数，一旦结果运算完毕就通知promis。Generrator以及await/async暂时还没有尝试过，待我大师兄分享完过后再补充；&lt;/p&gt;
+&lt;h3 id=&quot;JavaScript生态圈现状：初学者地图&quot;&gt;&lt;a href=&quot;#JavaScript生态圈现状：初学者地图&quot; class=&quot;headerlink&quot; title=&quot;JavaScript生态圈现状：初学者地图&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.infoq.com/cn/articles/state-of-javascript-2016&quot;&gt;JavaScript生态圈现状：初学者地图&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;这篇文章读完后非常有感触，作为一个前端新手来说，刚入门等待你的就是从零到一个成熟的生态圈的进化史，你在这个过程中没有丰富的经验和实战的话你就很容易迷茫，一系列的框架、专业术语、构建工具也很容易让你混淆，此时最重要的就是点进来看看，这篇文章写得非常清晰明了，或许会让你找到自己方向。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第111期</title>
+    <link href="https://exp-team.github.io/blog/2016/09/24/weekly/weekly-111/"/>
+    <id>https://exp-team.github.io/blog/2016/09/24/weekly/weekly-111/</id>
+    <published>2016-09-23T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>9.12-9.24，每一篇文章都凝结着心血，没有哪一篇文章是不好的，而是没有找到对的人，我多想让每一篇文章找到需要的人，想你所想，给你所需。</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="是什么使一名好程序员变得伟大"><a href="#是什么使一名好程序员变得伟大" class="headerlink" title="是什么使一名好程序员变得伟大"></a><a href="http://zcfy.cc/article/what-makes-a-good-developer-great-1316.html" target="_blank" rel="external">是什么使一名好程序员变得伟大</a></h3><p>如果你是一个一直想做的更有序，我建议你看看这篇文章，文中列举了好的程序员和伟大程序员之间的区别，我的建议是从其中挑一点然后去做，让我们一起变的伟大，together stronger。</p>
+<h3 id="如何增强单页应用的体验"><a href="#如何增强单页应用的体验" class="headerlink" title="如何增强单页应用的体验"></a><a href="https://github.com/xufei/blog/issues/35" target="_blank" rel="external">如何增强单页应用的体验</a></h3><p>@徐飞 大大的文章，从多个方面深入思考了如何做好单页，如果你问一个人单页好不好做，对方回答你很简单啊balabala，那他一定是一个眼高手低的新手；而老司机就是徐大大这种，深思良久，从多个方面娓娓道来，让你不得不佩服老司机就是老司机，失之毫厘谬以千里。</p>
+<h3 id="优秀的JavaScript模块是怎样炼成的"><a href="#优秀的JavaScript模块是怎样炼成的" class="headerlink" title="优秀的JavaScript模块是怎样炼成的"></a><a href="http://www.infoq.com/cn/articles/how-to-create-great-js-module" target="_blank" rel="external">优秀的JavaScript模块是怎样炼成的</a></h3><p>@仆灵 大大的一篇老文章，但今天看仍然值得一读，文章中提到的思想至今意义仍然很大，虽然ES6的模块已经可以取代commonjs了，但模块化的思想至今不变，一切大而全的东西都将死去，小而美终得永生，程序本该由很多功能单一的模块组成， 每个人都可以的挑选自己想要的模块来完成指定的功能，这正是web的精髓——free。</p>
+<a id="more"></a>
+<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="CSRF-是什么？"><a href="#CSRF-是什么？" class="headerlink" title="CSRF 是什么？"></a><a href="https://zhuanlan.zhihu.com/p/22521378" target="_blank" rel="external">CSRF 是什么？</a></h3><p>作为一个前端一定知道XSS是什么，但却不一定知道CRSF是什么，其实我以前也一直搞不懂CRSF是什么，看了这篇文章终于明白了。</p>
+<p>任何对非幂等有规律的数据库操作，都可能存在危险，关于如何防范CSRF文章中也有介绍。</p>
+<h3 id="网易前端技术总监帮你解决前端困惑"><a href="#网易前端技术总监帮你解决前端困惑" class="headerlink" title="网易前端技术总监帮你解决前端困惑"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651222935&amp;idx=1&amp;sn=7f0b476ac7fa523342c9d9416569d83d&amp;chksm=bd49aa138a3e230553a1400d0ce7222323f69f8224146f1daeab5b958e973c0c08863d63c1be&amp;scene=1&amp;srcid=0913w63bXkxoEwTNcEXW49CF#rd" target="_blank" rel="external">网易前端技术总监帮你解决前端困惑</a></h3><p>2017年校招已经快结束了，对于17年毕业想踏入前端的同学建议看看这篇文章，老司机帮你解惑前端入门的种种问题，老司机请绕路。</p>
+<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="如何实现-font-size-的响应式"><a href="#如何实现-font-size-的响应式" class="headerlink" title="如何实现 font-size 的响应式"></a><a href="http://www.erichain.me/front-end/2016/09/05/how-to-implement-responsive-font-size.html" target="_blank" rel="external">如何实现 font-size 的响应式</a></h3><p>这篇文章思路有点意思，但目前来看calc和vw的兼容性还不容乐观，等哪天只用兼容安卓4.4+的时候就能放心使用了。不过对于响应式我们还是应该思考，对于大屏是想让用户查看更多的内容，还是让用户查看更大的字体，这其实是一个哲学问题。</p>
+<h3 id="两张图解释CSS动画的性能"><a href="#两张图解释CSS动画的性能" class="headerlink" title="两张图解释CSS动画的性能"></a><a href="https://github.com/ccforward/cc/issues/42" target="_blank" rel="external">两张图解释CSS动画的性能</a></h3><h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="前端框架现状调查-–-中期结果"><a href="#前端框架现状调查-–-中期结果" class="headerlink" title="前端框架现状调查 – 中期结果"></a><a href="http://www.zcfy.cc/article/the-state-of-javascript-front-end-frameworks-medium-1144.html" target="_blank" rel="external">前端框架现状调查 – 中期结果</a></h3><p>如你所想，react是目前最火爆的框架了，vue稳居第二，如果你愿意折腾，我建议你学习react，这周我也都在学习react，组件化，数据自动同步视图，虚拟dom都是非常nice的东西。</p>
+<h3 id="JavaScript异步编程的Promise模式"><a href="#JavaScript异步编程的Promise模式" class="headerlink" title="JavaScript异步编程的Promise模式"></a><a href="http://www.infoq.com/cn/news/2011/09/js-promise" target="_blank" rel="external">JavaScript异步编程的Promise模式</a></h3><p>最近我们在做一个文件上传的功能，用到了百度开源库webuploader，这个库用到了大量的promise，组内同学深刻认识了promise的重要性，在大量异步任务的情况下promise比callback方便太多。</p>
+<h2 id="微信"><a href="#微信" class="headerlink" title="微信"></a>微信</h2><h3 id="微信小程序开发资源汇总"><a href="#微信小程序开发资源汇总" class="headerlink" title="微信小程序开发资源汇总"></a><a href="https://github.com/justjavac/awesome-wechat-weapp" target="_blank" rel="external">微信小程序开发资源汇总</a></h3><p>这周如果你还不知道微信小应用程序那你真是out了，微博，知乎，朋友圈已经被各种消息刷屏，来推荐给你一个小应用程序资源汇总，里面对文章和资源进行了分类，你想要的全都在这里。</p>
+<h3 id="weui"><a href="#weui" class="headerlink" title="weui"></a><a href="https://weui.io/" target="_blank" rel="external">weui</a></h3><p>我目测这个库回火，这是微信官方维护的微信内页面的ui库，这个库可以让所有微信内页面UI统一，相信随着小程序的火爆，这个库也会火起来。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="如何优雅地参加技术分享会？"><a href="#如何优雅地参加技术分享会？" class="headerlink" title="如何优雅地参加技术分享会？"></a><a href="https://zhuanlan.zhihu.com/p/22322885" target="_blank" rel="external">如何优雅地参加技术分享会？</a></h3><p>其实现在我都不愿意参加技术分享会了，如果你找不到参加技术分享会的目的，那么建议你来看看这篇文章，一定要带着目的去做某件事情。</p>
+<h3 id="怎样看待比自己强的人"><a href="#怎样看待比自己强的人" class="headerlink" title="怎样看待比自己强的人"></a><a href="http://www.ourd3js.com/wordpress/1640/" target="_blank" rel="external">怎样看待比自己强的人</a></h3><p>不想多说，见贤思齐，择其善者而从之，则其不善者而改之，三人行必有我师。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;9.12-9.24，每一篇文章都凝结着心血，没有哪一篇文章是不好的，而是没有找到对的人，我多想让每一篇文章找到需要的人，想你所想，给你所需。&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;是什么使一名好程序员变得伟大&quot;&gt;&lt;a href=&quot;#是什么使一名好程序员变得伟大&quot; class=&quot;headerlink&quot; title=&quot;是什么使一名好程序员变得伟大&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://zcfy.cc/article/what-makes-a-good-developer-great-1316.html&quot;&gt;是什么使一名好程序员变得伟大&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;如果你是一个一直想做的更有序，我建议你看看这篇文章，文中列举了好的程序员和伟大程序员之间的区别，我的建议是从其中挑一点然后去做，让我们一起变的伟大，together stronger。&lt;/p&gt;
+&lt;h3 id=&quot;如何增强单页应用的体验&quot;&gt;&lt;a href=&quot;#如何增强单页应用的体验&quot; class=&quot;headerlink&quot; title=&quot;如何增强单页应用的体验&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://github.com/xufei/blog/issues/35&quot;&gt;如何增强单页应用的体验&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;@徐飞 大大的文章，从多个方面深入思考了如何做好单页，如果你问一个人单页好不好做，对方回答你很简单啊balabala，那他一定是一个眼高手低的新手；而老司机就是徐大大这种，深思良久，从多个方面娓娓道来，让你不得不佩服老司机就是老司机，失之毫厘谬以千里。&lt;/p&gt;
+&lt;h3 id=&quot;优秀的JavaScript模块是怎样炼成的&quot;&gt;&lt;a href=&quot;#优秀的JavaScript模块是怎样炼成的&quot; class=&quot;headerlink&quot; title=&quot;优秀的JavaScript模块是怎样炼成的&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.infoq.com/cn/articles/how-to-create-great-js-module&quot;&gt;优秀的JavaScript模块是怎样炼成的&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;@仆灵 大大的一篇老文章，但今天看仍然值得一读，文章中提到的思想至今意义仍然很大，虽然ES6的模块已经可以取代commonjs了，但模块化的思想至今不变，一切大而全的东西都将死去，小而美终得永生，程序本该由很多功能单一的模块组成， 每个人都可以的挑选自己想要的模块来完成指定的功能，这正是web的精髓——free。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第110期</title>
+    <link href="https://exp-team.github.io/blog/2016/09/11/weekly/weekly-110/"/>
+    <id>https://exp-team.github.io/blog/2016/09/11/weekly/weekly-110/</id>
+    <published>2016-09-10T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>9.4-9.11，纸上得来终觉浅，绝知此事要躬行。</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="when-react-meets-VIRTUAL-REALITY"><a href="#when-react-meets-VIRTUAL-REALITY" class="headerlink" title="when react meets VIRTUAL REALITY"></a><a href="http://m.youku.com/video/id_XMTYxNTQ2MDM4NA==.html?x=&amp;from=groupmessage&amp;isappinstalled=1" target="_blank" rel="external">when react meets VIRTUAL REALITY</a></h3><p>在这个月初，百度世界大会上，公司在VIRTUAL REALITY上的投入让人眼前一亮。说起VR，貌似是个遥不可及，门槛很高的领域。其实，作为前端开发者，也许VR距离你并不遥远。虽然现在距离VR在前端的成熟还有一段距离，但是古语说“小荷才露尖尖角，早有蜻蜓立上头”。本着满足好奇心也好，探索有趣的技术也好，这里给大家推荐这个视频。他是在React.js Conf 2016大会上，大神Eric Florenzano做的一篇演讲。主要涉及了他本人开发的移动端VR引擎，这个引擎的特别之处是由react.js驱动。对react.js有兴趣的同学也可以了解一下。演讲里，还对比了A-Frame。不知道大家对A-Frame了解多少，A-Frame作为Mozilla发布的全新开源框架，旨在帮助开发者更轻松的开发在浏览器中运行的高性能响应式的VR体验，而不用学习强大但非常复杂的 WebGL。他的学习资料在国内社区并不多，鼓励大家可以翻墙去了解更多知识。</p>
+<p>After a short moment in the 90s, Virtual Reality faded away. Now in 2016, VR is coming back in a big way. Games are leading the charge, but with millions of headsets pouring into the marketplace over the next few years, how can React web and app developers get involved? Can React even handle the screaming-fast performance requirements of VR? Spoiler: it can.<br>This talk explores these concepts by incrementally building up a mobile VR engine that can be driven not just with JavaScript, but with React. We’ll discover how naive approaches fail, and why game engines are built the way they are. Finally, we’ll cover some exciting work with WebVR which intends to bring VR to all browsers.</p>
+<p>废话说到这里，快戳开视频观看吧。另附YouTube地址：<a href="https://www.youtube.com/watch?v=ty2bFeOdGeI" target="_blank" rel="external">https://www.youtube.com/watch?v=ty2bFeOdGeI</a></p>
+<h3 id="认识javascript中的作用域和上下文"><a href="#认识javascript中的作用域和上下文" class="headerlink" title="认识javascript中的作用域和上下文"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjE5NzAyMA==&amp;mid=2649879768&amp;idx=1&amp;sn=03e5dd16a44d7ba23cef4dfd4b7a012e&amp;scene=1&amp;srcid=0909Z9n37xFfLJ3bCVxMjCoG&amp;from=groupmessage&amp;isappinstalled=0#wechat_redirect" target="_blank" rel="external">认识javascript中的作用域和上下文</a></h3><p>在追求最新技术和理念的同时，JS的基础知识同样不可忽略。所谓“水之积也不厚，则其负大舟也无力”－《庄子·逍摇游》，想想作为新同学，多少次因为JS中的this漂移踩了坑；多少次挣扎在原型链里不得解；面试时，闭包的知识有多少次被提及。“墙高基下，虽得必失”，千里之行，还要从基础开始。这里给大家安利一篇颜海镜大神的文章，希望大家能对js中的作用域了解有所加深。<br>最后，给大家布置课后作业：ES6中，关于作用域的改进有哪些呢？</p>
+<a id="more"></a>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="高效jQuery的奥秘"><a href="#高效jQuery的奥秘" class="headerlink" title="高效jQuery的奥秘"></a><a href="https://zhuanlan.zhihu.com/p/22321162?from=groupmessage&amp;isappinstalled=1" target="_blank" rel="external">高效jQuery的奥秘</a></h3><p>同样是颜海镜大神的文章。讨论jQuery和javascript性能的博文并不罕见。然而，这里总结一些速度方面的技巧和一些建议，来提升jQuery和javascript代码。好的代码会带来速度的提升。快速渲染和响应意味着更好的用户体验。<br>同样，看过这些之后，想想如何能做到jquery free呢？</p>
+<h3 id="每日一个前端特效-视觉差"><a href="#每日一个前端特效-视觉差" class="headerlink" title="每日一个前端特效-视觉差"></a><a href="https://zhuanlan.zhihu.com/p/22321170?from=groupmessage&amp;isappinstalled=1" target="_blank" rel="external">每日一个前端特效-视觉差</a></h3><p>笔者第一次见到视差滚动的效果是在苹果官网上。当时我和我的小伙棒就被震惊了。这里给大家介绍关于视觉差的效果。</p>
+<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="30个你必须记住的CSS选择符"><a href="#30个你必须记住的CSS选择符" class="headerlink" title="30个你必须记住的CSS选择符"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIzNjE5NzAyMA==&amp;mid=2649879762&amp;idx=1&amp;sn=bf1436cd9e088400e65b53019ef51af3&amp;scene=1&amp;srcid=0907FARFbPufMIxx82THkSFr&amp;from=groupmessage&amp;isappinstalled=0#wechat_redirect" target="_blank" rel="external">30个你必须记住的CSS选择符</a></h3><p>同样是偏于基础的东西，可是，30个CSS选择符，你又能说出多少呢？</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="深入浅出ES6：代理-Proxies"><a href="#深入浅出ES6：代理-Proxies" class="headerlink" title="深入浅出ES6：代理 Proxies"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIwNjQwMzUwMQ==&amp;mid=2247484217&amp;idx=1&amp;sn=25841588efe33011c3abb62285db1147&amp;scene=1&amp;srcid=0908rX8cSzXLWS1CNn4cpF3u&amp;from=groupmessage&amp;isappinstalled=0#wechat_redirect" target="_blank" rel="external">深入浅出ES6：代理 Proxies</a></h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;9.4-9.11，纸上得来终觉浅，绝知此事要躬行。&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;when-react-meets-VIRTUAL-REALITY&quot;&gt;&lt;a href=&quot;#when-react-meets-VIRTUAL-REALITY&quot; class=&quot;headerlink&quot; title=&quot;when react meets VIRTUAL REALITY&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://m.youku.com/video/id_XMTYxNTQ2MDM4NA==.html?x=&amp;amp;from=groupmessage&amp;amp;isappinstalled=1&quot;&gt;when react meets VIRTUAL REALITY&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;在这个月初，百度世界大会上，公司在VIRTUAL REALITY上的投入让人眼前一亮。说起VR，貌似是个遥不可及，门槛很高的领域。其实，作为前端开发者，也许VR距离你并不遥远。虽然现在距离VR在前端的成熟还有一段距离，但是古语说“小荷才露尖尖角，早有蜻蜓立上头”。本着满足好奇心也好，探索有趣的技术也好，这里给大家推荐这个视频。他是在React.js Conf 2016大会上，大神Eric Florenzano做的一篇演讲。主要涉及了他本人开发的移动端VR引擎，这个引擎的特别之处是由react.js驱动。对react.js有兴趣的同学也可以了解一下。演讲里，还对比了A-Frame。不知道大家对A-Frame了解多少，A-Frame作为Mozilla发布的全新开源框架，旨在帮助开发者更轻松的开发在浏览器中运行的高性能响应式的VR体验，而不用学习强大但非常复杂的 WebGL。他的学习资料在国内社区并不多，鼓励大家可以翻墙去了解更多知识。&lt;/p&gt;
+&lt;p&gt;After a short moment in the 90s, Virtual Reality faded away. Now in 2016, VR is coming back in a big way. Games are leading the charge, but with millions of headsets pouring into the marketplace over the next few years, how can React web and app developers get involved? Can React even handle the screaming-fast performance requirements of VR? Spoiler: it can.&lt;br&gt;This talk explores these concepts by incrementally building up a mobile VR engine that can be driven not just with JavaScript, but with React. We’ll discover how naive approaches fail, and why game engines are built the way they are. Finally, we’ll cover some exciting work with WebVR which intends to bring VR to all browsers.&lt;/p&gt;
+&lt;p&gt;废话说到这里，快戳开视频观看吧。另附YouTube地址：&lt;a href=&quot;https://www.youtube.com/watch?v=ty2bFeOdGeI&quot;&gt;https://www.youtube.com/watch?v=ty2bFeOdGeI&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;认识javascript中的作用域和上下文&quot;&gt;&lt;a href=&quot;#认识javascript中的作用域和上下文&quot; class=&quot;headerlink&quot; title=&quot;认识javascript中的作用域和上下文&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzIzNjE5NzAyMA==&amp;amp;mid=2649879768&amp;amp;idx=1&amp;amp;sn=03e5dd16a44d7ba23cef4dfd4b7a012e&amp;amp;scene=1&amp;amp;srcid=0909Z9n37xFfLJ3bCVxMjCoG&amp;amp;from=groupmessage&amp;amp;isappinstalled=0#wechat_redirect&quot;&gt;认识javascript中的作用域和上下文&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;在追求最新技术和理念的同时，JS的基础知识同样不可忽略。所谓“水之积也不厚，则其负大舟也无力”－《庄子·逍摇游》，想想作为新同学，多少次因为JS中的this漂移踩了坑；多少次挣扎在原型链里不得解；面试时，闭包的知识有多少次被提及。“墙高基下，虽得必失”，千里之行，还要从基础开始。这里给大家安利一篇颜海镜大神的文章，希望大家能对js中的作用域了解有所加深。&lt;br&gt;最后，给大家布置课后作业：ES6中，关于作用域的改进有哪些呢？&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>经验无线步骤页改版总结</title>
+    <link href="https://exp-team.github.io/blog/2016/09/10/program/exp-wap-step/"/>
+    <id>https://exp-team.github.io/blog/2016/09/10/program/exp-wap-step/</id>
+    <published>2016-09-09T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近对经验无线步骤页进行了改版，今天在组内做了改版总结的分享，本文是这次分享的文字版，大纲如下：</p>
+<ul>
+<li>简介</li>
+<li>架构</li>
+<li>新技术</li>
+</ul>
+<p>我之前写过一个经验详情页的改版分享——《<a href="http://yanhaijing.com/program/2016/04/14/how-to-reconstruct-a-large-historical-project/" target="_blank" rel="external">如何重构一个大型历史项目——百度经验改版总结</a>》，很多和上次一样的东西这次就没做分享，有兴趣的同学可以看下（移动端或开模拟器）。</p>
+<a id="more"></a>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>经验步骤页是经验流量最多的页面，也是最重要的页面之一，<a href="http://jingyan.baidu.com/album/fea4511a71963bf7bb912580.html?stepindex=2&amp;stepGroup=E1" target="_blank" rel="external">点击这里</a>查看效果，页面的截图如下：</p>
+<p><img src="/bimg/425.png" alt=""></p>
+<p>页面大体可分文，最上面的bar，经验头部（听语音），主题内容等，其中主题内容部分可左右和上下滑动，左右滑动会切换到上一步，下一步，同时会更新经验头部，停止语音播放等。</p>
+<p>本次改版总共有两个FE参加，我主要负责页面基础架构，主要逻辑的开发，另一个同学主要负责，最后一页的交互和点击查看大图的功能。这次做的点击查看大图是非常亮点的一个特色，大家有兴趣可以试一下，关于查看大图介绍我等另一位FE写完，再贴到这里。</p>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><h3 id="一个模块"><a href="#一个模块" class="headerlink" title="一个模块"></a>一个模块</h3><p>这次改版需要小流量，新旧版页面需要在线上同时存在一段时间，以前的做法我们都是重新拉一个前端的模块，这次我们是在同一个模块完成的这个工作，新版的内容全部放到了v2路径下。</p>
+<p><img src="/bimg/426.png" alt=""></p>
+<p>一个非常小的点是fis打包的配置，为了能够自动把v2和v1的打包文件区分开我们用到了正则的<code>?!</code>技巧，关于正则我也打算写一篇博文《<a href="http://yanhaijing.com/javascript/2016/09/10/regexp-in-js" target="_blank" rel="external">详解JavaScript正则表达式</a>》。</p>
+<pre><code>pack: {
+    &apos;/static/pkg/step2.css&apos;: [
+        &apos;/widget/v2/css/base.less&apos;,
+        /\/widget\/v2\/(?!css\/).*\.less/
+    ],
+    &apos;/static/pkg/step.css&apos;: [
+        /\/widget\/(?!v2\/).*\.less/,
+        &apos;/widget/**.css&apos;
+    ]
+}
+</code></pre><h3 id="耦合"><a href="#耦合" class="headerlink" title="耦合"></a>耦合</h3><p>关于其中耦合的关系，我在之前一篇博文里面做过介绍了，<a href="http://yanhaijing.com/program/2016/09/01/about-coupling/" target="_blank" rel="external">点这里</a>查看。</p>
+<p>在我们项目中，还有一种独特的方式，我称其为消息中心，通过消息中心将模块之间的耦合变成了模块与消息中心的耦合。</p>
+<p><img src="/bimg/427.png" alt=""></p>
+<p>这种模式的缺点就是可能会消息爆炸，并且消息的订阅是散落在各个模块的，将来只能对消息扩展，而不能删除消息中的信息。</p>
+<p>下面举个栗子来说说消息中心和非直接耦合的区别，假设模块A B C D E F 如下图所示，线条代表模块之间的关系。</p>
+<p><img src="/bimg/428.png" alt=""></p>
+<p>消息中心模式的结构图如下所示，A与B之间的关系解耦成了A与消息中心的关系，但A还是要知道B的消息名称，我称其为消息名耦合，也就是说A对B还是有感知的。</p>
+<p><img src="/bimg/429.png" alt=""></p>
+<p>主模块模式的结构图如下所示，A与B之间的关系解耦合成A与主模块之间的关系，A完全不知道B的存在，消息中心模式中的消息名耦合被放到了主模块中。</p>
+<p><img src="/bimg/430.png" alt=""></p>
+<h3 id="新旧版架构对比"><a href="#新旧版架构对比" class="headerlink" title="新旧版架构对比"></a>新旧版架构对比</h3><p>旧版的架构图如下所示，其使用了消息和主模块两种模式，不够纯粹，并且其slider模块太过冗余，揉进了很多其他模块的逻辑。</p>
+<p><img src="/bimg/431.png" alt=""></p>
+<p>在新版的架构中，我们只是用了主模块模式，子模块之前完全没有直接关系。</p>
+<p><img src="/bimg/432.png" alt=""></p>
+<p>我们使用es6的class，实现了继承，继承关系如下所示。</p>
+<p><img src="/bimg/433.png" alt=""></p>
+<h3 id="F-context"><a href="#F-context" class="headerlink" title="F.context"></a>F.context</h3><p>我们项目中有一个全局的数据中心，叫做F.context，全局数据中心对应上面耦合中的数据耦合，术语耦合比较紧的一种模块，我原来对其有偏见，重新认识一下F.context，明确一下F.context应该放一下全局性的数据，并且一次赋值，尽量不要对其值进行修改。</p>
+<p>特别注意用F.context来代替传参，我们项目中有很多这种反模式。</p>
+<p><img src="/bimg/434.png" alt=""></p>
+<h2 id="新技术"><a href="#新技术" class="headerlink" title="新技术"></a>新技术</h2><p>这次改版中我们尝试了引入了三个新技术，包括ES6，postcss，flex，下面分别来介绍介绍这几个技术。</p>
+<h3 id="ES6"><a href="#ES6" class="headerlink" title="ES6"></a>ES6</h3><p>在之前我们都是在活动页面尝试使用ES6，在积累了经验后我们决定在这个页面尝试使用。</p>
+<p>如果你对ES6不了解，可以查看我之前写的一系列文章：</p>
+<ul>
+<li><a href="http://yanhaijing.com/javascript/2015/09/04/try-es2015/" target="_blank" rel="external">快来使用ECMAScript 2015吧</a></li>
+<li><a href="http://yanhaijing.com/javascript/2015/09/11/learn-es2015/" target="_blank" rel="external">ECMAScript 2015 简易教程</a></li>
+<li><a href="http://yanhaijing.com/javascript/2015/09/16/es6-promise/" target="_blank" rel="external">快来使用ES2015的Promise吧</a></li>
+<li><a href="http://yanhaijing.com/javascript/2016/04/27/es2015-practice/" target="_blank" rel="external">ES2015实战——面向未来编程</a></li>
+</ul>
+<p>关于ES6其实有<a href="http://espadrine.github.io/New-In-A-Spec/es2015/" target="_blank" rel="external">一系列功能</a>，但这次我们主要用到了三个：module, class, let。</p>
+<p>我们的ES6最后都会使用bable编译成ES5来执行，所以我们代码的兼容性就是ES5的兼容，而ES5在wap端<a href="http://kangax.github.io/compat-table/es5/" target="_blank" rel="external">兼容性</a>非常好。</p>
+<p><img src="/bimg/435.png" alt=""></p>
+<p>后续我准备写一篇如何用ES5来代替ES6的博文《<a href="/program/2016/09/10/es6-free/">如何做到ES6 free</a>》。</p>
+<p>下面上一段步骤页滑动模块的js</p>
+<pre><code>import $ from &apos;common:widget/lib/gmu/zepto/zepto.js&apos;;
+import {UIBase} from &apos;common:widget/js/ui/base/base.es&apos;;
+var ec = require(&apos;common:widget/js/util/event/event.es&apos;).event;
+
+class Slider extends UIBase {
+    constructor(index) {
+        super();
+        this.bindEvent();
+    }
+    bindEvent() {}
+    move(x) {}
+    update() {}
+    moveTo(index, anim) {}
+}
+
+export {Slider};
+</code></pre><h3 id="postcss"><a href="#postcss" class="headerlink" title="postcss"></a>postcss</h3><p><a href="http://postcss.org/" target="_blank" rel="external">postcss</a>是最近出来的新东西，学名是css后处理器，也就是处理标准化的css，和sass等预处理器的区别需要区分开，sass生成css，postcss处理标准css。</p>
+<p><img src="/bimg/436.png" alt=""></p>
+<p>目前已经有很多大公司在用，包括google，Facebook等。</p>
+<p>打开postcss的官网，可以看到介绍了4个特色——添加前缀，css变量，命名空间，语法验证。</p>
+<p>post是一套css的语法解析工具，可以通过插件来实现不同的功能，其插件可以分为下面这些分类。</p>
+<p><img src="/bimg/437.png" alt=""></p>
+<p>我们主要使用的是添加前缀功能，在fis中实现这个功能主要有两个插件，<code>fis-preprocessor-autoprefixer</code>，<code>fis-postprocessor-autoprefixer</code>，其中推荐使用前一个，这是fis官方维护的插件，在fis中有两个节点可以插入后处理器的功能；fis的编程流程如下，分为单文件编译和打包两个过程。</p>
+<p><img src="/bimg/438.png" alt=""></p>
+<p><a href="https://github.com/postcss/autoprefixer" target="_blank" rel="external">autoprefixer</a>有很多配置项</p>
+<ul>
+<li>Browsers 浏览器列表 默认 &gt; 1%, last 2 versions, Firefox ESR</li>
+<li>Cascade 是否级联 默认 true</li>
+<li>Add 是否添加前缀 默认true</li>
+<li>Remove 是否移除无用的前缀 默认true</li>
+<li>Supports 是否适配 @support 默认true</li>
+<li>Flexbox 是否支持flex 默认true</li>
+<li>Grid 是否支持grid 默认true</li>
+<li>Stats 自定义地区浏览器</li>
+</ul>
+<p>其中最主要的的配置项是第一个，其详细配置项在<a href="https://github.com/ai/browserslist" target="_blank" rel="external">这里</a>，这里有一个<a href="http://browserl.ist/" target="_blank" rel="external">在线版</a>，比较直观。</p>
+<p>我们的配置数据如下：<code>&#39;Android &gt;= 4&#39;, &#39;iOS &gt;= 6&#39;, &#39;and_uc &gt; 9&#39;</code>，兼容的浏览器顾名思义。</p>
+<p>postcss支持的css3属性列表在<a href="https://github.com/postcss/autoprefixer/wiki/support-list" target="_blank" rel="external">这里</a>，我们整理出一个常用的子集如下所示：</p>
+<p><img src="/bimg/439.png" alt=""></p>
+<p><strong>注意：</strong>需要注意的就是postcss并不能解决浏览器不兼容css的问题，而是可以帮我们磨平前缀，所以使用心得css3属性前，还是要先看<a href="http://caniuse.com/" target="_blank" rel="external">caniuse</a>。在下面的例子中，如果要兼容安卓4.3以下，就不能使用<code>calc</code>。</p>
+<p><img src="/bimg/440.png" alt=""></p>
+<h3 id="flex"><a href="#flex" class="headerlink" title="flex"></a>flex</h3><p>在这个项目中我们大规模使用了flex，其中也踩了不上坑，关于flex我打算在另一篇博文里详细介绍——《<a href="http://yanhaijing.com/css/2016/08/21/flex-practice-on-mobile/" target="_blank" rel="external">移动端flex布局实战经验</a>》。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>最后感谢大家浏览本文，如果你有任何疑问可以在下面留言和我交流。</p>
+<p>原文链接：<a href="http://yanhaijing.com/program/2016/09/07/exp-wap-step/" target="_blank" rel="external">http://yanhaijing.com/program/2016/09/07/exp-wap-step/</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近对经验无线步骤页进行了改版，今天在组内做了改版总结的分享，本文是这次分享的文字版，大纲如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;简介&lt;/li&gt;
+&lt;li&gt;架构&lt;/li&gt;
+&lt;li&gt;新技术&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;我之前写过一个经验详情页的改版分享——《&lt;a href=&quot;http://yanhaijing.com/program/2016/04/14/how-to-reconstruct-a-large-historical-project/&quot;&gt;如何重构一个大型历史项目——百度经验改版总结&lt;/a&gt;》，很多和上次一样的东西这次就没做分享，有兴趣的同学可以看下（移动端或开模拟器）。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="program" scheme="https://exp-team.github.io/categories/program/"/>
+    
+    
+      <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JavaScript事件章分享</title>
+    <link href="https://exp-team.github.io/blog/2016/09/04/program/event/"/>
+    <id>https://exp-team.github.io/blog/2016/09/04/program/event/</id>
+    <published>2016-09-03T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近做了一个启明星计划的分享，至于为什么叫启明星呢，这个得问我偶像，我们是一个造星平台，欢迎大家踊跃报名~</p>
+<p>本文是我整理的一些关于原生事件的东西。</p>
+<a id="more"></a>
+<h2 id="DOM事件流"><a href="#DOM事件流" class="headerlink" title="DOM事件流"></a>DOM事件流</h2><p>DOM事件流主要分为:事件捕获阶段-&gt;处于目标阶段-&gt;事件冒泡阶段，但是IE的事件流里没有捕获阶段。<br><img src="/bimg/b425.png" alt=""></p>
+<blockquote>
+<p>在一个事件完成了所有阶段的传播路径后，它的event.currentTarget会被设置为null并且event.eventPhase会被设为0。event的所有其他属性都不会改变（包括指向事件目标的Event.target属性）</p>
+</blockquote>
+<h2 id="事件处理程序"><a href="#事件处理程序" class="headerlink" title="事件处理程序"></a>事件处理程序</h2><p>事件处理程序主要分为以下三种：</p>
+<p><img src="/bimg/b426.png" alt=""></p>
+<p>ddEventListener是W3C工作组在DOM Level 2开始引入的一个注册事件监听器的方法；而在此之前，传统的事件监听方法是通过element[‘on’ + type]的方式来注册的。</p>
+<p>它们两之间的主要区别是，element[‘on’ + type]的方式无法使用事件捕获,attachEvent也不会支持捕获。</p>
+<p><strong>注：</strong>element[‘on’ + type]不支持对同一个元素的同一个事件注册多个事件监听器;<br>后面注册的事件处理程序会覆盖前面的事件处理事件程序。</p>
+<h3 id="原生事件对象："><a href="#原生事件对象：" class="headerlink" title="原生事件对象："></a>原生事件对象：</h3><p>window.event是IE支持的原生事件对象，event是其他浏览器是原生事件对象，这里列举的是事件对象的常用属性。</p>
+<p><img src="/bimg/b427.png" alt=""></p>
+<p>-&gt;其实在DOM中的事件对象也有bubbles和defaultPrevented属性可以赋值来表示冒泡和默认事件。</p>
+<h3 id="原生事件类型"><a href="#原生事件类型" class="headerlink" title="原生事件类型"></a>原生事件类型</h3><ul>
+<li>UI事件</li>
+<li>焦点事件</li>
+<li>鼠标事件</li>
+<li>滚动事件</li>
+<li>文本事件</li>
+<li>键盘事件</li>
+<li>HTML5事件</li>
+</ul>
+<h3 id="UI事件：用户与页面交互"><a href="#UI事件：用户与页面交互" class="headerlink" title="UI事件：用户与页面交互"></a>UI事件：用户与页面交互</h3><ul>
+<li>load：加载页面的时候触发</li>
+<li>unload：卸载页面的时候触发</li>
+<li>abort：加载被终止的时候被触发</li>
+<li>error：js错误、无法加载图像或者其他内容</li>
+<li>select：当用户选择文本框中的一个或者多个字符时触发</li>
+<li>resize：窗口或者框架的大小发生变化</li>
+<li>scroll：滚动带滚动条的元素</li>
+</ul>
+<p><strong>注：</strong>select在IE8之前不必释放鼠标就可以触发，resize在初始化页面的时候不会被触发。</p>
+<h3 id="焦点事件：获取或者失去焦点"><a href="#焦点事件：获取或者失去焦点" class="headerlink" title="焦点事件：获取或者失去焦点"></a>焦点事件：获取或者失去焦点</h3><ul>
+<li>blur：失去焦点</li>
+<li>focus：获得焦点</li>
+<li>focusin：与focus等价，冒泡</li>
+<li>focusout：与blur等价，冒泡</li>
+</ul>
+<p>Blur和focus在JavaScript早期就得到了所有浏览器的支持，后来IE出了focusout和focusin支持冒泡，Opera的DOMFocusout以及DOMFocusin也支持冒泡，但是后来DOM3采用了IE的作为标准，当页面从一个元素移动到另外一个页面的时候依次会触发：focusout-focusin-blur-focus，</p>
+<p>###鼠标和滚动事件：通过鼠标滚动发生</p>
+<ul>
+<li>click：单击</li>
+<li>dbclick ：双击</li>
+<li>mousedown：鼠标按下</li>
+<li>mouseup：鼠标释放</li>
+<li>mouseenter：首次移动到目标元素，并且在子元素上不会重复触发，不冒泡</li>
+<li>mouseleave：与mouseenter对应</li>
+<li>mousemove：当鼠标移动时触发</li>
+<li>mouseout：鼠标从一个元素移动到另一个元素时触发，这个可以是其子元素</li>
+<li>mouseover：与mouseout对应 </li>
+</ul>
+<p><strong>注：</strong>我们在执行双击操作的时候会经过mousedown-&gt;mouseup-&gt;click-&gt;mousedown-&gt;mouseup-&gt;dbclick，但是IE8之前会省略第二个mousedown；<br>鼠标事件event.button的值一共分为以下8个值：</p>
+<ul>
+<li>0：表示没有按下按钮</li>
+<li>1：按下了主鼠标</li>
+<li>2：按下次鼠标</li>
+<li>3：按下次鼠标</li>
+<li>4：同时按下主次鼠标</li>
+<li>5：主和中</li>
+<li>6：次和中</li>
+<li>7：三个键一起<br><strong>注：</strong>IE中7会返回0,6返回2,4返回1。</li>
+</ul>
+<p>这里主要区别以下mouseenter与mouseover的区别，来看一下以下这个图：</p>
+<p><img src="/bimg/b428.png" alt=""></p>
+<p>从这个图可以看到，当我们的鼠标从C元素移动到B元素的时候，会在B元素上触发mouseenter和mouseover，在C元素上触发mouseout和mouseleave，当鼠标从B元素移动到A元素上的时候，在B元素上会触发mouseout但是不会触发mouseleave，因为A元素是B元素的子元素。</p>
+<p>AB元素互为相对元素，BC互为相对元素，在IE中相对元素是保存在FromElement，和toElement属性中，其他浏览器则保存在relateTarget。</p>
+<h3 id="滚动鼠标事件"><a href="#滚动鼠标事件" class="headerlink" title="滚动鼠标事件"></a>滚动鼠标事件</h3><p><img src="/bimg/b429.png" alt=""></p>
+<p><strong>注：</strong>正常的值应该是120的倍数，Opera的wheelDelta的值的正负号是颠倒的，Firefox的detail值是3的倍数</p>
+<p>###键盘与文本事件：在文档中输入文本以及通过键盘在<br>页面上执行操作时</p>
+<ul>
+<li>keydown：键盘任意键按下</li>
+<li>keyup：键盘任意键释放</li>
+<li>keypress：按住键盘任意键不放会重复触发</li>
+<li>textInput：在文本插入文本框之前触发</li>
+<li>even.keyCode:键码，发生在keydown和keyup事件</li>
+<li>Event.charcode:字符编码，发生在keypress事件</li>
+<li>DOM3：key || keyIdentifier / char</li>
+</ul>
+<p>前三个事件所有浏览器都支持，textInput是对keypress的补充，用意在于将文本显示给用户之前更容易拦截文本，按下键盘时能影响到文本的显示的时候会触发keypress，<br>如果用户按下了一个非字符的键，则会一直触发keydown，不会触发keypress。<br>键盘每个键都对应一个keyCode，DOM3在字符键按下的时候key和char一样，在非字符键按下char返回null。</p>
+<h3 id="HTML5事件："><a href="#HTML5事件：" class="headerlink" title="HTML5事件："></a>HTML5事件：</h3><ul>
+<li>contextmenu：可以取消默认的上下文菜单</li>
+<li>beforeunload：在页面被卸载前触发</li>
+<li>DOMcontentLoaded：在形成完整的dom树之后就会触发</li>
+<li>readystatechange：提供文档或者元素的加载状态</li>
+<li>Pageshow:页面被打开时触发（document上触发）</li>
+<li>Pagehide：在浏览器卸载时触发，在unload之前</li>
+<li>Hashchange:url的参数列表发生变化时触发</li>
+</ul>
+<p><strong>注：</strong>每个窗口都会保存着用户的浏览记录，包括页面的DOM和js的状态，如果不关闭窗口我们都可以在左上角那里来返回或者前进历史的浏览记录，如果页面来至于bfcache，不会触发load事件，但是会触发Pageshow和Pagehide</p>
+<h3 id="jquery的事件绑定"><a href="#jquery的事件绑定" class="headerlink" title="jquery的事件绑定"></a>jquery的事件绑定</h3><ul>
+<li>bind()  不能给创建的元素添加事件</li>
+<li>delegate() 通过事件委托加在祖先元素上</li>
+<li>live() 通过事件委托加在document上，比较消耗性能</li>
+<li>on() bind和delegate函数最终都是调用了on函数，只是改变了传参方式，让其更语义化一点</li>
+</ul>
+<h3 id="jquery-on所做的事情"><a href="#jquery-on所做的事情" class="headerlink" title="jquery.on所做的事情"></a>jquery.on所做的事情</h3><ul>
+<li>兼容地实现了addEventListener的全部功能，包括多事件绑定事件函数按绑定顺序执行</li>
+<li>动态事件绑定</li>
+<li>自定义事件，自定义事件还能冒泡</li>
+<li>事件函数分组，方便事件函数解绑</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近做了一个启明星计划的分享，至于为什么叫启明星呢，这个得问我偶像，我们是一个造星平台，欢迎大家踊跃报名~&lt;/p&gt;
+&lt;p&gt;本文是我整理的一些关于原生事件的东西。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="program" scheme="https://exp-team.github.io/categories/program/"/>
+    
+    
+      <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第101期</title>
+    <link href="https://exp-team.github.io/blog/2016/09/04/weekly/weekly-101/"/>
+    <id>https://exp-team.github.io/blog/2016/09/04/weekly/weekly-101/</id>
+    <published>2016-09-03T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>8.29-9.4，本期是我第二次编写exp-team周刊，要变得有深度得慢慢来，加油！</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="如何运用最新的技术提升网页速度和性能"><a href="#如何运用最新的技术提升网页速度和性能" class="headerlink" title="如何运用最新的技术提升网页速度和性能"></a><a href="http://www.zcfy.cc/article/why-our-website-is-faster-than-yours-1030.html?sukey=3997c0719f151520dd1f40fbce22d2d30c77d4dd0494ab11b0c8291e63ef87080000e514d86eaebb849f57fd01f8a4b1" target="_blank" rel="external">如何运用最新的技术提升网页速度和性能</a></h3><p>我们在把一张酷炫的网页呈现给用的同时，我们也要考虑这些酷炫的交互对网页性能造成的影响，在之前这个周刊的前几期都有提到关于网页速度和性能的文章，目前有很多框架都有一站式的图片合并代码压缩的功能，还有css和js的懒加载都是属于提高网页速度和性能，我们可以从多方面来提高性能和速度，这篇文章就写得比较全，可以好好看看。</p>
+<h3 id="webp图片实践之路"><a href="#webp图片实践之路" class="headerlink" title="webp图片实践之路"></a><a href="http://www.cnblogs.com/season-huang/p/5804884.html?sukey=3997c0719f151520e8ff4cc81d367da8d31e4fa0618001f78192353a7dc0ec38e12a32bcd5f61b046640e1093c6cf2f0" target="_blank" rel="external">webp图片实践之路</a></h3><p>这篇文章算是上篇文章的绪论吧，webp是谷歌推出的一种图片格式，他的有点就是同等画面质量下，体积比jpg、png小了25%；目前这种格式还没有得到大多数的浏览器的支持，只有chrome和安卓的支持，但是我觉得webp的普及势在必行，因为在我们平时开发中图片会占据我们大量的页面体积，希望我们在接下来项目中能逐渐尝试一下这种格式，然后随着各大浏览器的逐步兼容，这样就可以让我们的网页飞起来啦，哈哈~~。这篇文章就详细的讲了如何使用webp，你是不是已经迫不及待的想要戳进去看看啦~</p>
+<a id="more"></a>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="使用Cookie实现Remember-Me功能"><a href="#使用Cookie实现Remember-Me功能" class="headerlink" title="使用Cookie实现Remember Me功能"></a><a href="http://zhuanlan.zhihu.com/p/22245658" target="_blank" rel="external">使用Cookie实现Remember Me功能</a></h3><p>cookie在web开发中已经非常普遍了，我们平时用cookie来保存信息，正如题目所说remember me，cookie可以保存设置要保存数据的时长，默认的生命期就是浏览器关闭，它是保存HTTP请求状态的一种手段，它是由客户端保存的小型文本文件，其内容为一系列的键值对（即Key-Value形式），在浏览器访问同一个域名的不同页面时，会在HTTP请求中附上Cookie，当我们在打开一个新网页的时候我们会根据头部cookie来对网页进行特殊的处理，来达到保存用户行为的效果。戳我可以详细的了解到如何使用cookie哦~</p>
+<h3 id="怎样合理地使用-Ajax-？过度使用-Ajax-会有哪些弊端？"><a href="#怎样合理地使用-Ajax-？过度使用-Ajax-会有哪些弊端？" class="headerlink" title="怎样合理地使用 Ajax ？过度使用 Ajax 会有哪些弊端？"></a><a href="http://www.zhihu.com/question/20410763" target="_blank" rel="external">怎样合理地使用 Ajax ？过度使用 Ajax 会有哪些弊端？</a></h3><h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="如何使用-CSS-和-SVG-剪切和遮罩技术"><a href="#如何使用-CSS-和-SVG-剪切和遮罩技术" class="headerlink" title="如何使用 CSS 和 SVG 剪切和遮罩技术"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDA2MTI1MA==&amp;mid=2649084029&amp;idx=1&amp;sn=6599ba63d282b7d872c1bd5e642fd2ec&amp;scene=0#wechat_redirect" target="_blank" rel="external">如何使用 CSS 和 SVG 剪切和遮罩技术</a></h3><h3 id="在-CSS-中使用功能查询"><a href="#在-CSS-中使用功能查询" class="headerlink" title="在 CSS 中使用功能查询"></a><a href="https://segmentfault.com/a/1190000006734430" target="_blank" rel="external">在 CSS 中使用功能查询</a></h3><p>我们在写css属性的时候通常都要考虑一下这个属性在各个浏览器的兼容问题，有的我们会通过前缀来支持，但是前缀也并不是能兼容所有的浏览器，我们在写css的时候往往会去做到优雅降级，所以css中使用查询功能来测试览器是否支持一个特定的 CSS 功能，这个功能可以是 CSS 的某种属性或者某个属性的某个值，然后，根据测试的结果来决定是否要应用某段样式。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="11-个-HTML5-动画工具"><a href="#11-个-HTML5-动画工具" class="headerlink" title="11 个 HTML5 动画工具"></a><a href="http://zhuanlan.zhihu.com/p/22252010" target="_blank" rel="external">11 个 HTML5 动画工具</a></h3><p>有的时候我们想要做出一些非常惊人、吸引用户眼球的动画效果，为了减少我们的开发成本，我们通常需要借助一些现成的工具来提高开发效率，这11款HTML5动画功工具可以供大家参考参考。</p>
+<h3 id="入门Webpack，看这篇就够了"><a href="#入门Webpack，看这篇就够了" class="headerlink" title="入门Webpack，看这篇就够了"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA5NTM2MTEzNw==&amp;mid=2736710548&amp;idx=1&amp;sn=b29e4d55d6dd4701d1be4c10efc8bcb4&amp;scene=1&amp;srcid=09013p3rQHqfo17Ysa7WKz78#rd" target="_blank" rel="external">入门Webpack，看这篇就够了</a></h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;8.29-9.4，本期是我第二次编写exp-team周刊，要变得有深度得慢慢来，加油！&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;如何运用最新的技术提升网页速度和性能&quot;&gt;&lt;a href=&quot;#如何运用最新的技术提升网页速度和性能&quot; class=&quot;headerlink&quot; title=&quot;如何运用最新的技术提升网页速度和性能&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.zcfy.cc/article/why-our-website-is-faster-than-yours-1030.html?sukey=3997c0719f151520dd1f40fbce22d2d30c77d4dd0494ab11b0c8291e63ef87080000e514d86eaebb849f57fd01f8a4b1&quot;&gt;如何运用最新的技术提升网页速度和性能&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;我们在把一张酷炫的网页呈现给用的同时，我们也要考虑这些酷炫的交互对网页性能造成的影响，在之前这个周刊的前几期都有提到关于网页速度和性能的文章，目前有很多框架都有一站式的图片合并代码压缩的功能，还有css和js的懒加载都是属于提高网页速度和性能，我们可以从多方面来提高性能和速度，这篇文章就写得比较全，可以好好看看。&lt;/p&gt;
+&lt;h3 id=&quot;webp图片实践之路&quot;&gt;&lt;a href=&quot;#webp图片实践之路&quot; class=&quot;headerlink&quot; title=&quot;webp图片实践之路&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.cnblogs.com/season-huang/p/5804884.html?sukey=3997c0719f151520e8ff4cc81d367da8d31e4fa0618001f78192353a7dc0ec38e12a32bcd5f61b046640e1093c6cf2f0&quot;&gt;webp图片实践之路&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;这篇文章算是上篇文章的绪论吧，webp是谷歌推出的一种图片格式，他的有点就是同等画面质量下，体积比jpg、png小了25%；目前这种格式还没有得到大多数的浏览器的支持，只有chrome和安卓的支持，但是我觉得webp的普及势在必行，因为在我们平时开发中图片会占据我们大量的页面体积，希望我们在接下来项目中能逐渐尝试一下这种格式，然后随着各大浏览器的逐步兼容，这样就可以让我们的网页飞起来啦，哈哈~~。这篇文章就详细的讲了如何使用webp，你是不是已经迫不及待的想要戳进去看看啦~&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>图解7种耦合关系</title>
+    <link href="https://exp-team.github.io/blog/2016/09/02/program/about-coupling/"/>
+    <id>https://exp-team.github.io/blog/2016/09/02/program/about-coupling/</id>
+    <published>2016-09-01T16:00:00.000Z</published>
+    <updated>2017-01-13T08:09:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>之前组内同学问我耦合的关系，我没给对方讲清楚，今天借这个机会来深入讲讲模块之间的耦合关系这个事情。</p>
+<p>本文将用图文详细讲解七种耦合的不同之处。</p>
+<a id="more"></a>
+<h2 id="高内聚与低耦合"><a href="#高内聚与低耦合" class="headerlink" title="高内聚与低耦合"></a>高内聚与低耦合</h2><p>高内聚与低耦合是每个软件开发者追求的目标，那么内聚和耦合分别是什么意思呢？</p>
+<p><img src="/bimg/416.png" alt=""></p>
+<blockquote>
+<p>内聚是从功能角度来度量模块内的联系，一个好的内聚模块应当恰好做一件事。它描述的是模块内的功能联系。</p>
+<p>耦合是软件结构中各模块之间相互连接的一种度量，耦合强弱取决于模块间接口的复杂程度、进入或访问一个模块的点以及通过接口的数据。</p>
+</blockquote>
+<h2 id="耦合"><a href="#耦合" class="headerlink" title="耦合"></a>耦合</h2><p>不同模块之间的关系就是耦合，根据耦合程度可以分为7种，耦合度依次变低。</p>
+<ul>
+<li>内容耦合</li>
+<li>公共耦合</li>
+<li>外部耦合</li>
+<li>控制耦合</li>
+<li>标记耦合</li>
+<li>数据耦合</li>
+<li>非直接耦合</li>
+</ul>
+<p>下面我们来说说每种耦合是什么，开始之前先来说下要实现的功能。m1和m2是两个独立的模块，其中m2种会显示m1的输入，m1会显示m2的输入。</p>
+<p><img src="/bimg/417.png" alt=""></p>
+<p>很显然，m1和m2两个模块之间会有一些联系（耦合），你也可以想想如何实现这个功能，下面用7种不同的方式来实现这个功能。</p>
+<p><strong>注：</strong>项目的代码我放到了<a href="https://github.com/yanhaijing/coupling" target="_blank" rel="external">github</a>，项目的demo，可以在<a href="http://yanhaijing.com/coupling/" target="_blank" rel="external">这里查看</a>。</p>
+<h3 id="内容耦合"><a href="#内容耦合" class="headerlink" title="内容耦合"></a>内容耦合</h3><p>内容耦合是最紧的耦合程度，一个模块直接访问另一模块的内容，则称这两个模块为内容耦合。</p>
+<p><img src="/bimg/418.png" alt=""></p>
+<p>为了实现功能，我们将m1的输入放到m2.m1input上，将m2的输入放到m1.m2input上。</p>
+<pre><code>// m1.js
+root.m2.m1input = this.value;
+m2.update();
+
+// m2.js
+root.m1.m2input = this.value;
+m1.update();
+</code></pre><p><strong>PS:</strong>不知道谁会这么写代码，除了我为了做演示之外。。。</p>
+<p>查看<a href="https://github.com/yanhaijing/coupling/tree/gh-pages/demo1" target="_blank" rel="external">完整代码</a>和<a href="http://yanhaijing.com/coupling/demo1/demo.html" target="_blank" rel="external">demo</a>。</p>
+<h3 id="公共耦合"><a href="#公共耦合" class="headerlink" title="公共耦合"></a>公共耦合</h3><p>一组模块都访问同一个全局数据结构，则称之为公共耦合。</p>
+<p><img src="/bimg/419.png" alt=""></p>
+<p>在这种case中，m1和m2将自己的输入放到全局的data上。</p>
+<pre><code>// m1.js
+root.data.m1input = this.value;
+m2.update();
+
+// m2.js
+root.data.m2input = this.value;
+m1.update();
+</code></pre><p>查看<a href="https://github.com/yanhaijing/coupling/tree/gh-pages/demo2" target="_blank" rel="external">完整代码</a>和<a href="http://yanhaijing.com/coupling/demo2/demo.html" target="_blank" rel="external">demo</a>。</p>
+<h3 id="外部耦合"><a href="#外部耦合" class="headerlink" title="外部耦合"></a>外部耦合</h3><p>一组模块都访问同一全局简单变量，而且不通过参数表传递该全局变量的信息，则称之为外部耦合。外部耦合和公共耦合很像，区别就是一个是简单变量，一个是复杂数据结构。</p>
+<p><img src="/bimg/420.png" alt=""></p>
+<p>在这种case中，m1和m2都将自己的输入放到全局上。</p>
+<pre><code>// m1.js
+root.m1input = this.value;
+m2.update();
+
+// m2.js
+root.m2input = this.value;
+m1.update();
+</code></pre><p>查看<a href="https://github.com/yanhaijing/coupling/tree/gh-pages/demo3" target="_blank" rel="external">完整代码</a>和<a href="http://yanhaijing.com/coupling/demo3/demo.html" target="_blank" rel="external">demo</a>。</p>
+<h3 id="控制耦合"><a href="#控制耦合" class="headerlink" title="控制耦合"></a>控制耦合</h3><p>模块之间传递的不是数据信息，而是控制信息例如标志、开关量等，一个模块控制了另一个模块的功能。</p>
+<p>从控制耦合开始，模块的数据就放在自己内部了，不同模块之间通过接口互相调用。</p>
+<p><img src="/bimg/421.png" alt=""></p>
+<p>在这个case中，得增加一个需求，就是当m1的输入为空时，隐藏m2的显示信息。</p>
+<pre><code>// m1.js
+root.m1input = this.value;
+m2.update();
+
+m2.toggle(!!this.value); // 传递flag
+</code></pre><p>上面的代码中m1直接控制了m2的显示和隐藏。</p>
+<p>查看<a href="https://github.com/yanhaijing/coupling/tree/gh-pages/demo4" target="_blank" rel="external">完整代码</a>和<a href="http://yanhaijing.com/coupling/demo4/demo.html" target="_blank" rel="external">demo</a>。</p>
+<h3 id="标记耦合"><a href="#标记耦合" class="headerlink" title="标记耦合"></a>标记耦合</h3><p>调用模块和被调用模块之间传递数据结构而不是简单数据，同时也称作特征耦合。</p>
+<p><img src="/bimg/422.png" alt=""></p>
+<p>在这个case中，m1传给m2的是一个对象。</p>
+<pre><code>// m1.js
+me.m1input = this.value;
+m2.update(me); // 传递引用
+
+// m2.js
+me.m2input = this.value;
+m1.update(me);
+</code></pre><p>查看<a href="https://github.com/yanhaijing/coupling/tree/gh-pages/demo5" target="_blank" rel="external">完整代码</a>和<a href="http://yanhaijing.com/coupling/demo5/demo.html" target="_blank" rel="external">demo</a>。</p>
+<h3 id="数据耦合"><a href="#数据耦合" class="headerlink" title="数据耦合"></a>数据耦合</h3><p>调用模块和被调用模块之间只传递简单的数据项参数。相当于高级语言中的值传递。</p>
+<p><img src="/bimg/423.png" alt=""></p>
+<p>在这个case中，m1传给m2的是一个简单数据结构。</p>
+<pre><code>// m1.js
+me.m1input = this.value;
+m2.update(me.m1input); // 传递值
+
+// m2.js
+me.m2input = this.value;
+m1.update(me.m2input);
+</code></pre><p>查看<a href="https://github.com/yanhaijing/coupling/tree/gh-pages/demo6" target="_blank" rel="external">完整代码</a>和<a href="http://yanhaijing.com/coupling/demo6/demo.html" target="_blank" rel="external">demo</a>。</p>
+<h3 id="非直接耦合"><a href="#非直接耦合" class="headerlink" title="非直接耦合"></a>非直接耦合</h3><p>两个模块之间没有直接关系，它们之间的联系完全是通过主模块的控制和调用来实现的。耦合度最弱，模块独立性最强。</p>
+<p>子模块无需知道对方的存在，子模块之间的联系，全部变成子模块和主模块之间的联系。</p>
+<p><img src="/bimg/424.png" alt=""></p>
+<p>在这个case种，增加一个index.js作为主模块。</p>
+<pre><code>// index.js
+var m1 = root.m1;
+var m2 = root.m2;
+
+m1.init(function (str) {
+    m2.update(str);
+});
+
+m2.init(function (str) {
+    m1.update(str);
+});
+
+// m1.js
+me.m1input = this.value;
+inputcb(me.m1input); // inputcb是回调函数
+
+// m2.js
+me.m2input = this.value;
+inputcb(me.m2input);
+</code></pre><p>查看<a href="https://github.com/yanhaijing/coupling/tree/gh-pages/demo7" target="_blank" rel="external">完整代码</a>和<a href="http://yanhaijing.com/coupling/demo7/demo.html" target="_blank" rel="external">demo</a>。</p>
+<h2 id="内聚"><a href="#内聚" class="headerlink" title="内聚"></a>内聚</h2><p>其实关于内聚也分为很多种，如下所示，如果你感兴趣可以自己研究研究，我们下次再来分享内聚的问题。</p>
+<ul>
+<li>偶然内聚</li>
+<li>逻辑内聚</li>
+<li>时间内聚</li>
+<li>通信内聚</li>
+<li>顺序内聚</li>
+<li>功能内聚</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>希望你看完上面的文章，搞懂了耦合的种类，也希望你以后能使用非直接耦合这种方式来写代码，祝好。</p>
+<p>原文链接：<a href="http://yanhaijing.com/program/2016/09/01/about-coupling/" target="_blank" rel="external">http://yanhaijing.com/program/2016/09/01/about-coupling/</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;之前组内同学问我耦合的关系，我没给对方讲清楚，今天借这个机会来深入讲讲模块之间的耦合关系这个事情。&lt;/p&gt;
+&lt;p&gt;本文将用图文详细讲解七种耦合的不同之处。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="program" scheme="https://exp-team.github.io/categories/program/"/>
+    
+    
+      <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
+    
+  </entry>
+  
+</feed>

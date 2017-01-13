@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys
+import os
+import commands
+
+def notice(string, notice):
+    attr = []
+    if notice:
+        # green
+        string = '[WCI NOTICE] @=]=====> ' + string
+        attr.append('32')
+    else:
+        # red
+        string = '[WCI ERROR] @=]=====> ' + string
+        attr.append('31')
+    attr.append('1')
+    print '\x1b[%sm%s\x1b[0m' % (';'.join(attr), string)
+
+comment = ''
+issue_file = 'issue.info'
+
+if len(sys.argv) < 2:
+    comment = 'cooder'
+else:
+    comment = sys.argv[1]
+
+if os.path.exists(issue_file):
+    os.remove(issue_file)
+
+(status, output) = commands.getstatusoutput('python /Users/Documents/Tools/upload.py -y -m "' + comment + '"')
+if status != 0:
+    notice('execute upload.py failed!', False)
+    sys.exit(-1)
+
+if os.path.exists(issue_file) == False:
+    notice('execute upload.py failed!', False)
+    sys.exit(-1)
+
+file_object = open(issue_file)
+try:
+    issue_num = file_object.read()
+finally:
+    file_object.close()
+
+if int(issue_num) <= 0:
+    notice('execute upload.py failed!', False)
+    sys.exit(-1)
+
+(status, output) = commands.getstatusoutput('svn ci -m "ISSUE=' + issue_num + '"')
+if status != 0:
+    notice('svn ci failed!', False)
+    sys.exit(-1)
+
+notice('svn ci success!', True)

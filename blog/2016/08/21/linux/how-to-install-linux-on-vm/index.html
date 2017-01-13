@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>手把手教你在虚拟机里安装linux | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="对于想学习linux的同学，第一步当然是要有一个linux环境，而我建议你在虚拟机里安装，本文将一步步教你如何在虚拟机里安装linux。
+整个过程可以分为两步，安装虚拟机和安装linux。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="手把手教你在虚拟机里安装linux">
+<meta property="og:url" content="https://exp-team.github.io/blog/2016/08/21/linux/how-to-install-linux-on-vm/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="对于想学习linux的同学，第一步当然是要有一个linux环境，而我建议你在虚拟机里安装，本文将一步步教你如何在虚拟机里安装linux。
+整个过程可以分为两步，安装虚拟机和安装linux。">
+<meta property="og:image" content="https://exp-team.github.io/bimg/298.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/299.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/300.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/301.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/302.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/303.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/304.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/305.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/306.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/307.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/308.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/309.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/310.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/311.png">
+<meta property="og:image" content="https://exp-team.github.io/bimg/312.png">
+<meta property="og:updated_time" content="2017-01-13T08:09:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="手把手教你在虚拟机里安装linux">
+<meta name="twitter:description" content="对于想学习linux的同学，第一步当然是要有一个linux环境，而我建议你在虚拟机里安装，本文将一步步教你如何在虚拟机里安装linux。
+整个过程可以分为两步，安装虚拟机和安装linux。">
+<meta name="twitter:image" content="https://exp-team.github.io/bimg/298.png">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-linux/how-to-install-linux-on-vm" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2016/08/21/linux/how-to-install-linux-on-vm/" class="article-date">
+  <time datetime="2016-08-20T16:00:00.000Z" itemprop="datePublished">2016-08-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux/">linux</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      手把手教你在虚拟机里安装linux
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>对于想学习linux的同学，第一步当然是要有一个linux环境，而我建议你在虚拟机里安装，本文将一步步教你如何在虚拟机里安装linux。</p>
+<p>整个过程可以分为两步，安装虚拟机和安装linux。</p>
+<a id="more"></a>
+<h2 id="安装虚拟机"><a href="#安装虚拟机" class="headerlink" title="安装虚拟机"></a>安装虚拟机</h2><p>我推荐大家使用<a href="https://www.virtualbox.org/" target="_blank" rel="external">Oracle VM VirtualBox</a>，这是一个跨平台的虚拟机，下载对应的平台安装包，安装过程不在赘述。</p>
+<p>(1) VirtualBox的界面如下图所示，点击新建。</p>
+<p><img src="/bimg/298.png" alt=""></p>
+<p>(2) 然后输入名称，我输入的是centos6.6-2，选择linux系统，并选择redhat版本，点击下一步</p>
+<p><img src="/bimg/299.png" alt=""></p>
+<p>(3) 这里将会给linux系统分配内存，在不开启图形界面的情况下512M就足够了，如果需要图形界面需要大于1GB内存，这里我选择512M，然后点击下一步</p>
+<p>(4) 接下来选择虚拟硬盘，这一步直接点创建即可</p>
+<p>(5) 接下来让你选择虚拟硬盘文件类型，这一步保持默认，点击下一步</p>
+<p>(6) 接下来存储在物理硬盘上的选项选择动态分配，点击下一步</p>
+<p>(7) 接下来可以选择在硬盘上的存储位置，选择好后点击创建</p>
+<p><img src="/bimg/300.png" alt=""></p>
+<h2 id="安装linux"><a href="#安装linux" class="headerlink" title="安装linux"></a>安装linux</h2><p>安装linux之前需要先下载镜像，我推荐centos6.x Minimal版，可以来<a href="https://wiki.centos.org/Download" target="_blank" rel="external">这里</a>下载。</p>
+<p>(1) 接下来就该安装linux了，我们通过虚拟光驱来安装linux，点击设置按钮</p>
+<p><img src="/bimg/301.png" alt=""></p>
+<p>然后点击左侧的“存储”，选中“没有磁片”，在点击右侧的小光盘图标，然后点击“选择一个虚拟光盘”，然后找到我们上面下载系统镜像文件。</p>
+<p><img src="/bimg/302.png" alt=""></p>
+<p>(2) 接下来就可以开始安装linux了，点击启动按钮</p>
+<p><img src="/bimg/303.png" alt=""></p>
+<p>(2) 接下来我们选择第二个安装选项</p>
+<p><img src="/bimg/304.png" alt=""></p>
+<p>(4) 等待硬件检测完成，询问我们是否检查光盘，选择跳过</p>
+<p><img src="/bimg/305.png" alt=""></p>
+<p>(5) 接下来问我们安装过程选择什么语言，保持默认下一步，然后选择US</p>
+<p><img src="/bimg/306.png" alt=""></p>
+<p>(6) 接下来问我们是否格式化磁盘，下面的选项</p>
+<p><img src="/bimg/307.png" alt=""></p>
+<p>(7) 接下来市选择时区，我们选择上海时区</p>
+<p><img src="/bimg/308.png" alt=""></p>
+<p>(8) 接下来输入root的密码，这个密码要记住</p>
+<p><img src="/bimg/309.png" alt=""></p>
+<p>(9) 接下来问我们安装到那里，选择使用整个磁盘</p>
+<p><img src="/bimg/310.png" alt=""></p>
+<p>这里应该还有一个分区的过程，linux系统分区的原则是：</p>
+<ul>
+<li>/boot/ 100MB</li>
+<li>swap内存大小两倍，不高于16GB</li>
+<li>/ 20GB</li>
+<li>/data/ 剩余空间</li>
+</ul>
+<p>(10) 接下来等待几分钟，安装完成后选择reboot</p>
+<p><img src="/bimg/311.png" alt=""></p>
+<p>(11) 接下来输入用户名密码进入linux系统，至此大功告成</p>
+<p><img src="/bimg/312.png" alt=""></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>不同的linux版本，不同的centos版本，安装界面可能会不同，但整个过程大同小异，相信你一定会举一反三的。</p>
+<p>原文链接：<a href="http://yanhaijing.com/linux/2016/08/21/how-to-install-linux-on-vm/" target="_blank" rel="external">http://yanhaijing.com/linux/2016/08/21/how-to-install-linux-on-vm/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2016/08/21/linux/how-to-install-linux-on-vm/" data-id="cixvlr6cn0007a9wgiqvd7hzd" class="article-share-link">Share</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2016/08/21/linux/how-to-install-linux-on-vm/" data-title="手把手教你在虚拟机里安装linux" data-url="https://exp-team.github.io/blog/2016/08/21/linux/how-to-install-linux-on-vm/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2016/08/21/js/event/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          js原生事件总结
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2016/08/20/tool/chrome-install/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">chrome的历史版本</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/program/" style="font-size: 16.67px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/tool/" style="font-size: 13.33px;">tool</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">一月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/01/12/program/babel-class/">揭秘babel的魔法之class魔法处理</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/31/weekly/weekly-10010/">expfe技术周刊第10010期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/24/weekly/weekly-10001/">expfe技术周刊第10001期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/17/weekly/weekly-10000/">expfe技术周刊第10000期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2016/12/10/weekly/weekly-1111/">expfe技术周刊第1111期</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
