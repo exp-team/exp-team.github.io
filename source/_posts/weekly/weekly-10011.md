@@ -2,7 +2,7 @@
 title: expfe技术周刊第10011期
 categories: weekly
 tags: weekly
-date: 2016-1-7
+date: 2017-1-7
 author: 颜海镜
 ---
 1.1-1.7，2017年的第一期，美好的事情即将发生，翘首期待。
@@ -30,3 +30,4 @@ author: 颜海镜
 
 ## Other
 ### [Browserscope](http://www.browserscope.org/)
+
