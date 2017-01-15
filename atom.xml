@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://exp-team.github.io/"/>
-  <updated>2017-01-13T12:23:08.000Z</updated>
+  <updated>2017-01-15T12:55:11.000Z</updated>
   <id>https://exp-team.github.io/</id>
   
   <author>
@@ -14,6 +14,78 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>如何使用PAC文件“科学上网”</title>
+    <link href="https://exp-team.github.io/blog/2017/01/13/tool/using-pac/"/>
+    <id>https://exp-team.github.io/blog/2017/01/13/tool/using-pac/</id>
+    <published>2017-01-12T16:00:00.000Z</published>
+    <updated>2017-01-15T12:55:11.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>万里长城是我们中华民族的瑰宝，是我们民族的骄傲，是世界八大奇迹之一，是我们中华的代表，它让我们避免了外族的侵略！</p>
+<p>嗯，不过对我们现代中华儿女，我们要做的就是！翻越它去征服世界上所有的蛮夷之地！</p>
+<a id="more"></a>
+<h2 id="GFW"><a href="#GFW" class="headerlink" title="GFW"></a>GFW</h2><p>令人敬畏的Great Fire Wall，说起他的由来。。。等下，我有个顺丰快递。</p>
+<h2 id="为什么要“科学上网”"><a href="#为什么要“科学上网”" class="headerlink" title="为什么要“科学上网”"></a>为什么要“科学上网”</h2><p>由于GFW的存在，我们失去了不少与友善外族沟通交流的机会，例如Facebook，Twitter，Instagram。我们只能靠那些处于水深火热环境中的朋友给我们搬运回来外族的消息。不过据说这些东西也不好玩，毕竟上面大部分都是外族百姓，我们不玩也罢。</p>
+<p>然而！对我们技术宅们，不能与外族高端人士沟通，实属悲哀之事。既然州官不让，那百姓们就自己想办法咯。</p>
+<p>“科学上网”方法其实有很多，今天介绍一个我个人比较认同的一个方法吧。</p>
+<h2 id="通过PAC文件“科学上网”"><a href="#通过PAC文件“科学上网”" class="headerlink" title="通过PAC文件“科学上网”"></a>通过PAC文件“科学上网”</h2><p>首先，你要有一个可用的代理。没有代理的话就自己想办法搞一个吧。我不教╭(╯^╰)╮</p>
+<p>PAC(Proxy Auto Config)实际上就是一个脚本(Script)，通过这个脚本，我们能够让系统判断在怎么样的情形下，要利用哪一台Proxy来进行联机。</p>
+<p>在“科学上网”方面呢，我们可以让系统确认，哪些网站通过代理访问，哪些直接通过本机网络访问，这样一来避免了直接整机挂VPN而导致国内不少网站访问不了的尴尬情况。</p>
+<p><strong>PAC文件采用JavaScript编写，想要实现高级规则，最好有点JavaScript基础^_^</strong></p>
+<h3 id="基本函数"><a href="#基本函数" class="headerlink" title="基本函数"></a>基本函数</h3><p>先新建一个*.pac文件，然后输(fu)入(zhi)以下代码。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">FindProxyForURL</span>(<span class="params">url, host</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="string">'DIRECT'</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>FindProxyForURL是PAC文件的“主函数”，PAC文件一定要定义它，所有的请求都会进入这个方法，然后匹配规则。</p>
+<p>其中 <em>return ‘DIRECT’;</em> 表示直接使用本机网络直接访问，这一段目前的含义是所有请求通过本机网络直接访问。</p>
+<p>PAC一共支持三种访问方式</p>
+<ul>
+<li>DIRECT <em>直接联机而不透过 Proxy</em></li>
+<li>PROXY host:port <em>使用指定的 Proxy 伺服机</em></li>
+<li>SOCKS host:port <em>使用指定的 Socks 伺服机</em></li>
+</ul>
+<p>比如将代码改成</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">FindProxyForURL</span>(<span class="params">url, host</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="string">'PROXY 127.0.0.1:7070'</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>则表示所有的请求，以HTTP方式，通过本机的7070端口访问。</p>
+<h3 id="通过域名匹配规则"><a href="#通过域名匹配规则" class="headerlink" title="通过域名匹配规则"></a>通过域名匹配规则</h3><p>我这里就介绍一个比较常用的规则，通过域名匹配，如果一个请求在一个域名下，我们就走代理访问。</p>
+<p>直接上代码吧。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> autoproxy_host = &#123;</div><div class="line">    <span class="string">"google.com"</span>: <span class="number">1</span>,</div><div class="line">    <span class="string">"twitter.com"</span>: <span class="number">1</span></div><div class="line">&#125;;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">FindProxyForURL</span>(<span class="params">url, host</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> lastPos;</div><div class="line">    <span class="keyword">do</span> &#123;</div><div class="line">        <span class="keyword">if</span> (autoproxy_host.hasOwnProperty(host)) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="string">'PROXY 127.0.0.1:7070'</span>;</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">        lastPos = host.indexOf(<span class="string">'.'</span>) + <span class="number">1</span>;</div><div class="line">        host = host.slice(lastPos);</div><div class="line">    &#125; <span class="keyword">while</span> (lastPos &gt;= <span class="number">1</span>);</div><div class="line">    <span class="keyword">return</span> <span class="string">'DIRECT'</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其实会Js的朋友应该很容易就能看懂了，不断分隔域名，然后去匹配autoproxy_host中设定好了的域名，如果匹配上了，我们就通过本机7070端口代理访问，否则就直接通过本机网络访问。比如这里，访问google.com和twitter.com的时候，就通过代理访问。</p>
+<p>实际上用的时候，记得把127.0.0.1:7070换成你自己代理，如果是SSH的代理，就用SOCKS就好了。</p>
+<h3 id="使用PAC文件"><a href="#使用PAC文件" class="headerlink" title="使用PAC文件"></a>使用PAC文件</h3><h4 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h4><p>Windows上面使用PAC文件很简单，新建一个你的PAC文件，放在一个固定的位置，比如</p>
+<p>D:\学习资料\国外学习资料\中外文化交流\跨越\别看\说了别看\搞毛啊\setting.pac</p>
+<p>然后，Internet设置 -&gt; 连接 -&gt; 局域网设置 </p>
+<p><img src="/bimg/pac-win-1.jpg" alt=""></p>
+<p>勾选“自动检测设置”以及“使用自动配置脚本”，在“地址”里面填写</p>
+<p>file:\\\ 加 文件路径，如下</p>
+<p><img src="/bimg/pac-win-2.jpg" alt=""></p>
+<p>然后多确认几次就好了，打开浏览器或者IE（没错我就是来黑IE的）试试看吧！</p>
+<h4 id="Mac-OSX"><a href="#Mac-OSX" class="headerlink" title="Mac OSX"></a>Mac OSX</h4><p>Mac上面比较麻烦，因为最新的OSX是不支持本地文件设置的，你需要填写一个网络地址。比较好的办法是你现在本地建立一个服务器，然后把你的pac文件丢进去，然后通过http能访问就好了。</p>
+<p>在Mac上建立本地服务器的方法很多，比如自带的apache。直接在命令行输入</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo apachectl start</div></pre></td></tr></table></figure>
+<p>一般默认的目录都是 /Library/WebServer/Documents，你也可以修改/etc/apache2/httpd.conf里面的DocumentRoot配置项，修改服务器的默认路径。</p>
+<p>把pac文件放进根目录，然后就可以直接通过 <a href="http://localhost/file.pac" target="_blank" rel="external">http://localhost/file.pac</a> 来访问了。</p>
+<p>接下来是配置网络，系统偏好 -&gt; 网络 -&gt; 高级 -&gt; 代理</p>
+<p>勾选“Automatic Proxy Configuration”，在右侧填写pac文件路径就好了。</p>
+<p><img src="/bimg/pac-mac-1.png" alt=""></p>
+<p>至此，大伙儿就开开心心地来“科学上网”吧！！！\(^o^)/！！</p>
+<h2 id="结束语"><a href="#结束语" class="headerlink" title="结束语"></a>结束语</h2><p>然后，没错，我就是被颜大大拜托过来耍宝的！=￣ω￣=</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;万里长城是我们中华民族的瑰宝，是我们民族的骄傲，是世界八大奇迹之一，是我们中华的代表，它让我们避免了外族的侵略！&lt;/p&gt;
+&lt;p&gt;嗯，不过对我们现代中华儿女，我们要做的就是！翻越它去征服世界上所有的蛮夷之地！&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="tool" scheme="https://exp-team.github.io/categories/tool/"/>
+    
+    
+      <category term="tool" scheme="https://exp-team.github.io/tags/tool/"/>
+    
+      <category term="pac" scheme="https://exp-team.github.io/tags/pac/"/>
+    
+  </entry>
   
   <entry>
     <title>expfe技术周刊第10100期</title>
@@ -47,17 +119,236 @@
   </entry>
   
   <entry>
+    <title>揭秘babel之class super魔法处理</title>
+    <link href="https://exp-team.github.io/blog/2017/01/12/js/babel-class2/"/>
+    <id>https://exp-team.github.io/blog/2017/01/12/js/babel-class2/</id>
+    <published>2017-01-11T16:00:00.000Z</published>
+    <updated>2017-01-15T12:55:11.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>如果你已经看过第一篇<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a>，这篇将会是一个延伸；<br>如果你还没看过，并且也不想<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">现在就去读一下</a>，单独看这篇也没有关系。</p>
+<p>上一篇针对Babel对ES6里面基础“class”的编译进行分析，这一篇将会对class的继承，包括extends和super进行讲解。</p>
+<p>什么？你还不了解ES6环境的继承？推荐参考<a href="http://es6.ruanyifeng.com/#docs/class#Class的继承" target="_blank" rel="external">阮一峰《ES6 标准入门》的相关章节</a></p>
+<p>再啰嗦一句，这一系列的文章并不是科普ECMAScript新规范。她的意义在于分析Babel对ES6的编译，从而希望读者对JS语言基础，设计理念等等有更深刻的认识。</p>
+<h2 id="Class的继承"><a href="#Class的继承" class="headerlink" title="Class的继承"></a>Class的继承</h2><p>在这篇文章中，我会讲解Babel如何处理ES6 Class里面的继承功能，同样，这其实是一系列语法糖的实现。<br>我们先来温习一下实现方式：</p>
+<h3 id="ES6-实现继承"><a href="#ES6-实现继承" class="headerlink" title="ES6 实现继承"></a>ES6 实现继承</h3><p>首先，我们定义一个父类：</p>
+<pre><code>class Person {
+    constructor(){
+        this.type = &apos;person&apos;
+    }
+}
+</code></pre><p>然后，实现一个Student类，这个“学生”类继承“人”类：</p>
+<pre><code>class Student extends Person {
+    constructor(){
+        super()
+    }
+}
+</code></pre><p>当然，从简出发，我们定义的Person类只包含了name为person这一个属性，不含有方法。所以我们extends+super()之后，Student类<br>也继承了同样的属性。<br>如下：</p>
+<pre><code>var student1 = new Student();
+student1.type // &quot;person&quot;
+</code></pre><p>我们进一步可以验证原型链上的关系</p>
+<pre><code>student1 instanceof Student // true
+student1 instanceof Person // true
+student1.hasOwnProperty(&apos;type&apos;) // true
+</code></pre><p>一切看上去cool极了，我们实现了ES6里面的继承。并且用instanceof验证了ES6中一系列的实质就是“魔法糖”的本质。<br>那么，经过Babel编译，我们的代码是什么样呢？</p>
+<h3 id="Babel-transformation"><a href="#Babel-transformation" class="headerlink" title="Babel transformation"></a>Babel transformation</h3><p>我们一步一步来看，</p>
+<p>Step1: Person定义<br>我们从最头来看：</p>
+<pre><code>class Person {
+    constructor(){
+        this.type = &apos;person&apos;
+    }
+}
+</code></pre><p>被编译为：</p>
+<pre><code>var Person = function Person() {
+    _classCallCheck(this, Person);
+    this.type = &apos;person&apos;;
+};
+</code></pre><p>如果你看过这一篇的<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">前传</a>，<br>你应该很明白这一系列的变换，也可能会记得_classCallCheck函数到底是什么鬼。这里因为篇幅和去冗余的原因，就不再展开。</p>
+<p>Step2：Student探秘<br>我们这次尝试观察Student子类：</p>
+<pre><code>class Student extends Person {
+    constructor(){
+        super()
+    }
+}
+</code></pre><p>编译结果：</p>
+<pre><code>var Student = (function(_Person) {
+    _inherits(Student, _Person);
+
+    function Student() {
+        _classCallCheck(this, Student);            
+        _get(Object.getPrototypeOf(Student.prototype), &apos;constructor&apos;, this).call(this);
+    }
+
+    return Student;
+})(Person);
+
+var _get = function get(_x, _x2, _x3) {
+    var _again = true;
+    _function: while (_again) {
+        var object = _x,
+            property = _x2,
+            receiver = _x3;
+        _again = false;
+        if (object === null) object = Function.prototype;
+        var desc = Object.getOwnPropertyDescriptor(object, property);
+        if (desc === undefined) {
+            var parent = Object.getPrototypeOf(object);
+            if (parent === null) {
+                return undefined;
+            } else {
+                _x = parent;
+                _x2 = property;
+                _x3 = receiver;
+                _again = true;
+                desc = parent = undefined;
+                continue _function;
+            }
+        } else if (&apos;value&apos; in desc) {
+            return desc.value;
+        } else {
+            var getter = desc.get;
+            if (getter === undefined) {
+                return undefined;
+            }
+            return getter.call(receiver);
+        }
+    }
+};
+
+function _inherits(subClass, superClass) {
+    if (typeof superClass !== &apos;function&apos; &amp;&amp; superClass !== null) {
+        throw new TypeError(&apos;Super expression must either be null or a function, not &apos; + typeof superClass);
+    }
+    subClass.prototype = Object.create(superClass &amp;&amp; superClass.prototype, {
+        constructor: {
+            value: subClass,
+            enumerable: false,
+            writable: true,
+            configurable: true
+        }
+    });
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+</code></pre><p>看上去恶心极了！没关系，下面我们进行拆解，并对代码加上注释，你很快就能明白。</p>
+<p>Step3：抽丝剥茧<br>我们首先看Student的编译结果</p>
+<pre><code>var Student = (function(_Person) {
+    _inherits(Student, _Person);
+
+    function Student() {
+        _classCallCheck(this, Student);            
+        _get(Object.getPrototypeOf(Student.prototype), &apos;constructor&apos;, this).call(this);
+    }
+
+    return Student;
+})(Person);
+</code></pre><p>这是一个自执行函数，它接受一个参数Person（就是他要继承的父类），返回一个构造函数Student。</p>
+<p>_inherits方法的本质其实就是让Student子类继承Person父类原型链上的方法。它实现原理可以归结为一句话：</p>
+<pre><code>Student.prototype = Object.create(Person.prototype);
+Object.setPrototypeOf(Student, Person)
+</code></pre><p>同时利用Object.create可以接收第二个参数来实现对Student的constructor修复。<br>如果你不了解Object.create，那么安利一下，<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create" target="_blank" rel="external">请参考</a></p>
+<p>上面，通过_inherits实现了对父类原型链上属性的继承，那么对于父类的实例属性（就是constructor定义的属性）的继承，也可以归结为一句话：</p>
+<pre><code>Person.call(this);
+</code></pre><p>如果你还不理解使用call或者apply或者bind来改变JS中this的指向，那么请参考<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call" target="_blank" rel="external">这篇文章</a></p>
+<p>这样，我们便透析了Babel编译的这一切秘密。上面的代码我加上了自己的理解和注释，你可以参考：</p>
+<pre><code>// 实现定义Student构造函数，它是一个自执行函数，接受父类构造函数为参数
+var Student = (function(_Person) {
+    // 实现对父类原型链属性的继承
+    _inherits(Student, _Person);
+
+    // 将会返回这个函数作为完整的Student构造函数
+    function Student() {
+        // 使用检测
+        _classCallCheck(this, Student);  
+        // _get的返回值可以先理解为父类构造函数       
+        _get(Object.getPrototypeOf(Student.prototype), &apos;constructor&apos;, this).call(this);
+    }
+
+    return Student;
+})(Person);
+
+// _x为Student.prototype.__proto__
+// _x2为&apos;constructor&apos;
+// _x3为this
+var _get = function get(_x, _x2, _x3) {
+    var _again = true;
+    _function: while (_again) {
+        var object = _x,
+            property = _x2,
+            receiver = _x3;
+        _again = false;
+        // Student.prototype.__proto__为null的处理
+        if (object === null) object = Function.prototype;
+        // 以下是为了完整复制父类原型链上的属性，包括属性特性的描述符
+        var desc = Object.getOwnPropertyDescriptor(object, property);
+        if (desc === undefined) {
+            var parent = Object.getPrototypeOf(object);
+            if (parent === null) {
+                return undefined;
+            } else {
+                _x = parent;
+                _x2 = property;
+                _x3 = receiver;
+                _again = true;
+                desc = parent = undefined;
+                continue _function;
+            }
+        } else if (&apos;value&apos; in desc) {
+            return desc.value;
+        } else {
+            var getter = desc.get;
+            if (getter === undefined) {
+                return undefined;
+            }
+            return getter.call(receiver);
+        }
+    }
+};
+
+function _inherits(subClass, superClass) {
+    // superClass需要为函数类型，否则会报错
+    if (typeof superClass !== &apos;function&apos; &amp;&amp; superClass !== null) {
+        throw new TypeError(&apos;Super expression must either be null or a function, not &apos; + typeof superClass);
+    }
+    // Object.create第二个参数是为了修复子类的constructor
+    subClass.prototype = Object.create(superClass &amp;&amp; superClass.prototype, {
+        constructor: {
+            value: subClass,
+            enumerable: false,
+            writable: true,
+            configurable: true
+        }
+    });
+    // Object.setPrototypeOf是否存在做了一个判断，否则使用__proto__
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>如果你看完这一系列的文章可能会有体会：我想表达的肯定不是ES6新特性的使用，关于这些东西有太多的文章、博客、书籍去讨论。<br>我是再讲Babel对这些新特性的编译产出，那为什么会在乎这些呢？<br>其实通过分析，我们悄然回顾了JS中很多重点以及难点概念，以及程序设计上的一些小思想。<br>最近面试了很多前端“新同学”：有的人框架用的很熟，可以使用React或者Vue做出页面炫酷的交互，甚至自觉SPA也不在话下；<br>有的人ES6、ES7了解很多，generator，async都能说出一二，仿佛Promise处理异步已经成为了“时代弃儿”。<br>可是同样是这些人，对原型原型链、this、作用域、闭包都没有深刻地理解和掌握。<br>对此，他们的解释大体都是：“哦，我看过，我了解过，不过后来用不到，就忘了。”<br>同样是这些页面，即便用callback处理异步回调，嵌套最多不到两层。<br>对此，他们的解释翻译一下都是：“放着先进的生产力我不用，我怎么做保持进步的青年？”</p>
+<p>也许，同样一批人也会问：“我能用前端框架、ES6撸出好多页面，可是为什么感觉进步很慢、面试也总被挂呢？”</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;如果你已经看过第一篇&lt;a href=&quot;http://www.jianshu.com/p/d36fb31f9cff&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;揭秘babel的魔法之class魔法处理&lt;/a&gt;，这篇将会是一个延伸；&lt;br&gt;如果你还没看过，并
+    
+    </summary>
+    
+      <category term="js" scheme="https://exp-team.github.io/categories/js/"/>
+    
+    
+      <category term="js" scheme="https://exp-team.github.io/tags/js/"/>
+    
+  </entry>
+  
+  <entry>
     <title>揭秘babel的魔法之class魔法处理</title>
     <link href="https://exp-team.github.io/blog/2017/01/12/program/babel-class/"/>
     <id>https://exp-team.github.io/blog/2017/01/12/program/babel-class/</id>
     <published>2017-01-11T16:00:00.000Z</published>
-    <updated>2017-01-13T10:19:58.000Z</updated>
+    <updated>2017-01-15T12:55:11.000Z</updated>
     
-    <content type="html"><![CDATA[<p>2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？</p>
-<p>这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以<a href="https://babeljs.io/repl/" target="_blank" rel="external">在线测试编译结果</a>，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。</p>
-<p>另外，这篇文章并不适合初学者阅读。如果你还不明白JS中原型链等OOP相关知识，建议出门左转找到经典的《JS高级程序设计<br>》来补课；如果你对JS中，通过原型链来实现继承一直云里雾里，安利一下<a href="http://yanhaijing.com/javascript/2014/11/09/object-inherit-of-js/" target="_blank" rel="external">颜海镜大大的文章</a></p>
+    <content type="html"><![CDATA[<p>2017年，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？</p>
+<p>这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以在线<a href="https://babeljs.io/repl/" target="_blank" rel="external">测试编译结果</a>，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。</p>
+<p>另外，如果你还不明白JS中原型链等OOP相关知识，建议出门左转找到经典的《JS高级程序设计》来补课；如果你对JS中，通过原型链来实现继承一直云里雾里，安利一下我的同事，前端著名网红<a href="http://yanhaijing.com/javascript/2014/11/09/object-inherit-of-js/" target="_blank" rel="external">颜海镜大大早在2014年的文章</a></p>
 <a id="more"></a>
-<h2 id="为什么使用选择Babel"><a href="#为什么使用选择Babel" class="headerlink" title="为什么使用选择Babel"></a>为什么使用选择Babel</h2><p>我们知道，现在大部分浏览器或者类似NodeJS的javascript引擎还不能直接支持Babel。但这并不是障碍，比如Babel的出现，使得在生产环境中书写ES6代码成为了现实，它工作原理是编译ES6的新特性为老版本的ES5，从而得到宿主环境的支持。</p>
+<h2 id="为什么使用选择Babel"><a href="#为什么使用选择Babel" class="headerlink" title="为什么使用选择Babel"></a>为什么使用选择Babel</h2><p>Babel：The compiler for writing next generation JavaScript；<br>我们知道，现在大部分浏览器或者类似NodeJS的javascript引擎还不能直接支持ES6语法。但这并不构成障碍，比如Babel的出现，使得我们在生产环境中书写ES6代码成为了现实，它工作原理是编译ES6的新特性为老版本的ES5，从而得到宿主环境的支持。</p>
 <h2 id="Class例子"><a href="#Class例子" class="headerlink" title="Class例子"></a>Class例子</h2><p>在这篇文章中，我会讲解Babel如何处理ES6新特性：Class，这其实是一系列语法糖的实现。</p>
 <h3 id="Old-school方式实现继承"><a href="#Old-school方式实现继承" class="headerlink" title="Old school方式实现继承"></a>Old school方式实现继承</h3><p>在探究ES6之前，我们先来回顾一下ES5环境下，我们如何实现类的继承：</p>
 <pre><code>// Person是一个构造器
@@ -84,7 +375,7 @@ Person.fn(); // &apos;static&apos;
 
 // 这样会报错，因为fn是一个私有属性
 julien.fn(); //Uncaught TypeError: julien.fn is not a function
-</code></pre><h3 id="New-school方式-ES6-实现继承"><a href="#New-school方式-ES6-实现继承" class="headerlink" title="New school方式(ES6)实现继承"></a>New school方式(ES6)实现继承</h3><p>在ES6环境下，我们当然迫不及待地试一试Class</p>
+</code></pre><h3 id="New-school方式-ES6-实现继承"><a href="#New-school方式-ES6-实现继承" class="headerlink" title="New school方式(ES6)实现继承"></a>New school方式(ES6)实现继承</h3><p>在ES6环境下，我们当然迫不及待地试一试Class：</p>
 <pre><code>class Person {
     constructor(name) {
         this.name = name;
@@ -114,7 +405,7 @@ var Person = function Person() {
 };
 </code></pre><p>你可能会一头雾水,_classCallCheck是什么？其实很简单，它是为了保证调用的安全性。<br>比如我们这么调用：</p>
 <pre><code>// ok
-new p = new Person();
+var p = new Person();
 </code></pre><p>是没有问题的，但是直接调用：</p>
 <pre><code>// Uncaught TypeError: Cannot call a class as a function
 Person();
@@ -134,7 +425,7 @@ Person();
     this.name = name;
 };
 </code></pre><p>看上去棒极了，我们继续探索。</p>
-<p>Step3：增加方法<br>我们尝试给Person类添加一个方法：hello</p>
+<p>Step3：增加方法<br>我们尝试给Person类添加一个方法：hello：</p>
 <pre><code>class Person {
     constructor(name) {
         this.name = name;
@@ -207,7 +498,7 @@ var Person = (function () {
     return Person;
 })();
 </code></pre><p>如果你不明白defineProperty方法, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty" target="_blank" rel="external">请参考这里</a></p>
-<p>现在，我们知道我们添加的方法</p>
+<p>现在，我们知道我们添加的方法：</p>
 <pre><code>hello() {
     console.log(&apos;hello &apos; + this.name);
 }
@@ -224,14 +515,14 @@ var Person = (function () {
 参数2 =&gt; 需要在目标对象原型链上添加的属性，这是一个数组
 参数3 =&gt; 需要在目标对象上添加的属性，这是一个数组
 </code></pre><p>这样，Babel的魔法就一步一步被揭穿了。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>希望这篇文章能够让你了解到Babel是如何初步把我们ES6 Class语法编译成ES5的。下一篇文章我会继续介绍Babel如何处理Super(), 并会通过一段函数桥梁，使得ES5环境下也能够继承ES6定义的Class</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>希望这篇文章能够让你了解到Babel是如何初步把我们ES6 Class语法编译成ES5的。下一篇文章我会继续介绍Babel如何处理子类的Super(), 并会通过一段函数桥梁，使得ES5环境下也能够继承ES6定义的Class。</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？&lt;/p&gt;
-&lt;p&gt;这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以&lt;a href=&quot;https://babeljs.io/repl/&quot;&gt;在线测试编译结果&lt;/a&gt;，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。&lt;/p&gt;
-&lt;p&gt;另外，这篇文章并不适合初学者阅读。如果你还不明白JS中原型链等OOP相关知识，建议出门左转找到经典的《JS高级程序设计&lt;br&gt;》来补课；如果你对JS中，通过原型链来实现继承一直云里雾里，安利一下&lt;a href=&quot;http://yanhaijing.com/javascript/2014/11/09/object-inherit-of-js/&quot;&gt;颜海镜大大的文章&lt;/a&gt;&lt;/p&gt;
+      &lt;p&gt;2017年，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？&lt;/p&gt;
+&lt;p&gt;这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以在线&lt;a href=&quot;https://babeljs.io/repl/&quot;&gt;测试编译结果&lt;/a&gt;，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。&lt;/p&gt;
+&lt;p&gt;另外，如果你还不明白JS中原型链等OOP相关知识，建议出门左转找到经典的《JS高级程序设计》来补课；如果你对JS中，通过原型链来实现继承一直云里雾里，安利一下我的同事，前端著名网红&lt;a href=&quot;http://yanhaijing.com/javascript/2014/11/09/object-inherit-of-js/&quot;&gt;颜海镜大大早在2014年的文章&lt;/a&gt;&lt;/p&gt;
     
     </summary>
     
@@ -1042,167 +1333,6 @@ function check_webp_feature(feature, callback) {
 &lt;p&gt;After a short moment in the 90s, Virtual Reality faded away. Now in 2016, VR is coming back in a big way. Games are leading the charge, but with millions of headsets pouring into the marketplace over the next few years, how can React web and app developers get involved? Can React even handle the screaming-fast performance requirements of VR? Spoiler: it can.&lt;br&gt;This talk explores these concepts by incrementally building up a mobile VR engine that can be driven not just with JavaScript, but with React. We’ll discover how naive approaches fail, and why game engines are built the way they are. Finally, we’ll cover some exciting work with WebVR which intends to bring VR to all browsers.&lt;/p&gt;
 &lt;p&gt;废话说到这里，快戳开视频观看吧。另附YouTube地址：&lt;a href=&quot;https://www.youtube.com/watch?v=ty2bFeOdGeI&quot;&gt;https://www.youtube.com/watch?v=ty2bFeOdGeI&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;认识javascript中的作用域和上下文&quot;&gt;&lt;a href=&quot;#认识javascript中的作用域和上下文&quot; class=&quot;headerlink&quot; title=&quot;认识javascript中的作用域和上下文&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzIzNjE5NzAyMA==&amp;amp;mid=2649879768&amp;amp;idx=1&amp;amp;sn=03e5dd16a44d7ba23cef4dfd4b7a012e&amp;amp;scene=1&amp;amp;srcid=0909Z9n37xFfLJ3bCVxMjCoG&amp;amp;from=groupmessage&amp;amp;isappinstalled=0#wechat_redirect&quot;&gt;认识javascript中的作用域和上下文&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;在追求最新技术和理念的同时，JS的基础知识同样不可忽略。所谓“水之积也不厚，则其负大舟也无力”－《庄子·逍摇游》，想想作为新同学，多少次因为JS中的this漂移踩了坑；多少次挣扎在原型链里不得解；面试时，闭包的知识有多少次被提及。“墙高基下，虽得必失”，千里之行，还要从基础开始。这里给大家安利一篇颜海镜大神的文章，希望大家能对js中的作用域了解有所加深。&lt;br&gt;最后，给大家布置课后作业：ES6中，关于作用域的改进有哪些呢？&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
-    
-    
-      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>经验无线步骤页改版总结</title>
-    <link href="https://exp-team.github.io/blog/2016/09/10/program/exp-wap-step/"/>
-    <id>https://exp-team.github.io/blog/2016/09/10/program/exp-wap-step/</id>
-    <published>2016-09-09T16:00:00.000Z</published>
-    <updated>2017-01-13T08:09:51.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>最近对经验无线步骤页进行了改版，今天在组内做了改版总结的分享，本文是这次分享的文字版，大纲如下：</p>
-<ul>
-<li>简介</li>
-<li>架构</li>
-<li>新技术</li>
-</ul>
-<p>我之前写过一个经验详情页的改版分享——《<a href="http://yanhaijing.com/program/2016/04/14/how-to-reconstruct-a-large-historical-project/" target="_blank" rel="external">如何重构一个大型历史项目——百度经验改版总结</a>》，很多和上次一样的东西这次就没做分享，有兴趣的同学可以看下（移动端或开模拟器）。</p>
-<a id="more"></a>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>经验步骤页是经验流量最多的页面，也是最重要的页面之一，<a href="http://jingyan.baidu.com/album/fea4511a71963bf7bb912580.html?stepindex=2&amp;stepGroup=E1" target="_blank" rel="external">点击这里</a>查看效果，页面的截图如下：</p>
-<p><img src="/bimg/425.png" alt=""></p>
-<p>页面大体可分文，最上面的bar，经验头部（听语音），主题内容等，其中主题内容部分可左右和上下滑动，左右滑动会切换到上一步，下一步，同时会更新经验头部，停止语音播放等。</p>
-<p>本次改版总共有两个FE参加，我主要负责页面基础架构，主要逻辑的开发，另一个同学主要负责，最后一页的交互和点击查看大图的功能。这次做的点击查看大图是非常亮点的一个特色，大家有兴趣可以试一下，关于查看大图介绍我等另一位FE写完，再贴到这里。</p>
-<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><h3 id="一个模块"><a href="#一个模块" class="headerlink" title="一个模块"></a>一个模块</h3><p>这次改版需要小流量，新旧版页面需要在线上同时存在一段时间，以前的做法我们都是重新拉一个前端的模块，这次我们是在同一个模块完成的这个工作，新版的内容全部放到了v2路径下。</p>
-<p><img src="/bimg/426.png" alt=""></p>
-<p>一个非常小的点是fis打包的配置，为了能够自动把v2和v1的打包文件区分开我们用到了正则的<code>?!</code>技巧，关于正则我也打算写一篇博文《<a href="http://yanhaijing.com/javascript/2016/09/10/regexp-in-js" target="_blank" rel="external">详解JavaScript正则表达式</a>》。</p>
-<pre><code>pack: {
-    &apos;/static/pkg/step2.css&apos;: [
-        &apos;/widget/v2/css/base.less&apos;,
-        /\/widget\/v2\/(?!css\/).*\.less/
-    ],
-    &apos;/static/pkg/step.css&apos;: [
-        /\/widget\/(?!v2\/).*\.less/,
-        &apos;/widget/**.css&apos;
-    ]
-}
-</code></pre><h3 id="耦合"><a href="#耦合" class="headerlink" title="耦合"></a>耦合</h3><p>关于其中耦合的关系，我在之前一篇博文里面做过介绍了，<a href="http://yanhaijing.com/program/2016/09/01/about-coupling/" target="_blank" rel="external">点这里</a>查看。</p>
-<p>在我们项目中，还有一种独特的方式，我称其为消息中心，通过消息中心将模块之间的耦合变成了模块与消息中心的耦合。</p>
-<p><img src="/bimg/427.png" alt=""></p>
-<p>这种模式的缺点就是可能会消息爆炸，并且消息的订阅是散落在各个模块的，将来只能对消息扩展，而不能删除消息中的信息。</p>
-<p>下面举个栗子来说说消息中心和非直接耦合的区别，假设模块A B C D E F 如下图所示，线条代表模块之间的关系。</p>
-<p><img src="/bimg/428.png" alt=""></p>
-<p>消息中心模式的结构图如下所示，A与B之间的关系解耦成了A与消息中心的关系，但A还是要知道B的消息名称，我称其为消息名耦合，也就是说A对B还是有感知的。</p>
-<p><img src="/bimg/429.png" alt=""></p>
-<p>主模块模式的结构图如下所示，A与B之间的关系解耦合成A与主模块之间的关系，A完全不知道B的存在，消息中心模式中的消息名耦合被放到了主模块中。</p>
-<p><img src="/bimg/430.png" alt=""></p>
-<h3 id="新旧版架构对比"><a href="#新旧版架构对比" class="headerlink" title="新旧版架构对比"></a>新旧版架构对比</h3><p>旧版的架构图如下所示，其使用了消息和主模块两种模式，不够纯粹，并且其slider模块太过冗余，揉进了很多其他模块的逻辑。</p>
-<p><img src="/bimg/431.png" alt=""></p>
-<p>在新版的架构中，我们只是用了主模块模式，子模块之前完全没有直接关系。</p>
-<p><img src="/bimg/432.png" alt=""></p>
-<p>我们使用es6的class，实现了继承，继承关系如下所示。</p>
-<p><img src="/bimg/433.png" alt=""></p>
-<h3 id="F-context"><a href="#F-context" class="headerlink" title="F.context"></a>F.context</h3><p>我们项目中有一个全局的数据中心，叫做F.context，全局数据中心对应上面耦合中的数据耦合，术语耦合比较紧的一种模块，我原来对其有偏见，重新认识一下F.context，明确一下F.context应该放一下全局性的数据，并且一次赋值，尽量不要对其值进行修改。</p>
-<p>特别注意用F.context来代替传参，我们项目中有很多这种反模式。</p>
-<p><img src="/bimg/434.png" alt=""></p>
-<h2 id="新技术"><a href="#新技术" class="headerlink" title="新技术"></a>新技术</h2><p>这次改版中我们尝试了引入了三个新技术，包括ES6，postcss，flex，下面分别来介绍介绍这几个技术。</p>
-<h3 id="ES6"><a href="#ES6" class="headerlink" title="ES6"></a>ES6</h3><p>在之前我们都是在活动页面尝试使用ES6，在积累了经验后我们决定在这个页面尝试使用。</p>
-<p>如果你对ES6不了解，可以查看我之前写的一系列文章：</p>
-<ul>
-<li><a href="http://yanhaijing.com/javascript/2015/09/04/try-es2015/" target="_blank" rel="external">快来使用ECMAScript 2015吧</a></li>
-<li><a href="http://yanhaijing.com/javascript/2015/09/11/learn-es2015/" target="_blank" rel="external">ECMAScript 2015 简易教程</a></li>
-<li><a href="http://yanhaijing.com/javascript/2015/09/16/es6-promise/" target="_blank" rel="external">快来使用ES2015的Promise吧</a></li>
-<li><a href="http://yanhaijing.com/javascript/2016/04/27/es2015-practice/" target="_blank" rel="external">ES2015实战——面向未来编程</a></li>
-</ul>
-<p>关于ES6其实有<a href="http://espadrine.github.io/New-In-A-Spec/es2015/" target="_blank" rel="external">一系列功能</a>，但这次我们主要用到了三个：module, class, let。</p>
-<p>我们的ES6最后都会使用bable编译成ES5来执行，所以我们代码的兼容性就是ES5的兼容，而ES5在wap端<a href="http://kangax.github.io/compat-table/es5/" target="_blank" rel="external">兼容性</a>非常好。</p>
-<p><img src="/bimg/435.png" alt=""></p>
-<p>后续我准备写一篇如何用ES5来代替ES6的博文《<a href="/program/2016/09/10/es6-free/">如何做到ES6 free</a>》。</p>
-<p>下面上一段步骤页滑动模块的js</p>
-<pre><code>import $ from &apos;common:widget/lib/gmu/zepto/zepto.js&apos;;
-import {UIBase} from &apos;common:widget/js/ui/base/base.es&apos;;
-var ec = require(&apos;common:widget/js/util/event/event.es&apos;).event;
-
-class Slider extends UIBase {
-    constructor(index) {
-        super();
-        this.bindEvent();
-    }
-    bindEvent() {}
-    move(x) {}
-    update() {}
-    moveTo(index, anim) {}
-}
-
-export {Slider};
-</code></pre><h3 id="postcss"><a href="#postcss" class="headerlink" title="postcss"></a>postcss</h3><p><a href="http://postcss.org/" target="_blank" rel="external">postcss</a>是最近出来的新东西，学名是css后处理器，也就是处理标准化的css，和sass等预处理器的区别需要区分开，sass生成css，postcss处理标准css。</p>
-<p><img src="/bimg/436.png" alt=""></p>
-<p>目前已经有很多大公司在用，包括google，Facebook等。</p>
-<p>打开postcss的官网，可以看到介绍了4个特色——添加前缀，css变量，命名空间，语法验证。</p>
-<p>post是一套css的语法解析工具，可以通过插件来实现不同的功能，其插件可以分为下面这些分类。</p>
-<p><img src="/bimg/437.png" alt=""></p>
-<p>我们主要使用的是添加前缀功能，在fis中实现这个功能主要有两个插件，<code>fis-preprocessor-autoprefixer</code>，<code>fis-postprocessor-autoprefixer</code>，其中推荐使用前一个，这是fis官方维护的插件，在fis中有两个节点可以插入后处理器的功能；fis的编程流程如下，分为单文件编译和打包两个过程。</p>
-<p><img src="/bimg/438.png" alt=""></p>
-<p><a href="https://github.com/postcss/autoprefixer" target="_blank" rel="external">autoprefixer</a>有很多配置项</p>
-<ul>
-<li>Browsers 浏览器列表 默认 &gt; 1%, last 2 versions, Firefox ESR</li>
-<li>Cascade 是否级联 默认 true</li>
-<li>Add 是否添加前缀 默认true</li>
-<li>Remove 是否移除无用的前缀 默认true</li>
-<li>Supports 是否适配 @support 默认true</li>
-<li>Flexbox 是否支持flex 默认true</li>
-<li>Grid 是否支持grid 默认true</li>
-<li>Stats 自定义地区浏览器</li>
-</ul>
-<p>其中最主要的的配置项是第一个，其详细配置项在<a href="https://github.com/ai/browserslist" target="_blank" rel="external">这里</a>，这里有一个<a href="http://browserl.ist/" target="_blank" rel="external">在线版</a>，比较直观。</p>
-<p>我们的配置数据如下：<code>&#39;Android &gt;= 4&#39;, &#39;iOS &gt;= 6&#39;, &#39;and_uc &gt; 9&#39;</code>，兼容的浏览器顾名思义。</p>
-<p>postcss支持的css3属性列表在<a href="https://github.com/postcss/autoprefixer/wiki/support-list" target="_blank" rel="external">这里</a>，我们整理出一个常用的子集如下所示：</p>
-<p><img src="/bimg/439.png" alt=""></p>
-<p><strong>注意：</strong>需要注意的就是postcss并不能解决浏览器不兼容css的问题，而是可以帮我们磨平前缀，所以使用心得css3属性前，还是要先看<a href="http://caniuse.com/" target="_blank" rel="external">caniuse</a>。在下面的例子中，如果要兼容安卓4.3以下，就不能使用<code>calc</code>。</p>
-<p><img src="/bimg/440.png" alt=""></p>
-<h3 id="flex"><a href="#flex" class="headerlink" title="flex"></a>flex</h3><p>在这个项目中我们大规模使用了flex，其中也踩了不上坑，关于flex我打算在另一篇博文里详细介绍——《<a href="http://yanhaijing.com/css/2016/08/21/flex-practice-on-mobile/" target="_blank" rel="external">移动端flex布局实战经验</a>》。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>最后感谢大家浏览本文，如果你有任何疑问可以在下面留言和我交流。</p>
-<p>原文链接：<a href="http://yanhaijing.com/program/2016/09/07/exp-wap-step/" target="_blank" rel="external">http://yanhaijing.com/program/2016/09/07/exp-wap-step/</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;最近对经验无线步骤页进行了改版，今天在组内做了改版总结的分享，本文是这次分享的文字版，大纲如下：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;简介&lt;/li&gt;
-&lt;li&gt;架构&lt;/li&gt;
-&lt;li&gt;新技术&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;我之前写过一个经验详情页的改版分享——《&lt;a href=&quot;http://yanhaijing.com/program/2016/04/14/how-to-reconstruct-a-large-historical-project/&quot;&gt;如何重构一个大型历史项目——百度经验改版总结&lt;/a&gt;》，很多和上次一样的东西这次就没做分享，有兴趣的同学可以看下（移动端或开模拟器）。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="program" scheme="https://exp-team.github.io/categories/program/"/>
-    
-    
-      <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>expfe技术周刊第101期</title>
-    <link href="https://exp-team.github.io/blog/2016/09/04/weekly/weekly-101/"/>
-    <id>https://exp-team.github.io/blog/2016/09/04/weekly/weekly-101/</id>
-    <published>2016-09-03T16:00:00.000Z</published>
-    <updated>2017-01-13T08:09:51.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>8.29-9.4，本期是我第二次编写exp-team周刊，要变得有深度得慢慢来，加油！</p>
-<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="如何运用最新的技术提升网页速度和性能"><a href="#如何运用最新的技术提升网页速度和性能" class="headerlink" title="如何运用最新的技术提升网页速度和性能"></a><a href="http://www.zcfy.cc/article/why-our-website-is-faster-than-yours-1030.html?sukey=3997c0719f151520dd1f40fbce22d2d30c77d4dd0494ab11b0c8291e63ef87080000e514d86eaebb849f57fd01f8a4b1" target="_blank" rel="external">如何运用最新的技术提升网页速度和性能</a></h3><p>我们在把一张酷炫的网页呈现给用的同时，我们也要考虑这些酷炫的交互对网页性能造成的影响，在之前这个周刊的前几期都有提到关于网页速度和性能的文章，目前有很多框架都有一站式的图片合并代码压缩的功能，还有css和js的懒加载都是属于提高网页速度和性能，我们可以从多方面来提高性能和速度，这篇文章就写得比较全，可以好好看看。</p>
-<h3 id="webp图片实践之路"><a href="#webp图片实践之路" class="headerlink" title="webp图片实践之路"></a><a href="http://www.cnblogs.com/season-huang/p/5804884.html?sukey=3997c0719f151520e8ff4cc81d367da8d31e4fa0618001f78192353a7dc0ec38e12a32bcd5f61b046640e1093c6cf2f0" target="_blank" rel="external">webp图片实践之路</a></h3><p>这篇文章算是上篇文章的绪论吧，webp是谷歌推出的一种图片格式，他的有点就是同等画面质量下，体积比jpg、png小了25%；目前这种格式还没有得到大多数的浏览器的支持，只有chrome和安卓的支持，但是我觉得webp的普及势在必行，因为在我们平时开发中图片会占据我们大量的页面体积，希望我们在接下来项目中能逐渐尝试一下这种格式，然后随着各大浏览器的逐步兼容，这样就可以让我们的网页飞起来啦，哈哈~~。这篇文章就详细的讲了如何使用webp，你是不是已经迫不及待的想要戳进去看看啦~</p>
-<a id="more"></a>
-<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="使用Cookie实现Remember-Me功能"><a href="#使用Cookie实现Remember-Me功能" class="headerlink" title="使用Cookie实现Remember Me功能"></a><a href="http://zhuanlan.zhihu.com/p/22245658" target="_blank" rel="external">使用Cookie实现Remember Me功能</a></h3><p>cookie在web开发中已经非常普遍了，我们平时用cookie来保存信息，正如题目所说remember me，cookie可以保存设置要保存数据的时长，默认的生命期就是浏览器关闭，它是保存HTTP请求状态的一种手段，它是由客户端保存的小型文本文件，其内容为一系列的键值对（即Key-Value形式），在浏览器访问同一个域名的不同页面时，会在HTTP请求中附上Cookie，当我们在打开一个新网页的时候我们会根据头部cookie来对网页进行特殊的处理，来达到保存用户行为的效果。戳我可以详细的了解到如何使用cookie哦~</p>
-<h3 id="怎样合理地使用-Ajax-？过度使用-Ajax-会有哪些弊端？"><a href="#怎样合理地使用-Ajax-？过度使用-Ajax-会有哪些弊端？" class="headerlink" title="怎样合理地使用 Ajax ？过度使用 Ajax 会有哪些弊端？"></a><a href="http://www.zhihu.com/question/20410763" target="_blank" rel="external">怎样合理地使用 Ajax ？过度使用 Ajax 会有哪些弊端？</a></h3><h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="如何使用-CSS-和-SVG-剪切和遮罩技术"><a href="#如何使用-CSS-和-SVG-剪切和遮罩技术" class="headerlink" title="如何使用 CSS 和 SVG 剪切和遮罩技术"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MDA2MTI1MA==&amp;mid=2649084029&amp;idx=1&amp;sn=6599ba63d282b7d872c1bd5e642fd2ec&amp;scene=0#wechat_redirect" target="_blank" rel="external">如何使用 CSS 和 SVG 剪切和遮罩技术</a></h3><h3 id="在-CSS-中使用功能查询"><a href="#在-CSS-中使用功能查询" class="headerlink" title="在 CSS 中使用功能查询"></a><a href="https://segmentfault.com/a/1190000006734430" target="_blank" rel="external">在 CSS 中使用功能查询</a></h3><p>我们在写css属性的时候通常都要考虑一下这个属性在各个浏览器的兼容问题，有的我们会通过前缀来支持，但是前缀也并不是能兼容所有的浏览器，我们在写css的时候往往会去做到优雅降级，所以css中使用查询功能来测试览器是否支持一个特定的 CSS 功能，这个功能可以是 CSS 的某种属性或者某个属性的某个值，然后，根据测试的结果来决定是否要应用某段样式。</p>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="11-个-HTML5-动画工具"><a href="#11-个-HTML5-动画工具" class="headerlink" title="11 个 HTML5 动画工具"></a><a href="http://zhuanlan.zhihu.com/p/22252010" target="_blank" rel="external">11 个 HTML5 动画工具</a></h3><p>有的时候我们想要做出一些非常惊人、吸引用户眼球的动画效果，为了减少我们的开发成本，我们通常需要借助一些现成的工具来提高开发效率，这11款HTML5动画功工具可以供大家参考参考。</p>
-<h3 id="入门Webpack，看这篇就够了"><a href="#入门Webpack，看这篇就够了" class="headerlink" title="入门Webpack，看这篇就够了"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA5NTM2MTEzNw==&amp;mid=2736710548&amp;idx=1&amp;sn=b29e4d55d6dd4701d1be4c10efc8bcb4&amp;scene=1&amp;srcid=09013p3rQHqfo17Ysa7WKz78#rd" target="_blank" rel="external">入门Webpack，看这篇就够了</a></h3>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;8.29-9.4，本期是我第二次编写exp-team周刊，要变得有深度得慢慢来，加油！&lt;/p&gt;
-&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;如何运用最新的技术提升网页速度和性能&quot;&gt;&lt;a href=&quot;#如何运用最新的技术提升网页速度和性能&quot; class=&quot;headerlink&quot; title=&quot;如何运用最新的技术提升网页速度和性能&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.zcfy.cc/article/why-our-website-is-faster-than-yours-1030.html?sukey=3997c0719f151520dd1f40fbce22d2d30c77d4dd0494ab11b0c8291e63ef87080000e514d86eaebb849f57fd01f8a4b1&quot;&gt;如何运用最新的技术提升网页速度和性能&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;我们在把一张酷炫的网页呈现给用的同时，我们也要考虑这些酷炫的交互对网页性能造成的影响，在之前这个周刊的前几期都有提到关于网页速度和性能的文章，目前有很多框架都有一站式的图片合并代码压缩的功能，还有css和js的懒加载都是属于提高网页速度和性能，我们可以从多方面来提高性能和速度，这篇文章就写得比较全，可以好好看看。&lt;/p&gt;
-&lt;h3 id=&quot;webp图片实践之路&quot;&gt;&lt;a href=&quot;#webp图片实践之路&quot; class=&quot;headerlink&quot; title=&quot;webp图片实践之路&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.cnblogs.com/season-huang/p/5804884.html?sukey=3997c0719f151520e8ff4cc81d367da8d31e4fa0618001f78192353a7dc0ec38e12a32bcd5f61b046640e1093c6cf2f0&quot;&gt;webp图片实践之路&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;这篇文章算是上篇文章的绪论吧，webp是谷歌推出的一种图片格式，他的有点就是同等画面质量下，体积比jpg、png小了25%；目前这种格式还没有得到大多数的浏览器的支持，只有chrome和安卓的支持，但是我觉得webp的普及势在必行，因为在我们平时开发中图片会占据我们大量的页面体积，希望我们在接下来项目中能逐渐尝试一下这种格式，然后随着各大浏览器的逐步兼容，这样就可以让我们的网页飞起来啦，哈哈~~。这篇文章就详细的讲了如何使用webp，你是不是已经迫不及待的想要戳进去看看啦~&lt;/p&gt;
     
     </summary>
     

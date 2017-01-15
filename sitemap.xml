@@ -2,16 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/</loc>
+    <loc>https://exp-team.github.io/blog/2017/01/12/program/babel-class/</loc>
     
-    <lastmod>2017-01-13T12:23:08.000Z</lastmod>
+    <lastmod>2017-01-15T12:55:11.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/01/12/program/babel-class/</loc>
+    <loc>https://exp-team.github.io/blog/2017/01/13/tool/using-pac/</loc>
     
-    <lastmod>2017-01-13T10:19:58.000Z</lastmod>
+    <lastmod>2017-01-15T12:55:11.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/01/12/js/babel-class2/</loc>
+    
+    <lastmod>2017-01-15T12:55:11.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/</loc>
+    
+    <lastmod>2017-01-13T12:23:08.000Z</lastmod>
     
   </url>
   
@@ -23,21 +37,7 @@
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/08/27/weekly/weekly-100/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/21/linux/how-to-install-linux-on-vm/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/10/tool/xshell-commond/</loc>
+    <loc>https://exp-team.github.io/blog/2016/12/31/weekly/weekly-10010/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
@@ -121,14 +121,14 @@
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/07/28/hexo/hello-world/</loc>
+    <loc>https://exp-team.github.io/blog/2016/08/27/weekly/weekly-100/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/12/31/weekly/weekly-10010/</loc>
+    <loc>https://exp-team.github.io/blog/2016/07/28/hexo/hello-world/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
@@ -234,6 +234,20 @@
   
   <url>
     <loc>https://exp-team.github.io/blog/2016/08/20/tool/chrome-install/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/21/linux/how-to-install-linux-on-vm/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/10/tool/xshell-commond/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     

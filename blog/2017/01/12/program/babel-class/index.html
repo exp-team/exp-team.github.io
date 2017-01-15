@@ -5,22 +5,22 @@
   
   <title>揭秘babel的魔法之class魔法处理 | exp team</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？
+  <meta name="description" content="2017年，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？
 这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以在线测试编译结果，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。
-另外，这篇文章">
+另外，如果你">
 <meta property="og:type" content="article">
 <meta property="og:title" content="揭秘babel的魔法之class魔法处理">
 <meta property="og:url" content="https://exp-team.github.io/blog/2017/01/12/program/babel-class/index.html">
 <meta property="og:site_name" content="exp team">
-<meta property="og:description" content="2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？
+<meta property="og:description" content="2017年，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？
 这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以在线测试编译结果，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。
-另外，这篇文章">
-<meta property="og:updated_time" content="2017-01-13T10:19:58.000Z">
+另外，如果你">
+<meta property="og:updated_time" content="2017-01-15T12:55:11.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="揭秘babel的魔法之class魔法处理">
-<meta name="twitter:description" content="2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？
+<meta name="twitter:description" content="2017年，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？
 这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以在线测试编译结果，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。
-另外，这篇文章">
+另外，如果你">
   
     <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
   
@@ -113,11 +113,11 @@ var _hmt = _hmt || [];
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？</p>
-<p>这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以<a href="https://babeljs.io/repl/" target="_blank" rel="external">在线测试编译结果</a>，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。</p>
-<p>另外，这篇文章并不适合初学者阅读。如果你还不明白JS中原型链等OOP相关知识，建议出门左转找到经典的《JS高级程序设计<br>》来补课；如果你对JS中，通过原型链来实现继承一直云里雾里，安利一下<a href="http://yanhaijing.com/javascript/2014/11/09/object-inherit-of-js/" target="_blank" rel="external">颜海镜大大的文章</a></p>
+        <p>2017年，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？</p>
+<p>这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以在线<a href="https://babeljs.io/repl/" target="_blank" rel="external">测试编译结果</a>，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。</p>
+<p>另外，如果你还不明白JS中原型链等OOP相关知识，建议出门左转找到经典的《JS高级程序设计》来补课；如果你对JS中，通过原型链来实现继承一直云里雾里，安利一下我的同事，前端著名网红<a href="http://yanhaijing.com/javascript/2014/11/09/object-inherit-of-js/" target="_blank" rel="external">颜海镜大大早在2014年的文章</a></p>
 <a id="more"></a>
-<h2 id="为什么使用选择Babel"><a href="#为什么使用选择Babel" class="headerlink" title="为什么使用选择Babel"></a>为什么使用选择Babel</h2><p>我们知道，现在大部分浏览器或者类似NodeJS的javascript引擎还不能直接支持Babel。但这并不是障碍，比如Babel的出现，使得在生产环境中书写ES6代码成为了现实，它工作原理是编译ES6的新特性为老版本的ES5，从而得到宿主环境的支持。</p>
+<h2 id="为什么使用选择Babel"><a href="#为什么使用选择Babel" class="headerlink" title="为什么使用选择Babel"></a>为什么使用选择Babel</h2><p>Babel：The compiler for writing next generation JavaScript；<br>我们知道，现在大部分浏览器或者类似NodeJS的javascript引擎还不能直接支持ES6语法。但这并不构成障碍，比如Babel的出现，使得我们在生产环境中书写ES6代码成为了现实，它工作原理是编译ES6的新特性为老版本的ES5，从而得到宿主环境的支持。</p>
 <h2 id="Class例子"><a href="#Class例子" class="headerlink" title="Class例子"></a>Class例子</h2><p>在这篇文章中，我会讲解Babel如何处理ES6新特性：Class，这其实是一系列语法糖的实现。</p>
 <h3 id="Old-school方式实现继承"><a href="#Old-school方式实现继承" class="headerlink" title="Old school方式实现继承"></a>Old school方式实现继承</h3><p>在探究ES6之前，我们先来回顾一下ES5环境下，我们如何实现类的继承：</p>
 <pre><code>// Person是一个构造器
@@ -144,7 +144,7 @@ Person.fn(); // &apos;static&apos;
 
 // 这样会报错，因为fn是一个私有属性
 julien.fn(); //Uncaught TypeError: julien.fn is not a function
-</code></pre><h3 id="New-school方式-ES6-实现继承"><a href="#New-school方式-ES6-实现继承" class="headerlink" title="New school方式(ES6)实现继承"></a>New school方式(ES6)实现继承</h3><p>在ES6环境下，我们当然迫不及待地试一试Class</p>
+</code></pre><h3 id="New-school方式-ES6-实现继承"><a href="#New-school方式-ES6-实现继承" class="headerlink" title="New school方式(ES6)实现继承"></a>New school方式(ES6)实现继承</h3><p>在ES6环境下，我们当然迫不及待地试一试Class：</p>
 <pre><code>class Person {
     constructor(name) {
         this.name = name;
@@ -174,7 +174,7 @@ var Person = function Person() {
 };
 </code></pre><p>你可能会一头雾水,_classCallCheck是什么？其实很简单，它是为了保证调用的安全性。<br>比如我们这么调用：</p>
 <pre><code>// ok
-new p = new Person();
+var p = new Person();
 </code></pre><p>是没有问题的，但是直接调用：</p>
 <pre><code>// Uncaught TypeError: Cannot call a class as a function
 Person();
@@ -194,7 +194,7 @@ Person();
     this.name = name;
 };
 </code></pre><p>看上去棒极了，我们继续探索。</p>
-<p>Step3：增加方法<br>我们尝试给Person类添加一个方法：hello</p>
+<p>Step3：增加方法<br>我们尝试给Person类添加一个方法：hello：</p>
 <pre><code>class Person {
     constructor(name) {
         this.name = name;
@@ -267,7 +267,7 @@ var Person = (function () {
     return Person;
 })();
 </code></pre><p>如果你不明白defineProperty方法, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty" target="_blank" rel="external">请参考这里</a></p>
-<p>现在，我们知道我们添加的方法</p>
+<p>现在，我们知道我们添加的方法：</p>
 <pre><code>hello() {
     console.log(&apos;hello &apos; + this.name);
 }
@@ -284,7 +284,7 @@ var Person = (function () {
 参数2 =&gt; 需要在目标对象原型链上添加的属性，这是一个数组
 参数3 =&gt; 需要在目标对象上添加的属性，这是一个数组
 </code></pre><p>这样，Babel的魔法就一步一步被揭穿了。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>希望这篇文章能够让你了解到Babel是如何初步把我们ES6 Class语法编译成ES5的。下一篇文章我会继续介绍Babel如何处理Super(), 并会通过一段函数桥梁，使得ES5环境下也能够继承ES6定义的Class</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>希望这篇文章能够让你了解到Babel是如何初步把我们ES6 Class语法编译成ES5的。下一篇文章我会继续介绍Babel如何处理子类的Super(), 并会通过一段函数桥梁，使得ES5环境下也能够继承ES6定义的Class。</p>
 
       
     </div>
@@ -305,11 +305,11 @@ var Person = (function () {
     
 <nav id="article-nav">
   
-    <a href="/blog/2017/01/13/weekly/weekly-10100/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/blog/2017/01/12/js/babel-class2/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          expfe技术周刊第10100期
+          揭秘babel之class super魔法处理
         
       </div>
     </a>
@@ -359,7 +359,7 @@ var duoshuoQuery = {short_name:"exp-team"};
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
     </div>
   </div>
 
@@ -369,7 +369,7 @@ var duoshuoQuery = {short_name:"exp-team"};
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/program/" style="font-size: 16.67px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/tool/" style="font-size: 13.33px;">tool</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 17.5px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/tool/" style="font-size: 15px;">tool</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
     </div>
   </div>
 
@@ -391,7 +391,15 @@ var duoshuoQuery = {short_name:"exp-team"};
       <ul>
         
           <li>
+            <a href="/blog/2017/01/13/tool/using-pac/">如何使用PAC文件“科学上网”</a>
+          </li>
+        
+          <li>
             <a href="/blog/2017/01/13/weekly/weekly-10100/">expfe技术周刊第10100期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/01/12/js/babel-class2/">揭秘babel之class super魔法处理</a>
           </li>
         
           <li>
@@ -400,14 +408,6 @@ var duoshuoQuery = {short_name:"exp-team"};
         
           <li>
             <a href="/blog/2017/01/07/weekly/weekly-10011/">expfe技术周刊第10011期</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2016/12/31/weekly/weekly-10010/">expfe技术周刊第10010期</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2016/12/24/weekly/weekly-10001/">expfe技术周刊第10001期</a>
           </li>
         
       </ul>
