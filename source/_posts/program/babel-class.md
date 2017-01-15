@@ -6,17 +6,17 @@ date: 2017-01-12
 author: 侯策
 ---
 
-2017，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？
+2017年，很多人已经开始接触ES6环境，并且早已经用在了生产当中。我们知道ES6在大部分浏览器还是跑不通的，因此我们使用了伟大的Babel来进行编译。很多人可能没有关心过，经过Babel编译之后，我们华丽的ES6代码究竟变成了什么样子？
 
-这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以[在线测试编译结果](https://babeljs.io/repl/)，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。
+这篇文章，针对Babel对ES6里面“类class”的编译进行分析，你可以在线[测试编译结果](https://babeljs.io/repl/)，毕竟纸上得来终觉浅，自己动手，才能真正体会其中的奥秘。
 
-另外，这篇文章并不适合初学者阅读。如果你还不明白JS中原型链等OOP相关知识，建议出门左转找到经典的《JS高级程序设计
-》来补课；如果你对JS中，通过原型链来实现继承一直云里雾里，安利一下[颜海镜大大的文章](http://yanhaijing.com/javascript/2014/11/09/object-inherit-of-js/)
+另外，如果你还不明白JS中原型链等OOP相关知识，建议出门左转找到经典的《JS高级程序设计》来补课；如果你对JS中，通过原型链来实现继承一直云里雾里，安利一下我的同事，前端著名网红[颜海镜大大早在2014年的文章](http://yanhaijing.com/javascript/2014/11/09/object-inherit-of-js/)
 
 <!-- more -->
 
 ## 为什么使用选择Babel
-我们知道，现在大部分浏览器或者类似NodeJS的javascript引擎还不能直接支持Babel。但这并不是障碍，比如Babel的出现，使得在生产环境中书写ES6代码成为了现实，它工作原理是编译ES6的新特性为老版本的ES5，从而得到宿主环境的支持。
+Babel：The compiler for writing next generation JavaScript；
+我们知道，现在大部分浏览器或者类似NodeJS的javascript引擎还不能直接支持ES6语法。但这并不构成障碍，比如Babel的出现，使得我们在生产环境中书写ES6代码成为了现实，它工作原理是编译ES6的新特性为老版本的ES5，从而得到宿主环境的支持。
 
 ## Class例子
 在这篇文章中，我会讲解Babel如何处理ES6新特性：Class，这其实是一系列语法糖的实现。
@@ -53,7 +53,7 @@ author: 侯策
 
 
 ### New school方式(ES6)实现继承
-在ES6环境下，我们当然迫不及待地试一试Class
+在ES6环境下，我们当然迫不及待地试一试Class：
 
     class Person {
         constructor(name) {
@@ -95,7 +95,7 @@ Step1: 定义
 比如我们这么调用：
 
     // ok
-    new p = new Person();
+    var p = new Person();
 
 是没有问题的，但是直接调用：
     
@@ -128,7 +128,7 @@ Step2：Constructor探秘
 看上去棒极了，我们继续探索。
 
 Step3：增加方法
-我们尝试给Person类添加一个方法：hello
+我们尝试给Person类添加一个方法：hello：
 
     class Person {
         constructor(name) {
@@ -208,7 +208,7 @@ Oh...no,看上去有很多需要消化!不要急，我尝试先把他精简一�
 
 如果你不明白defineProperty方法, [请参考这里](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty)
 
-现在，我们知道我们添加的方法
+现在，我们知道我们添加的方法：
 
     hello() {
         console.log('hello ' + this.name);
@@ -233,7 +233,7 @@ Oh...no,看上去有很多需要消化!不要急，我尝试先把他精简一�
 这样，Babel的魔法就一步一步被揭穿了。
 
 ## 总结
-希望这篇文章能够让你了解到Babel是如何初步把我们ES6 Class语法编译成ES5的。下一篇文章我会继续介绍Babel如何处理Super(), 并会通过一段函数桥梁，使得ES5环境下也能够继承ES6定义的Class
+希望这篇文章能够让你了解到Babel是如何初步把我们ES6 Class语法编译成ES5的。下一篇文章我会继续介绍Babel如何处理子类的Super(), 并会通过一段函数桥梁，使得ES5环境下也能够继承ES6定义的Class。
 
 
 
