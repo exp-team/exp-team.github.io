@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://exp-team.github.io/blog/2017/01/12/js/babel-class2/</loc>
+    
+    <lastmod>2017-01-16T07:13:59.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://exp-team.github.io/blog/2017/01/12/program/babel-class/</loc>
     
     <lastmod>2017-01-15T12:55:11.000Z</lastmod>
@@ -10,13 +17,6 @@
   
   <url>
     <loc>https://exp-team.github.io/blog/2017/01/13/tool/using-pac/</loc>
-    
-    <lastmod>2017-01-15T12:55:11.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/01/12/js/babel-class2/</loc>
     
     <lastmod>2017-01-15T12:55:11.000Z</lastmod>
     
