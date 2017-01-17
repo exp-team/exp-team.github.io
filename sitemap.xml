@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://exp-team.github.io/blog/2017/01/12/program/BS4/</loc>
+    
+    <lastmod>2017-01-17T05:56:37.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/11/26/program/react-redux-1/</loc>
+    
+    <lastmod>2017-01-17T05:04:05.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://exp-team.github.io/blog/2017/01/12/js/babel-class2/</loc>
     
     <lastmod>2017-01-16T07:13:59.000Z</lastmod>
@@ -37,21 +51,7 @@
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/12/31/weekly/weekly-10010/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/09/02/program/about-coupling/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/20/java/how-to-install-java-on-win/</loc>
+    <loc>https://exp-team.github.io/blog/2016/10/22/weekly/weekly-1001/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
@@ -86,7 +86,7 @@
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/11/26/program/react-redux-1/</loc>
+    <loc>https://exp-team.github.io/blog/2016/08/11/tool/ci-tools/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
@@ -128,14 +128,14 @@
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/07/28/hexo/hello-world/</loc>
+    <loc>https://exp-team.github.io/blog/2016/12/31/weekly/weekly-10010/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/10/22/weekly/weekly-1001/</loc>
+    <loc>https://exp-team.github.io/blog/2016/07/28/hexo/hello-world/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
@@ -163,7 +163,7 @@
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/08/11/tool/ci-tools/</loc>
+    <loc>https://exp-team.github.io/blog/2016/08/20/tool/chrome-install/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
@@ -233,13 +233,6 @@
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/08/20/tool/chrome-install/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://exp-team.github.io/blog/2016/08/21/linux/how-to-install-linux-on-vm/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
@@ -248,6 +241,20 @@
   
   <url>
     <loc>https://exp-team.github.io/blog/2016/08/10/tool/xshell-commond/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/09/02/program/about-coupling/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/20/java/how-to-install-java-on-win/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     

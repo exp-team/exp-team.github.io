@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   
-  <title>揭秘babel的魔法之class继承的处理 | exp team</title>
+  <title>深入新版BS4源码 探索flex和工程化sass奥秘 | exp team</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="如果你已经看过第一篇揭秘babel的魔法之class魔法处理，这篇将">
+  <meta name="description" content="近日，你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布">
 <meta property="og:type" content="article">
-<meta property="og:title" content="揭秘babel的魔法之class继承的处理">
-<meta property="og:url" content="https://exp-team.github.io/blog/2017/01/12/js/babel-class2/index.html">
+<meta property="og:title" content="深入新版BS4源码 探索flex和工程化sass奥秘">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/01/12/program/BS4/index.html">
 <meta property="og:site_name" content="exp team">
-<meta property="og:description" content="如果你已经看过第一篇揭秘babel的魔法之class魔法处理，这篇将">
-<meta property="og:updated_time" content="2017-01-16T07:13:59.000Z">
+<meta property="og:description" content="近日，你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布">
+<meta property="og:updated_time" content="2017-01-17T05:56:37.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="揭秘babel的魔法之class继承的处理">
-<meta name="twitter:description" content="如果你已经看过第一篇揭秘babel的魔法之class魔法处理，这篇将">
+<meta name="twitter:title" content="深入新版BS4源码 探索flex和工程化sass奥秘">
+<meta name="twitter:description" content="近日，你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布">
   
     <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
   
@@ -81,14 +81,14 @@ var _hmt = _hmt || [];
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-js/babel-class2" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-program/BS4" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/blog/2017/01/12/js/babel-class2/" class="article-date">
+    <a href="/blog/2017/01/12/program/BS4/" class="article-date">
   <time datetime="2017-01-11T16:00:00.000Z" itemprop="datePublished">2017-01-12</time>
 </a>
     
   <div class="article-category">
-    <a class="article-category-link" href="/categories/js/">js</a>
+    <a class="article-category-link" href="/categories/program/">program</a>
   </div>
 
   </div>
@@ -99,7 +99,7 @@ var _hmt = _hmt || [];
         
   
     <h1 class="article-title" itemprop="name">
-      揭秘babel的魔法之class继承的处理
+      深入新版BS4源码 探索flex和工程化sass奥秘
     </h1>
   
 
@@ -107,7 +107,8 @@ var _hmt = _hmt || [];
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>如果你已经看过第一篇<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a>，这篇将会是一个延伸；<br>如果你还没看过，并且也不想<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">现在就去读一下</a>，单独看这篇也没有关系，并不存在理解上的障碍。</p>
+        <p>近日，你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布<a href="https://github.com/twbs/bootstrap/pull/21389" target="_blank" rel="external">放弃支持IE9，并默认使用flexbox弹性盒模型</a>。<br>这标志着前端开发全面进入“现代浏览器”的时代进一步来临；样式处理也再一次面向未来，深情拥抱弹性盒模型Flex布局。<br>不论你有没有使用过Bootstrap，对于这篇文章的理解都不会存在障碍；<br>如果听说过Flex布局，但是还从未学习或者使用过它，没有关系，这一篇文章会涉及一二；</p>
+<p>如果你已经看过第一篇<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a>，这篇将会是一个延伸；<br>如果你还没看过，并且也不想<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">现在就去读一下</a>，单独看这篇也没有关系，并不存在理解上的障碍。</p>
 <p>上一篇针对Babel对ES6里面基础“class”的编译进行了分析。这一篇将会对class的继承，包括extends和super进行讲解。</p>
 <p>什么？你还不了解ES6如何实现继承？没关系，下文内容也有详细示例。</p>
 <p>再啰嗦一句，这一系列的文章并不是科普ECMAScript新规范。她的意义在于分析Babel对ES6的编译，从而希望读者对JS语言基础，程序设计理念等有更深刻的认识。</p>
@@ -252,15 +253,15 @@ Object.setPrototypeOf(Student, Person)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://exp-team.github.io/blog/2017/01/12/js/babel-class2/" data-id="cixyo15700001rdfyyry0ybwb" class="article-share-link">Share</a>
+      <a data-url="https://exp-team.github.io/blog/2017/01/12/program/BS4/" data-id="ciy1hxh4h0000zswhddbikjx0" class="article-share-link">Share</a>
       
         <!-- 多说评论框 start -->
-<div class="ds-thread" data-thread-key="blog/2017/01/12/js/babel-class2/" data-title="揭秘babel的魔法之class继承的处理" data-url="https://exp-team.github.io/blog/2017/01/12/js/babel-class2/"></div>
+<div class="ds-thread" data-thread-key="blog/2017/01/12/program/BS4/" data-title="深入新版BS4源码 探索flex和工程化sass奥秘" data-url="https://exp-team.github.io/blog/2017/01/12/program/BS4/"></div>
 <!-- 多说评论框 end -->
 
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/program/">program</a></li></ul>
 
     </footer>
   </div>
@@ -268,19 +269,19 @@ Object.setPrototypeOf(Student, Person)
     
 <nav id="article-nav">
   
-    <a href="/blog/2017/01/12/program/BS4/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/blog/2017/01/13/weekly/weekly-10100/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          深入新版BS4源码 探索flex和工程化sass奥秘
+          expfe技术周刊第10100期
         
       </div>
     </a>
   
   
-    <a href="/blog/2017/01/12/program/babel-class/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/blog/2017/01/12/js/babel-class2/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">揭秘babel的魔法之class魔法处理</div>
+      <div class="article-nav-title">揭秘babel的魔法之class继承的处理</div>
     </a>
   
 </nav>
