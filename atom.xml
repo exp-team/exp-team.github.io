@@ -123,155 +123,101 @@
     <link href="https://exp-team.github.io/blog/2017/01/12/program/BS4/"/>
     <id>https://exp-team.github.io/blog/2017/01/12/program/BS4/</id>
     <published>2017-01-11T16:00:00.000Z</published>
-    <updated>2017-01-17T05:56:37.000Z</updated>
+    <updated>2017-01-19T09:47:42.000Z</updated>
     
-    <content type="html"><![CDATA[<p>近日，你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布<a href="https://github.com/twbs/bootstrap/pull/21389" target="_blank" rel="external">放弃支持IE9，并默认使用flexbox弹性盒模型</a>。<br>这标志着前端开发全面进入“现代浏览器”的时代进一步来临；样式处理也再一次面向未来，深情拥抱弹性盒模型Flex布局。<br>不论你有没有使用过Bootstrap，对于这篇文章的理解都不会存在障碍；<br>如果听说过Flex布局，但是还从未学习或者使用过它，没有关系，这一篇文章会涉及一二；</p>
-<p>如果你已经看过第一篇<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a>，这篇将会是一个延伸；<br>如果你还没看过，并且也不想<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">现在就去读一下</a>，单独看这篇也没有关系，并不存在理解上的障碍。</p>
-<p>上一篇针对Babel对ES6里面基础“class”的编译进行了分析。这一篇将会对class的继承，包括extends和super进行讲解。</p>
-<p>什么？你还不了解ES6如何实现继承？没关系，下文内容也有详细示例。</p>
-<p>再啰嗦一句，这一系列的文章并不是科普ECMAScript新规范。她的意义在于分析Babel对ES6的编译，从而希望读者对JS语言基础，程序设计理念等有更深刻的认识。</p>
-<h2 id="Class的继承"><a href="#Class的继承" class="headerlink" title="Class的继承"></a>Class的继承</h2><p>在这篇文章中，我会讲解Babel如何处理ES6 Class里面的继承功能，同样，这其实是一系列语法糖的实现。<br>我们先来温习一下实现方式：</p>
-<h3 id="ES6-实现继承"><a href="#ES6-实现继承" class="headerlink" title="ES6 实现继承"></a>ES6 实现继承</h3><p>首先，我们定义一个父类：</p>
-<pre><code>class Person {
-    constructor(){
-        this.type = &apos;person&apos;
-    }
+    <content type="html"><![CDATA[<p>你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布<a href="https://github.com/twbs/bootstrap/pull/21389" target="_blank" rel="external">放弃支持IE9，并默认使用flexbox弹性盒模型</a>。<br>这标志着前端开发全面步入“现代浏览器”的时代进一步来临；样式处理也再一次面向未来，拥抱更加灵活的弹性盒模型－Flex布局。</p>
+<p>这篇文章会带你深入Bootstrap最新版源码，窥探其架构组织奥秘，并解析最具亮点的栅格化系统。<br>你也会了解到sass的高阶用法和flex最新语法奥秘。</p>
+<h2 id="BS4的新特性"><a href="#BS4的新特性" class="headerlink" title="BS4的新特性"></a>BS4的新特性</h2><p>在开启我们的探索之前，有必要先梳理一下BS4添加的新特性：<br>1）从Less迁移到Sass：<br>现在，Bootstrap已加入Sass的大家庭中。得益于Libsass（Sass 解析器），Bootstrap的编译速度比以前更快；<br>2）改进网格系统：<br>新增一个网格层适配移动设备，并整顿语义混合。<br>3）默认弹性盒模型（flexbox）：<br>这是项划时代的变动，利用flexbox的优势快速布局。<br>4）废弃了wells、thumbnails和panels，使用cards代替。<br>5）新的自定义选项：<br>不再像上个版本一样，将渐变、淡入淡出、阴影等效果分放在单独的样式表中。而是将所有选项都移到一个Sass变量中。<br>想要给全局或考虑不到的角落定义一个默认效果？很简单，只要更新变量值，然后重新编译就可以了。<br>6）使用rem和em单位。<br>7）重构所有JavaScript插件：<br>Bootstrap 4用ES6重写了所有插件。现在提供UMD支持、泛型拆解方法、选项类型检查等特性。<br>8）改进工具提示和popovers自动定位：<br>这部分要感谢Tether（A positioning engine to make overlays, tooltips and dropdowns better）工具的帮助，<br>如果你还不知道Tether是什么，可以去他家<a href="https://github.com/HubSpot/tether" target="_blank" rel="external">Github地址</a>。</p>
+<h2 id="BS4栅格系统揭秘"><a href="#BS4栅格系统揭秘" class="headerlink" title="BS4栅格系统揭秘"></a>BS4栅格系统揭秘</h2><p>了解了以上新特性，我们主要研究BS从诞生以来最大的“卖点”－栅格系统。</p>
+<h2 id="一个栅格实例"><a href="#一个栅格实例" class="headerlink" title="一个栅格实例"></a>一个栅格实例</h2><p>我们选取代表性的BS4官网范例，可以<a href="http://v4.bootcss.com/examples/dashboard/#" target="_blank" rel="external">在线参考</a>, 或者参看以下截图，<br>在大屏幕下，我们看到：</p>
+<p>当屏幕宽度小于576px时候，我们有：</p>
+<p>对应代码：</p>
+<pre><code>&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
+    ...
+&lt;/div&gt;
+&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
+    ...
+&lt;/div&gt;
+&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
+    ...
+&lt;/div&gt;
+&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
+    ...
+&lt;/div&gt;
+</code></pre><p>.col-6 class样式在源码里面可以简单归纳（不完全）为：</p>
+<pre><code>.col-6 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 50%;
+    -ms-flex: 0 0 50%;
+    flex: 0 0 50%;
+    max-width: 50%;
 }
-</code></pre><p>这个类包含了一个实例属性。</p>
-<p>然后，实现一个Student类，这个“学生”类继承“人”类：</p>
-<pre><code>class Student extends Person {
-    constructor(){
-        super()
-    }
+</code></pre><p>.col-sm-3 class在源码里面可以归纳为：</p>
+<pre><code>.col-sm-3{
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 25%;
+        -ms-flex: 0 0 25%;
+            flex: 0 0 25%;
+    max-width: 25%;
 }
-</code></pre><p>从简出发，我们定义的Person类只包含了type为person的这一个属性，不含有方法。所以我们extends+super()之后，Student类<br>也继承了同样的属性。<br>如下：</p>
-<pre><code>var student1 = new Student();
-student1.type // &quot;person&quot;
-</code></pre><p>我们进一步可以验证原型链上的关系：</p>
-<pre><code>student1 instanceof Student // true
-student1 instanceof Person // true
-student1.hasOwnProperty(&apos;type&apos;) // true
-</code></pre><p>一切看上去cool极了，我们实现了ES6里面的继承。并且用instanceof验证了ES6中一系列的实质就是“魔法糖”的本质。<br>那么，经过Babel编译，我们的代码是什么样呢？</p>
-<h3 id="Babel-transformation"><a href="#Babel-transformation" class="headerlink" title="Babel transformation"></a>Babel transformation</h3><p>我们一步一步来看，</p>
-<p>Step1: Person定义</p>
-<pre><code>class Person {
-    constructor(){
-        this.type = &apos;person&apos;
-    }
+</code></pre><h3 id="两种类的共存和交替作用"><a href="#两种类的共存和交替作用" class="headerlink" title="两种类的共存和交替作用"></a>两种类的共存和交替作用</h3><p>我们看到，代码里设置了这两个class进行样式声明，很明显他们的样式属性是有冲突的，那么他们是如何做到“和平共处”交替发挥作用的呢？</p>
+<p>1）在屏幕宽度小于576px时候，我们发现.col-sm-3并没有起作用，这时候起作用的是.col-6。<br>我们在源码里发现.col-sm-<em>的样式声明全部在@media (min-width: 576px) {…}的媒体查询中，<br>这就保证了在576px以下屏幕，只有在媒体查询之外的.col-</em>样式声明发挥了作用。<br>2）在屏幕宽度大于576px时候，命中.col-sm-3的样式声明，所有他的优先级一定大于.col-6，这时候就保证了一行四栏的样式“占上风”。</p>
+<h3 id="flex讲解"><a href="#flex讲解" class="headerlink" title="flex讲解"></a>flex讲解</h3><p>我们从样式代码里看到类似flex: 0 0 25%的声明，为了理解它，我们从flex属性入手：<br>flex属性是flex-grow, flex-shrink 和 flex-basis的简写（类似backgroud是很多背景属性的简写一样），<br>它的默认值为0 1 auto。后两个属性可选。语法格式如下：</p>
+<pre><code>.item {
+    flex: none | [ &lt;&apos;flex-grow&apos;&gt; &lt;&apos;flex-shrink&apos;&gt;? || &lt;&apos;flex-basis&apos;&gt; ]
 }
-</code></pre><p>被编译为：</p>
-<pre><code>var Person = function Person() {
-    _classCallCheck(this, Person);
-    this.type = &apos;person&apos;;
-};
-</code></pre><p>如果你看过这一篇的<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">前传</a>，<br>你应该就熟悉这一系列的变换，也可能会记得_classCallCheck函数到底是什么鬼。这里因为篇幅和去冗余的原因，就不再展开。</p>
-<p>Step2：Student探秘<br>我们这次尝试观察Student子类：</p>
-<pre><code>class Student extends Person {
-    constructor(){
-        super()
-    }
+</code></pre><p>1）flex-grow：属性定义项目的放大比例，默认为0。我们看到BS代码里这个值一直为0，即如果存在剩余空间，也不放大。</p>
+<p>2）flex-shrink：属性定义了项目的缩小比例，默认为1，即如果空间不足，该项目将缩小。</p>
+<p>3）flex-basis：属性定义了在分配多余空间之前，项目占据的主轴空间（main size）。<br>浏览器根据这个属性，计算主轴是否有多余空间。它可以设为跟width或height属性一样的值（比如350px），则项目将占据固定空间。<br>当然BS4这里设置为比例值，这也是响应式自然而然实现的基础。</p>
+<h2 id="SASS在BS4工程化中的伟大作用"><a href="#SASS在BS4工程化中的伟大作用" class="headerlink" title="SASS在BS4工程化中的伟大作用"></a>SASS在BS4工程化中的伟大作用</h2><p>看到此，不难明白BS4栅格的实现，但是这并不是此文的最终目的。我们可以深入更多，比如，BS4的栅格系统里，一行一共是12栏。他的媒体查询断点又包括：xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px。<br>参考其源码dist/css目录下样式代码，我们会想组织生成如此大量的CSS样式，不用预处理器简直是反人类的。而BS4却是把sass用到了极致。</p>
+<h3 id="col-sm-是如何生成的"><a href="#col-sm-是如何生成的" class="headerlink" title=".col-sm-*是如何生成的"></a>.col-sm-*是如何生成的</h3><p>我们深入其scss目录下，scss/mixins/_grid.scss文件：</p>
+<pre><code>@if $enable-grid-classes {
+    @include make-grid-columns();
 }
-</code></pre><p>编译结果：</p>
-<pre><code>// 实现定义Student构造函数，它是一个自执行函数，接受父类构造函数为参数
-var Student = (function(_Person) {
-    // 实现对父类原型链属性的继承
-    _inherits(Student, _Person);
-
-    // 将会返回这个函数作为完整的Student构造函数
-    function Student() {
-        // 使用检测
-        _classCallCheck(this, Student);  
-        // _get的返回值可以先理解为父类构造函数       
-        _get(Object.getPrototypeOf(Student.prototype), &apos;constructor&apos;, this).call(this);
-    }
-
-    return Student;
-})(Person);
-
-// _x为Student.prototype.__proto__
-// _x2为&apos;constructor&apos;
-// _x3为this
-var _get = function get(_x, _x2, _x3) {
-    var _again = true;
-    _function: while (_again) {
-        var object = _x,
-            property = _x2,
-            receiver = _x3;
-        _again = false;
-        // Student.prototype.__proto__为null的处理
-        if (object === null) object = Function.prototype;
-        // 以下是为了完整复制父类原型链上的属性，包括属性特性的描述符
-        var desc = Object.getOwnPropertyDescriptor(object, property);
-        if (desc === undefined) {
-            var parent = Object.getPrototypeOf(object);
-            if (parent === null) {
-                return undefined;
-            } else {
-                _x = parent;
-                _x2 = property;
-                _x3 = receiver;
-                _again = true;
-                desc = parent = undefined;
-                continue _function;
+</code></pre><p>在enable-grid-classes变量为true的情况下（默认为true），调用make-grid-columns()</p>
+<p>make-grid-columns()这个mixin定义在scss/mixins/_grid-reamework.scss文件中（找的我好心累。。。）：</p>
+<pre><code>@mixin make-grid-columns($columns: $grid-columns, $gutters: $grid-gutter-widths, $breakpoints: $grid-breakpoints) {
+    ...
+}
+</code></pre><p>这个mixin接受三个参数：<br>1）$columns表示栅格数目默认为12<br>2）$gutters默认为30<br>3）$breakpoints表示断点设置，这是一个全局变量，为map类型。<br>这些你可以在scss/mixins/_breakpoints.scss文件中和scss/_variables.scss文件中找到。</p>
+<p>认识了这些参数，我们看.col-sm-<em>具体实现，下面代码我已经进行过大范围精简，只保留col-sm-</em>相关部分，并且加了注释：</p>
+<pre><code>@each $breakpoint in map-keys($breakpoints) {
+    // Returns a blank string if smallest breakpoint, otherwise returns the name with a dash infront.
+    $infix: breakpoint-infix($breakpoint, $breakpoints);
+    // Media of at least the minimum breakpoint width. No query for the smallest breakpoint.
+    // Makes the @content apply to the given breakpoint and wider.
+    @include media-breakpoint-up($breakpoint, $breakpoints) {
+        @for $i from 1 through $columns {
+            .col#{$infix}-#{$i} {
+                @include make-col($i, $columns);
             }
-        } else if (&apos;value&apos; in desc) {
-            return desc.value;
-        } else {
-            var getter = desc.get;
-            if (getter === undefined) {
-                return undefined;
-            }
-            return getter.call(receiver);
         }
     }
-};
-
-function _inherits(subClass, superClass) {
-    // superClass需要为函数类型，否则会报错
-    if (typeof superClass !== &apos;function&apos; &amp;&amp; superClass !== null) {
-        throw new TypeError(&apos;Super expression must either be null or a function, not &apos; + typeof superClass);
-    }
-    // Object.create第二个参数是为了修复子类的constructor
-    subClass.prototype = Object.create(superClass &amp;&amp; superClass.prototype, {
-        constructor: {
-            value: subClass,
-            enumerable: false,
-            writable: true,
-            configurable: true
-        }
-    });
-    // Object.setPrototypeOf是否存在做了一个判断，否则使用__proto__
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 }
-</code></pre><p>虽然我加上了注释，但是这一坨代码仍然看上去恶心极了！没关系，下面我们进行拆解，你很快就能明白。</p>
-<p>Step3：抽丝剥茧<br>我们首先看Student的编译结果：</p>
-<pre><code>var Student = (function(_Person) {
-    _inherits(Student, _Person);
-
-    function Student() {
-        _classCallCheck(this, Student);            
-        _get(Object.getPrototypeOf(Student.prototype), &apos;constructor&apos;, this).call(this);
+</code></pre><p>我们一步一步来分析：<br>1）@each $breakpoint in map-keys($breakpoints)，对每一个断点进行遍历；<br>2）breakpoint-infix是一个函数，它定义在css/mixins/_breakpoints.scss文件当中， 返回一个带破折号的断点标识字符串，比如这里我们关系的就是“-sm”；<br>3）media-breakpoint-up是一个mixin：</p>
+<pre><code>@mixin media-breakpoint-up($name, $breakpoints: $grid-breakpoints) {
+    $min: breakpoint-min($name, $breakpoints);
+    @if $min {
+        @media (min-width: $min) {
+        @content;
     }
-
-    return Student;
-})(Person);
-</code></pre><p>这是一个自执行函数，它接受一个参数Person（就是他要继承的父类），返回一个构造函数Student。</p>
-<p>上面_inherits方法的本质其实就是让Student子类继承Person父类原型链上的方法。它实现原理可以归结为一句话：</p>
-<pre><code>Student.prototype = Object.create(Person.prototype);
-Object.setPrototypeOf(Student, Person)
-</code></pre><p>注意，Object.create接收第二个参数，这就实现了对Student的constructor修复。<br>如果你不了解Object.create，那么<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create" target="_blank" rel="external">请参考这里。</a></p>
-<p>以上通过_inherits实现了对父类原型链上属性的继承，那么对于父类的实例属性（就是constructor定义的属性）的继承，也可以归结为一句话：</p>
-<pre><code>Person.call(this);
-</code></pre><p>如果你还不理解使用call或者apply或者bind来改变JS中this的指向，那么请参考<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call" target="_blank" rel="external">这篇文章。</a></p>
-<p>这样，我们便透析了Babel编译这一切的秘密。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>如果你看完这一系列的文章可能会有体会：我想灌输的肯定不是ES6新特性的使用，关于这些东西有太多的文章、博客、书籍去讨论。</p>
-<p>我是在讲Babel对这些新特性的编译产出，那为什么我会在乎这些呢？<br>其实通过分析，我们悄然回顾了JS中很多重点以及难点，还包括程序设计上的一些小思想。<br>最近面试了很多前端“新同学”：有的人痴迷于框架，可以使用React或者Vue比照tutorial做出页面炫酷的交互，甚至自觉SPA也不在话下；<br>有的人ES6、ES7了解很多，generator，async都能说出一二，仿佛Promise处理异步已经成为了“时代弃儿”。<br>可是同样是这些人，对原型原型链、this、作用域、闭包都没有深刻地理解和掌握。<br>同样是这些页面，即便用callback处理异步回调，嵌套最多也不到两层。</p>
-<p>也许，同样一批人也会问：“我能用前端框架、ES6撸出好多页面，可是为什么感觉进步很慢处于瓶颈中、面试也总被挂呢？”</p>
+    } @else {
+        @content;
+    }
+}
+</code></pre><p>4）breakpoint-min又是一个函数，它返回了断点的具体数值。这里是用来拼媒体查询条件的。<br>5）最后最关键样式的生成又使用了另外一个定义在css/mixins/_grid.scss文件当中的mixin:</p>
+<pre><code>@mixin make-col($size, $columns: $grid-columns) {
+    flex: 0 0 percentage($size / $columns);
+    max-width: percentage($size / $columns);
+}
+</code></pre><p>到此为止，我们深入了Bootstrap V4的scss/目录下的源码，研究涉及了：<br>css/mixins/_grid-framework.scss文件;<br>css/mixins/_breakpoints.scss文件;<br>css/mixins/_grid.scss文件;<br>css/_variables.scss文件;<br>css/bootstrap-gris.scss文件;<br>……</p>
+<p>如果你理解了这些，那么再去读bootstrap新版源码就不会存在任何难度。相信你也能够在全局上，以“上帝视角”了解sass所起的作用，大型样式框架的架构组织。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过阅读源码的栅格系统部分，我们应该认识到sass对于这样大型样式框架系统的重要意义：<br>1）css模块化在管理组织上的灵活性；<br>2）复用的意义，我们使用了大量的mixin,function,全局变量；<br>3）像JS一样神奇的语法，包括条件、遍历等等等等。<br>我们也应该对flex这一神器有了更加深刻的认识。</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;近日，你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布&lt;a href=&quot;https://github.com/twbs/bootstrap/pull/21389&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;放弃支
+      &lt;p&gt;你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布&lt;a href=&quot;https://github.com/twbs/bootstrap/pull/21389&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;放弃支持IE
     
     </summary>
     
