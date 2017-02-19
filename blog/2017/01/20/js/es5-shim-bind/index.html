@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>从一道面试题的进阶，到“我可能看了假源码”（2） | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="上一篇从一道面试题的进阶，到“我可能看了假源码”由浅入深介绍了关于一篇经典面试题的解法。最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。
+如果你还没有看过">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从一道面试题的进阶，到“我可能看了假源码”（2）">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="上一篇从一道面试题的进阶，到“我可能看了假源码”由浅入深介绍了关于一篇经典面试题的解法。最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。
+如果你还没有看过">
+<meta property="og:updated_time" content="2017-02-19T12:29:49.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从一道面试题的进阶，到“我可能看了假源码”（2）">
+<meta name="twitter:description" content="上一篇从一道面试题的进阶，到“我可能看了假源码”由浅入深介绍了关于一篇经典面试题的解法。最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。
+如果你还没有看过">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/es5-shim-bind" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/01/20/js/es5-shim-bind/" class="article-date">
+  <time datetime="2017-01-19T16:00:00.000Z" itemprop="datePublished">2017-01-20</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      从一道面试题的进阶，到“我可能看了假源码”（2）
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>上一篇<a href="">从一道面试题的进阶，到“我可能看了假源码”</a>由浅入深介绍了关于一篇经典面试题的解法。<br>最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。</p>
+<p>如果你还没有看过<a href="">前传</a>，可以参看前情回顾：</p>
+<ol>
+<li>问题是模拟实现ES5中原生bind函数；</li>
+<li>我们通过4中递进实现达到了完美状态；</li>
+<li>可是ES5-shim中的实现，又让我们大跌眼镜…</li>
+</ol>
+<h2 id="ES5-shim的悬念"><a href="#ES5-shim的悬念" class="headerlink" title="ES5-shim的悬念"></a>ES5-shim的悬念</h2><p>ES5-shim实现方式源码贴在了最后，我们看看他做了什么奇怪的事情：<br>1）从结果上看，返回了bound函数。<br>2）bound函数是这样子声明的：</p>
+<pre><code>bound = Function(&apos;binder&apos;, &apos;return function (&apos; + boundArgs.join(&apos;,&apos;) + &apos;){ return binder.apply(this, arguments); }&apos;)(binder);
+</code></pre><p>3）bound使用了系统自己的构造函数Function来声明，第一个参数是binder，函数体内又binder.apply(this, arguments)。<br>我们知道这种动态方式，类似eval。最好不要使用它，因为用它定义函数比用传统方式要慢得多。<br>4）那么ES5-shim抽风了吗？</p>
+<h2 id="追根问底"><a href="#追根问底" class="headerlink" title="追根问底"></a>追根问底</h2><p>答案肯定是没抽风，他这样做是有理由的。</p>
+<h3 id="神秘的函数的length属性"><a href="#神秘的函数的length属性" class="headerlink" title="神秘的函数的length属性"></a>神秘的函数的length属性</h3><p>你可能不知道，每个函数都有length属性。对，就像数组和字符串那样。函数的length属性，用于表示函数的形参。更重要的是函数的length属性值是不可重写的。我写了个测试代码：</p>
+<pre><code>function test (){}
+test.length  // 输出0
+test.hasOwnProperty(&apos;length&apos;)  // 输出true
+Object.getOwnPropertyDescriptor(&apos;test&apos;, &apos;length&apos;) 
+// 输出：
+// configurable: false, 
+// enumerable: false,
+// value: 4, 
+// writable: false 
+</code></pre><h3 id="拨云见日"><a href="#拨云见日" class="headerlink" title="拨云见日"></a>拨云见日</h3><p>说到这里，那就好解释了。<br>ES5-shim为了最大限度的进行兼容，所以：既然不能修改length的属性值，那么在初始化时赋值总可以吧，也就是定义函数的形参个数！<br>于是我们可通过eval和new Function的方式动态定义函数来。<br>同时，很有意思的是，源码里有这样的注释：</p>
+<pre><code>// XXX Build a dynamic function with desired amount of arguments is the only
+// way to set the length property of a function.
+// In environments where Content Security Policies enabled (Chrome extensions,
+// for ex.) all use of eval or Function costructor throws an exception.
+// However in all of these environments Function.prototype.bind exists
+// and so this code will never be executed.
+</code></pre><p>他解释了为什么要使用动态函数，就如同我们上边所讲的那样，是为了保证length属性的合理值。但是在一些浏览器中出于安全考虑，使用eval或者Function构造器都会被抛出异常。但是，巧合也就是这些浏览器基本上都实现了bind函数，这些异常又不会被执行。</p>
+<p>So, What a coincidence!</p>
+<h3 id="叹为观止"><a href="#叹为观止" class="headerlink" title="叹为观止"></a>叹为观止</h3><p>我们明白了这些，再看他的进一步实现：</p>
+<pre><code>if (!isCallable(target)) {
+    throw new TypeError(&apos;Function.prototype.bind called on incompatible &apos; + target);
+}
+</code></pre><p>这是为了保证调用的正确性，他使用了isCallable做判断，isCallable很好实现：</p>
+<pre><code>isCallable = function isCallable(value) { 
+    if (typeof value !== &apos;function&apos;) { 
+        return false; 
+    }
+}
+</code></pre><p>重设绑定函数的length属性：</p>
+<pre><code>var boundLength = max(0, target.length - args.length);
+</code></pre><p>构造函数使用情况，在binder中也有效兼容。如果你不明白，可以参考<a href="">上一篇</a></p>
+<pre><code>if (this instanceof bound) { 
+    ... // 构造函数调用情况
+} else {
+    ... // 正常方式调用
+}
+
+if (target.prototype) {
+    Empty.prototype = target.prototype;
+    bound.prototype = new Empty();
+    // Clean up dangling references.
+    Empty.prototype = null;
+}
+</code></pre><h2 id="无穷无尽"><a href="#无穷无尽" class="headerlink" title="无穷无尽"></a>无穷无尽</h2><p>当然，ES5-shim里还归纳了几项todo…</p>
+<pre><code>// TODO
+// 18. Set the [[Extensible]] internal property of F to true.
+// 19. Let thrower be the [[ThrowTypeError]] function Object (13.2.3).
+// 20. Call the [[DefineOwnProperty]] internal method of F with
+//   arguments &quot;caller&quot;, PropertyDescriptor {[[Get]]: thrower, [[Set]]:
+//   thrower, [[Enumerable]]: false, [[Configurable]]: false}, and
+//   false.
+// 21. Call the [[DefineOwnProperty]] internal method of F with
+//   arguments &quot;arguments&quot;, PropertyDescriptor {[[Get]]: thrower,
+//   [[Set]]: thrower, [[Enumerable]]: false, [[Configurable]]: false},
+//   and false.
+// 22. Return F.
+</code></pre><p>比较简单，我就不再翻译了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过学习ES5-shim的源码实现bind方法，结合前一篇，希望能对bind和JS包括闭包，原型原型链，this等一系列知识点能有更深刻的理解。<br>同时在程序设计上，尤其是逻辑的严密性上，有所积累。</p>
+<p>PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/" data-id="cizco0fwc0003qtfyddxl5v6a" class="article-share-link">Share</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/01/20/js/es5-shim-bind/" data-title="从一道面试题的进阶，到“我可能看了假源码”（2）" data-url="https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/01/20/js/bind/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          从一道面试题的进阶，到“我可能看了假源码”
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/01/13/tool/using-pac/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">如何使用PAC文件“科学上网”</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 13.33px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16.67px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 13.33px;">tool</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/01/21/weekly/weekly-10101/">expfe技术周刊第10101期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/01/21/other/wujiang-2016/">伍酱的2016</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/01/20/js/bind/">从一道面试题的进阶，到“我可能看了假源码”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/01/20/js/es5-shim-bind/">从一道面试题的进阶，到“我可能看了假源码”（2）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/01/13/tool/using-pac/">如何使用PAC文件“科学上网”</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
