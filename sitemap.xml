@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/</loc>
+    
+    <lastmod>2017-02-19T14:25:59.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/01/20/js/bind/</loc>
+    
+    <lastmod>2017-02-19T14:24:04.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/</loc>
     
     <lastmod>2017-02-19T12:29:49.000Z</lastmod>
@@ -9,21 +23,7 @@
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/</loc>
-    
-    <lastmod>2017-02-19T12:29:49.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://exp-team.github.io/blog/2017/01/21/other/wujiang-2016/</loc>
-    
-    <lastmod>2017-02-19T12:29:49.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/01/20/js/bind/</loc>
     
     <lastmod>2017-02-19T12:29:49.000Z</lastmod>
     

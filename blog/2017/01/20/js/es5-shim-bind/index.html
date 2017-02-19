@@ -5,19 +5,16 @@
   
   <title>从一道面试题的进阶，到“我可能看了假源码”（2） | exp team</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="上一篇从一道面试题的进阶，到“我可能看了假源码”由浅入深介绍了关于一篇经典面试题的解法。最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。
-如果你还没有看过">
+  <meta name="description" content="上一篇从一道面试题的进阶，到“我可能看了假源码”中，由浅入深介绍了关于一篇经典面试题的解法。最">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从一道面试题的进阶，到“我可能看了假源码”（2）">
 <meta property="og:url" content="https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/index.html">
 <meta property="og:site_name" content="exp team">
-<meta property="og:description" content="上一篇从一道面试题的进阶，到“我可能看了假源码”由浅入深介绍了关于一篇经典面试题的解法。最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。
-如果你还没有看过">
-<meta property="og:updated_time" content="2017-02-19T12:29:49.000Z">
+<meta property="og:description" content="上一篇从一道面试题的进阶，到“我可能看了假源码”中，由浅入深介绍了关于一篇经典面试题的解法。最">
+<meta property="og:updated_time" content="2017-02-19T14:25:59.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从一道面试题的进阶，到“我可能看了假源码”（2）">
-<meta name="twitter:description" content="上一篇从一道面试题的进阶，到“我可能看了假源码”由浅入深介绍了关于一篇经典面试题的解法。最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。
-如果你还没有看过">
+<meta name="twitter:description" content="上一篇从一道面试题的进阶，到“我可能看了假源码”中，由浅入深介绍了关于一篇经典面试题的解法。最">
   
     <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
   
@@ -110,18 +107,13 @@ var _hmt = _hmt || [];
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>上一篇<a href="">从一道面试题的进阶，到“我可能看了假源码”</a>由浅入深介绍了关于一篇经典面试题的解法。<br>最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。</p>
-<p>如果你还没有看过<a href="">前传</a>，可以参看前情回顾：</p>
-<ol>
-<li>问题是模拟实现ES5中原生bind函数；</li>
-<li>我们通过4中递进实现达到了完美状态；</li>
-<li>可是ES5-shim中的实现，又让我们大跌眼镜…</li>
-</ol>
+        <p>上一篇<a href="https://exp-team.github.io/blog/2017/01/20/js/bind/">从一道面试题的进阶，到“我可能看了假源码”</a>中，由浅入深介绍了关于一篇经典面试题的解法。<br>最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。</p>
+<p>如果你还没有看过<a href="https://exp-team.github.io/blog/2017/01/20/js/bind/">前传</a>，可以参看前情回顾：<br>回顾1. 题目是模拟实现ES5中原生bind函数；<br>回顾2. 我们通过4种递进实现达到了完美状态；<br>回顾3. 可是ES5-shim中的实现，又让我们大跌眼镜…</p>
 <h2 id="ES5-shim的悬念"><a href="#ES5-shim的悬念" class="headerlink" title="ES5-shim的悬念"></a>ES5-shim的悬念</h2><p>ES5-shim实现方式源码贴在了最后，我们看看他做了什么奇怪的事情：<br>1）从结果上看，返回了bound函数。<br>2）bound函数是这样子声明的：</p>
 <pre><code>bound = Function(&apos;binder&apos;, &apos;return function (&apos; + boundArgs.join(&apos;,&apos;) + &apos;){ return binder.apply(this, arguments); }&apos;)(binder);
-</code></pre><p>3）bound使用了系统自己的构造函数Function来声明，第一个参数是binder，函数体内又binder.apply(this, arguments)。<br>我们知道这种动态方式，类似eval。最好不要使用它，因为用它定义函数比用传统方式要慢得多。<br>4）那么ES5-shim抽风了吗？</p>
+</code></pre><p>3）bound使用了系统自己的构造函数Function来声明，第一个参数是binder，函数体内又binder.apply(this, arguments)。<br>我们知道这种动态创建函数的方式，类似eval。最好不要使用它，因为用它定义函数比用传统方式要慢得多。<br>4）那么ES5-shim抽风了吗？</p>
 <h2 id="追根问底"><a href="#追根问底" class="headerlink" title="追根问底"></a>追根问底</h2><p>答案肯定是没抽风，他这样做是有理由的。</p>
-<h3 id="神秘的函数的length属性"><a href="#神秘的函数的length属性" class="headerlink" title="神秘的函数的length属性"></a>神秘的函数的length属性</h3><p>你可能不知道，每个函数都有length属性。对，就像数组和字符串那样。函数的length属性，用于表示函数的形参。更重要的是函数的length属性值是不可重写的。我写了个测试代码：</p>
+<h3 id="神秘的函数的length属性"><a href="#神秘的函数的length属性" class="headerlink" title="神秘的函数的length属性"></a>神秘的函数的length属性</h3><p>你可能不知道，每个函数都有length属性。对，就像数组和字符串那样。函数的length属性，用于表示函数的形参个数。更重要的是函数的length属性值是不可重写的。我写了个测试代码来证明：</p>
 <pre><code>function test (){}
 test.length  // 输出0
 test.hasOwnProperty(&apos;length&apos;)  // 输出true
@@ -131,7 +123,7 @@ Object.getOwnPropertyDescriptor(&apos;test&apos;, &apos;length&apos;)
 // enumerable: false,
 // value: 4, 
 // writable: false 
-</code></pre><h3 id="拨云见日"><a href="#拨云见日" class="headerlink" title="拨云见日"></a>拨云见日</h3><p>说到这里，那就好解释了。<br>ES5-shim为了最大限度的进行兼容，所以：既然不能修改length的属性值，那么在初始化时赋值总可以吧，也就是定义函数的形参个数！<br>于是我们可通过eval和new Function的方式动态定义函数来。<br>同时，很有意思的是，源码里有这样的注释：</p>
+</code></pre><h3 id="拨云见日"><a href="#拨云见日" class="headerlink" title="拨云见日"></a>拨云见日</h3><p>说到这里，那就好解释了。<br>ES5-shim为了最大限度的进行兼容，包括对返回函数length属性的还原。如果按照我们之前实现的那种方式，length值始终为零。<br>所以：既然不能修改length的属性值，那么在初始化时赋值总可以吧！<br>于是我们可通过eval和new Function的方式动态定义函数来。<br>同时，很有意思的是，源码里有这样的注释：</p>
 <pre><code>// XXX Build a dynamic function with desired amount of arguments is the only
 // way to set the length property of a function.
 // In environments where Content Security Policies enabled (Chrome extensions,
@@ -152,7 +144,7 @@ Object.getOwnPropertyDescriptor(&apos;test&apos;, &apos;length&apos;)
 }
 </code></pre><p>重设绑定函数的length属性：</p>
 <pre><code>var boundLength = max(0, target.length - args.length);
-</code></pre><p>构造函数使用情况，在binder中也有效兼容。如果你不明白，可以参考<a href="">上一篇</a></p>
+</code></pre><p>构造函数调用情况，在binder中也有效兼容。如果你不明白什么是构造函数调用情况，可以参考<a href="https://exp-team.github.io/blog/2017/01/20/js/bind/">上一篇</a>。</p>
 <pre><code>if (this instanceof bound) { 
     ... // 构造函数调用情况
 } else {
@@ -179,7 +171,45 @@ if (target.prototype) {
 //   and false.
 // 22. Return F.
 </code></pre><p>比较简单，我就不再翻译了。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过学习ES5-shim的源码实现bind方法，结合前一篇，希望能对bind和JS包括闭包，原型原型链，this等一系列知识点能有更深刻的理解。<br>同时在程序设计上，尤其是逻辑的严密性上，有所积累。</p>
+<h2 id="源码回放"><a href="#源码回放" class="headerlink" title="源码回放"></a>源码回放</h2><pre><code>bind: function bind(that) {
+    var target = this;
+    if (!isCallable(target)) {
+        throw new TypeError(&apos;Function.prototype.bind called on incompatible &apos; + target);
+    }
+    var args = array_slice.call(arguments, 1);
+    var bound;
+    var binder = function () {
+        if (this instanceof bound) {
+            var result = target.apply(
+                this,
+                array_concat.call(args, array_slice.call(arguments))
+            );
+            if ($Object(result) === result) {
+                return result;
+            }
+            return this;
+        } else {
+            return target.apply(
+                that,
+                array_concat.call(args, array_slice.call(arguments))
+            );
+        }
+    };
+    var boundLength = max(0, target.length - args.length);
+    var boundArgs = [];
+    for (var i = 0; i &lt; boundLength; i++) {
+        array_push.call(boundArgs, &apos;$&apos; + i);
+    }
+    bound = Function(&apos;binder&apos;, &apos;return function (&apos; + boundArgs.join(&apos;,&apos;) + &apos;){ return binder.apply(this, arguments); }&apos;)(binder);
+
+    if (target.prototype) {
+        Empty.prototype = target.prototype;
+        bound.prototype = new Empty();
+        Empty.prototype = null;
+    }
+    return bound;
+}
+</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过学习ES5-shim的源码实现bind方法，结合前一篇，希望读者能对bind和JS包括闭包，原型原型链，this等一系列知识点能有更深刻的理解。<br>同时在程序设计上，尤其是逻辑的严密性上，有所积累。</p>
 <p>PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。</p>
 
       
