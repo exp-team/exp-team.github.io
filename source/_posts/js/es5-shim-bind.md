@@ -6,13 +6,13 @@ date: 2017-01-20
 author: 侯策
 ---
 
-上一篇[从一道面试题的进阶，到“我可能看了假源码”]()由浅入深介绍了关于一篇经典面试题的解法。
+上一篇[从一道面试题的进阶，到“我可能看了假源码”](https://exp-team.github.io/blog/2017/01/20/js/bind/)中，由浅入深介绍了关于一篇经典面试题的解法。
 最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。
 
-如果你还没有看过[前传]()，可以参看前情回顾：
-1. 问题是模拟实现ES5中原生bind函数；
-2. 我们通过4中递进实现达到了完美状态；
-3. 可是ES5-shim中的实现，又让我们大跌眼镜...
+如果你还没有看过[前传](https://exp-team.github.io/blog/2017/01/20/js/bind/)，可以参看前情回顾：
+回顾1. 题目是模拟实现ES5中原生bind函数；
+回顾2. 我们通过4种递进实现达到了完美状态；
+回顾3. 可是ES5-shim中的实现，又让我们大跌眼镜...
 
 ## ES5-shim的悬念
 ES5-shim实现方式源码贴在了最后，我们看看他做了什么奇怪的事情：
@@ -22,14 +22,14 @@ ES5-shim实现方式源码贴在了最后，我们看看他做了什么奇怪的
     bound = Function('binder', 'return function (' + boundArgs.join(',') + '){ return binder.apply(this, arguments); }')(binder);
 
 3）bound使用了系统自己的构造函数Function来声明，第一个参数是binder，函数体内又binder.apply(this, arguments)。
-我们知道这种动态方式，类似eval。最好不要使用它，因为用它定义函数比用传统方式要慢得多。
+我们知道这种动态创建函数的方式，类似eval。最好不要使用它，因为用它定义函数比用传统方式要慢得多。
 4）那么ES5-shim抽风了吗？
 
 ## 追根问底
 答案肯定是没抽风，他这样做是有理由的。
 
 ### 神秘的函数的length属性
-你可能不知道，每个函数都有length属性。对，就像数组和字符串那样。函数的length属性，用于表示函数的形参。更重要的是函数的length属性值是不可重写的。我写了个测试代码：
+你可能不知道，每个函数都有length属性。对，就像数组和字符串那样。函数的length属性，用于表示函数的形参个数。更重要的是函数的length属性值是不可重写的。我写了个测试代码来证明：
 
     function test (){}
     test.length  // 输出0
@@ -43,7 +43,8 @@ ES5-shim实现方式源码贴在了最后，我们看看他做了什么奇怪的
 
 ### 拨云见日
 说到这里，那就好解释了。
-ES5-shim为了最大限度的进行兼容，所以：既然不能修改length的属性值，那么在初始化时赋值总可以吧，也就是定义函数的形参个数！
+ES5-shim为了最大限度的进行兼容，包括对返回函数length属性的还原。如果按照我们之前实现的那种方式，length值始终为零。
+所以：既然不能修改length的属性值，那么在初始化时赋值总可以吧！
 于是我们可通过eval和new Function的方式动态定义函数来。
 同时，很有意思的是，源码里有这样的注释：
 
@@ -77,7 +78,7 @@ So, What a coincidence!
 
     var boundLength = max(0, target.length - args.length);
 
-构造函数使用情况，在binder中也有效兼容。如果你不明白，可以参考[上一篇]()
+构造函数调用情况，在binder中也有效兼容。如果你不明白什么是构造函数调用情况，可以参考[上一篇](https://exp-team.github.io/blog/2017/01/20/js/bind/)。
 
     if (this instanceof bound) { 
         ... // 构造函数调用情况
@@ -110,8 +111,50 @@ So, What a coincidence!
 
 比较简单，我就不再翻译了。
 
+## 源码回放
+
+    bind: function bind(that) {
+        var target = this;
+        if (!isCallable(target)) {
+            throw new TypeError('Function.prototype.bind called on incompatible ' + target);
+        }
+        var args = array_slice.call(arguments, 1);
+        var bound;
+        var binder = function () {
+            if (this instanceof bound) {
+                var result = target.apply(
+                    this,
+                    array_concat.call(args, array_slice.call(arguments))
+                );
+                if ($Object(result) === result) {
+                    return result;
+                }
+                return this;
+            } else {
+                return target.apply(
+                    that,
+                    array_concat.call(args, array_slice.call(arguments))
+                );
+            }
+        };
+        var boundLength = max(0, target.length - args.length);
+        var boundArgs = [];
+        for (var i = 0; i < boundLength; i++) {
+            array_push.call(boundArgs, '$' + i);
+        }
+        bound = Function('binder', 'return function (' + boundArgs.join(',') + '){ return binder.apply(this, arguments); }')(binder);
+
+        if (target.prototype) {
+            Empty.prototype = target.prototype;
+            bound.prototype = new Empty();
+            Empty.prototype = null;
+        }
+        return bound;
+    }
+
+
 ## 总结
-通过学习ES5-shim的源码实现bind方法，结合前一篇，希望能对bind和JS包括闭包，原型原型链，this等一系列知识点能有更深刻的理解。
+通过学习ES5-shim的源码实现bind方法，结合前一篇，希望读者能对bind和JS包括闭包，原型原型链，this等一系列知识点能有更深刻的理解。
 同时在程序设计上，尤其是逻辑的严密性上，有所积累。
 
 PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。
