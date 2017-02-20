@@ -2,7 +2,7 @@
 title: 从一道面试题的进阶，到“我可能看了假源码”（2）
 categories: js
 tags: js
-date: 2017-01-20
+date: 2017-02-20
 author: 侯策
 ---
 
@@ -10,6 +10,7 @@ author: 侯策
 最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。
 
 如果你还没有看过[前传](https://exp-team.github.io/blog/2017/01/20/js/bind/)，可以参看前情回顾：
+
 回顾1. 题目是模拟实现ES5中原生bind函数；
 回顾2. 我们通过4种递进实现达到了完美状态；
 回顾3. 可是ES5-shim中的实现，又让我们大跌眼镜...
@@ -43,7 +44,7 @@ ES5-shim实现方式源码贴在了最后，我们看看他做了什么奇怪的
 
 ### 拨云见日
 说到这里，那就好解释了。
-ES5-shim为了最大限度的进行兼容，包括对返回函数length属性的还原。如果按照我们之前实现的那种方式，length值始终为零。
+ES5-shim是为了最大限度的进行兼容，包括对返回函数length属性的还原。如果按照我们之前实现的那种方式，length值始终为零。
 所以：既然不能修改length的属性值，那么在初始化时赋值总可以吧！
 于是我们可通过eval和new Function的方式动态定义函数来。
 同时，很有意思的是，源码里有这样的注释：
@@ -55,7 +56,7 @@ ES5-shim为了最大限度的进行兼容，包括对返回函数length属性的
     // However in all of these environments Function.prototype.bind exists
     // and so this code will never be executed.
 
-他解释了为什么要使用动态函数，就如同我们上边所讲的那样，是为了保证length属性的合理值。但是在一些浏览器中出于安全考虑，使用eval或者Function构造器都会被抛出异常。但是，巧合也就是这些浏览器基本上都实现了bind函数，这些异常又不会被执行。
+他解释了为什么要使用动态函数，就如同我们上边所讲的那样，是为了保证length属性的合理值。但是在一些浏览器中出于安全考虑，使用eval或者Function构造器都会被抛出异常。但是，巧合也就是这些浏览器基本上都实现了bind函数，这些异常又不会被触发。
 
 So, What a coincidence!
 
