@@ -8,10 +8,10 @@
   <meta name="description" content="上一篇从一道面试题的进阶，到“我可能看了假源码”中，由浅入深介绍了关于一篇经典面试题的解法。最">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从一道面试题的进阶，到“我可能看了假源码”（2）">
-<meta property="og:url" content="https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/index.html">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/index.html">
 <meta property="og:site_name" content="exp team">
 <meta property="og:description" content="上一篇从一道面试题的进阶，到“我可能看了假源码”中，由浅入深介绍了关于一篇经典面试题的解法。最">
-<meta property="og:updated_time" content="2017-02-19T14:25:59.000Z">
+<meta property="og:updated_time" content="2017-02-20T00:47:13.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从一道面试题的进阶，到“我可能看了假源码”（2）">
 <meta name="twitter:description" content="上一篇从一道面试题的进阶，到“我可能看了假源码”中，由浅入深介绍了关于一篇经典面试题的解法。最">
@@ -83,8 +83,8 @@ var _hmt = _hmt || [];
       <div class="outer">
         <section id="main"><article id="post-js/es5-shim-bind" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/blog/2017/01/20/js/es5-shim-bind/" class="article-date">
-  <time datetime="2017-01-19T16:00:00.000Z" itemprop="datePublished">2017-01-20</time>
+    <a href="/blog/2017/02/20/js/es5-shim-bind/" class="article-date">
+  <time datetime="2017-02-19T16:00:00.000Z" itemprop="datePublished">2017-02-20</time>
 </a>
     
   <div class="article-category">
@@ -108,7 +108,8 @@ var _hmt = _hmt || [];
     <div class="article-entry" itemprop="articleBody">
       
         <p>上一篇<a href="https://exp-team.github.io/blog/2017/01/20/js/bind/">从一道面试题的进阶，到“我可能看了假源码”</a>中，由浅入深介绍了关于一篇经典面试题的解法。<br>最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。</p>
-<p>如果你还没有看过<a href="https://exp-team.github.io/blog/2017/01/20/js/bind/">前传</a>，可以参看前情回顾：<br>回顾1. 题目是模拟实现ES5中原生bind函数；<br>回顾2. 我们通过4种递进实现达到了完美状态；<br>回顾3. 可是ES5-shim中的实现，又让我们大跌眼镜…</p>
+<p>如果你还没有看过<a href="https://exp-team.github.io/blog/2017/01/20/js/bind/">前传</a>，可以参看前情回顾：</p>
+<p>回顾1. 题目是模拟实现ES5中原生bind函数；<br>回顾2. 我们通过4种递进实现达到了完美状态；<br>回顾3. 可是ES5-shim中的实现，又让我们大跌眼镜…</p>
 <h2 id="ES5-shim的悬念"><a href="#ES5-shim的悬念" class="headerlink" title="ES5-shim的悬念"></a>ES5-shim的悬念</h2><p>ES5-shim实现方式源码贴在了最后，我们看看他做了什么奇怪的事情：<br>1）从结果上看，返回了bound函数。<br>2）bound函数是这样子声明的：</p>
 <pre><code>bound = Function(&apos;binder&apos;, &apos;return function (&apos; + boundArgs.join(&apos;,&apos;) + &apos;){ return binder.apply(this, arguments); }&apos;)(binder);
 </code></pre><p>3）bound使用了系统自己的构造函数Function来声明，第一个参数是binder，函数体内又binder.apply(this, arguments)。<br>我们知道这种动态创建函数的方式，类似eval。最好不要使用它，因为用它定义函数比用传统方式要慢得多。<br>4）那么ES5-shim抽风了吗？</p>
@@ -123,14 +124,14 @@ Object.getOwnPropertyDescriptor(&apos;test&apos;, &apos;length&apos;)
 // enumerable: false,
 // value: 4, 
 // writable: false 
-</code></pre><h3 id="拨云见日"><a href="#拨云见日" class="headerlink" title="拨云见日"></a>拨云见日</h3><p>说到这里，那就好解释了。<br>ES5-shim为了最大限度的进行兼容，包括对返回函数length属性的还原。如果按照我们之前实现的那种方式，length值始终为零。<br>所以：既然不能修改length的属性值，那么在初始化时赋值总可以吧！<br>于是我们可通过eval和new Function的方式动态定义函数来。<br>同时，很有意思的是，源码里有这样的注释：</p>
+</code></pre><h3 id="拨云见日"><a href="#拨云见日" class="headerlink" title="拨云见日"></a>拨云见日</h3><p>说到这里，那就好解释了。<br>ES5-shim是为了最大限度的进行兼容，包括对返回函数length属性的还原。如果按照我们之前实现的那种方式，length值始终为零。<br>所以：既然不能修改length的属性值，那么在初始化时赋值总可以吧！<br>于是我们可通过eval和new Function的方式动态定义函数来。<br>同时，很有意思的是，源码里有这样的注释：</p>
 <pre><code>// XXX Build a dynamic function with desired amount of arguments is the only
 // way to set the length property of a function.
 // In environments where Content Security Policies enabled (Chrome extensions,
 // for ex.) all use of eval or Function costructor throws an exception.
 // However in all of these environments Function.prototype.bind exists
 // and so this code will never be executed.
-</code></pre><p>他解释了为什么要使用动态函数，就如同我们上边所讲的那样，是为了保证length属性的合理值。但是在一些浏览器中出于安全考虑，使用eval或者Function构造器都会被抛出异常。但是，巧合也就是这些浏览器基本上都实现了bind函数，这些异常又不会被执行。</p>
+</code></pre><p>他解释了为什么要使用动态函数，就如同我们上边所讲的那样，是为了保证length属性的合理值。但是在一些浏览器中出于安全考虑，使用eval或者Function构造器都会被抛出异常。但是，巧合也就是这些浏览器基本上都实现了bind函数，这些异常又不会被触发。</p>
 <p>So, What a coincidence!</p>
 <h3 id="叹为观止"><a href="#叹为观止" class="headerlink" title="叹为观止"></a>叹为观止</h3><p>我们明白了这些，再看他的进一步实现：</p>
 <pre><code>if (!isCallable(target)) {
@@ -215,10 +216,10 @@ if (target.prototype) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/" data-id="cizco0fwc0003qtfyddxl5v6a" class="article-share-link">Share</a>
+      <a data-url="https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/" data-id="cizco0fwc0003qtfyddxl5v6a" class="article-share-link">Share</a>
       
         <!-- 多说评论框 start -->
-<div class="ds-thread" data-thread-key="blog/2017/01/20/js/es5-shim-bind/" data-title="从一道面试题的进阶，到“我可能看了假源码”（2）" data-url="https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/"></div>
+<div class="ds-thread" data-thread-key="blog/2017/02/20/js/es5-shim-bind/" data-title="从一道面试题的进阶，到“我可能看了假源码”（2）" data-url="https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/"></div>
 <!-- 多说评论框 end -->
 
       
@@ -231,7 +232,7 @@ if (target.prototype) {
     
 <nav id="article-nav">
   
-    <a href="/blog/2017/01/20/js/bind/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/blog/2017/02/20/js/bind/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
@@ -241,9 +242,9 @@ if (target.prototype) {
     </a>
   
   
-    <a href="/blog/2017/01/13/tool/using-pac/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/blog/2017/01/21/weekly/weekly-10101/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">如何使用PAC文件“科学上网”</div>
+      <div class="article-nav-title">expfe技术周刊第10101期</div>
     </a>
   
 </nav>
@@ -304,7 +305,7 @@ var duoshuoQuery = {short_name:"exp-team"};
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
     </div>
   </div>
 
@@ -317,19 +318,19 @@ var duoshuoQuery = {short_name:"exp-team"};
       <ul>
         
           <li>
+            <a href="/blog/2017/02/20/js/bind/">从一道面试题的进阶，到“我可能看了假源码”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/02/20/js/es5-shim-bind/">从一道面试题的进阶，到“我可能看了假源码”（2）</a>
+          </li>
+        
+          <li>
             <a href="/blog/2017/01/21/weekly/weekly-10101/">expfe技术周刊第10101期</a>
           </li>
         
           <li>
             <a href="/blog/2017/01/21/other/wujiang-2016/">伍酱的2016</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2017/01/20/js/bind/">从一道面试题的进阶，到“我可能看了假源码”</a>
-          </li>
-        
-          <li>
-            <a href="/blog/2017/01/20/js/es5-shim-bind/">从一道面试题的进阶，到“我可能看了假源码”（2）</a>
           </li>
         
           <li>

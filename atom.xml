@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://exp-team.github.io/"/>
-  <updated>2017-02-19T12:29:49.000Z</updated>
+  <updated>2017-02-20T00:47:41.000Z</updated>
   <id>https://exp-team.github.io/</id>
   
   <author>
@@ -14,6 +14,248 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>从一道面试题的进阶，到“我可能看了假源码”</title>
+    <link href="https://exp-team.github.io/blog/2017/02/20/js/bind/"/>
+    <id>https://exp-team.github.io/blog/2017/02/20/js/bind/</id>
+    <published>2017-02-19T16:00:00.000Z</published>
+    <updated>2017-02-20T00:47:41.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>今天想谈谈一道前端面试题，我做面试官的时候经常喜欢用它来考察面试者的基础是否扎实，以及逻辑、思维能力和临场表现，题目是：“模拟实现ES5中原生bind函数”。<br>也许这道题目已经不再新鲜，部分读者也会有思路来解答。社区上关于原生bind的研究也很多，比如用它来实现函数“颗粒化（currying）”，<br>或者“反颗粒化（uncurrying）”。<br>但是，我确信有很多细节是您注意不到的，也是社区上关于这个话题普遍缺失的。<br>这篇文章面向有较牢固JS基础的读者，会从最基本的理解入手，一直到分析ES5-shim实现bind源码，相信不同程度的读者都能有所收获。<br>也欢迎大家与我讨论。</p>
+<h2 id="bind函数究竟是什么"><a href="#bind函数究竟是什么" class="headerlink" title="bind函数究竟是什么?"></a>bind函数究竟是什么?</h2><p>在开启我们的探索之前，有必要先明确一下bind到底实现了什么：<br>1）简单粗暴地来说，bind是用于绑定this指向的。（如果你还不了解JS中this的指向问题，以及执行环境上下文的奥秘，这篇文章暂时就不太适合阅读）。</p>
+<p>2）bind使用语法：</p>
+<pre><code>fun.bind(thisArg[, arg1[, arg2[, ...]]])
+</code></pre><p>bind方法会创建一个新函数。当这个新函数被调用时，bind的第一个参数将作为它运行时的this，之后的一序列参数将会在传递的实参前传入作为它的参数。本文不打算科普基础，如果您还不清楚，请<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind" target="_blank" rel="external">参考MDN内容</a>。</p>
+<p>3)bind返回的绑定函数也能使用new操作符创建对象：这种行为就像把原函数当成构造器。提供的this值被忽略，同时调用时的参数被提供给模拟函数。</p>
+<h2 id="初级实现"><a href="#初级实现" class="headerlink" title="初级实现"></a>初级实现</h2><p>了解了以上内容，我们来实现一个初级的bind函数Polyfill:</p>
+<pre><code>Function.prototype.bind = function (context) {
+    var me = this;
+    var argsArray = Array.prototype.slice.call(arguments);
+    return function () {
+        return me.apply(context, argsArray.slice(1))
+    }
+}
+</code></pre><p>这是一般“表现良好”的面试者所能给我提供的答案，如果面试者能写到这里，我会给他60分。<br>我们先简要解读一下：<br>基本原理是使用apply进行模拟。函数体内的this，就是需要绑定this的实例函数，或者说是原函数。最后我们使用apply来进行参数（context）绑定，并返回。<br>同时，将第一个参数（context）以外的其他参数，作为提供给原函数的预设参数，这也是基本的“颗粒化（curring）”基础。</p>
+<h2 id="初级实现的加分项"><a href="#初级实现的加分项" class="headerlink" title="初级实现的加分项"></a>初级实现的加分项</h2><p>上面的实现（包括后面的实现），其实是一个典型的<a href="https://en.wikipedia.org/wiki/Monkey_patch" target="_blank" rel="external">“Monkey patching(猴子补丁)”</a>，即“给内置对象扩展方法”。所以，如果面试者能进行一下“嗅探”，进行兼容处理，就是锦上添花了，我会给10分的附加分。</p>
+<pre><code>Function.prototype.bind = Function.prototype.bind || function (context) {
+    ...
+}
+</code></pre><h2 id="颗粒化（curring）实现"><a href="#颗粒化（curring）实现" class="headerlink" title="颗粒化（curring）实现"></a>颗粒化（curring）实现</h2><p>上述的实现方式中，我们返回的参数列表里包含：atgsArray.slice(1)，他的问题在于存在预置参数功能丢失的现象。<br>想象我们返回的绑定函数中，如果想实现预设传参（就像bind所实现的那样），就面临尴尬的局面。真正实现颗粒化的“完美方式”是：</p>
+<pre><code>Function.prototype.bind = Function.prototype.bind || function (context) {
+    var me = this;
+    var args = Array.prototype.slice.call(arguments, 1);
+    return function () {
+        var innerArgs = Array.prototype.slice.call(arguments);
+        var finalArgs = args.concat(innerArgs);
+        return me.apply(contenxt, finalArgs);
+    }
+}
+</code></pre><p>如果面试者能够给出这样的答案，我内心独白会是“不错啊，貌似你就是我要找的那个TA～”。但是，我们注意在上边bind方法介绍的第三条提到：bind返回的函数如果作为构造函数，搭配new关键字出现的话，我们的绑定this就需要“被忽略”。</p>
+<h2 id="构造函数场景下的兼容"><a href="#构造函数场景下的兼容" class="headerlink" title="构造函数场景下的兼容"></a>构造函数场景下的兼容</h2><p>有了上边的讲解，不难理解需要兼容构造函数场景的实现：</p>
+<pre><code>Function.prototype.bind = Function.prototype.bind || function (context) {
+    var me = this;
+    var args = Array.prototype.slice.call(arguments, 1);
+    var F = function () {};
+    F.prototype = this.prototype;
+    var bound = function () {
+        var innerArgs = Array.prototype.slice.call(arguments);
+        var finalArgs = args.contact(innerArgs);
+        return me.apply(this instanceof F ? this : context || this, finalArgs);
+    }
+    bound.prototype = new fNOP();
+    return bound;
+}
+</code></pre><p>如果面试者能够写成这样，我几乎要给满分，会帮忙联系HR谈薪酬了。当然，还可以做的更加严谨。</p>
+<h2 id="更严谨的做法"><a href="#更严谨的做法" class="headerlink" title="更严谨的做法"></a>更严谨的做法</h2><p>我们需要调用bind方法的一定要是一个函数，所以可以在函数体内做一个判断：</p>
+<pre><code>if (typeof this !== &quot;function&quot;) {
+  throw new TypeError(&quot;Function.prototype.bind - what is trying to be bound is not callable&quot;);
+}
+</code></pre><p>做到所有这一切，我会很开心的给满分。其实MDN上有个自己实现的polyfill，就是如此实现的。<br>另外，《JavaScript Web Application》一书中对bind()的实现，也是如此。</p>
+<p>故事貌似要画上休止符了——</p>
+<h2 id="一切还没完，高潮即将上演"><a href="#一切还没完，高潮即将上演" class="headerlink" title="一切还没完，高潮即将上演"></a>一切还没完，高潮即将上演</h2><p>如果你认为这样就完了，其实我会告诉你说，高潮才刚要上演。曾经的我也认为上述方法已经比较完美了，直到我看了es5-shim源码（已适当删减）：</p>
+<pre><code>bind: function bind(that) {
+    var target = this;
+    if (!isCallable(target)) {
+        throw new TypeError(&apos;Function.prototype.bind called on incompatible &apos; + target);
+    }
+    var args = array_slice.call(arguments, 1);
+    var bound;
+    var binder = function () {
+        if (this instanceof bound) {
+            var result = target.apply(
+                this,
+                array_concat.call(args, array_slice.call(arguments))
+            );
+            if ($Object(result) === result) {
+                return result;
+            }
+            return this;
+        } else {
+            return target.apply(
+                that,
+                array_concat.call(args, array_slice.call(arguments))
+            );
+        }
+    };
+    var boundLength = max(0, target.length - args.length);
+    var boundArgs = [];
+    for (var i = 0; i &lt; boundLength; i++) {
+        array_push.call(boundArgs, &apos;$&apos; + i);
+    }
+    bound = Function(&apos;binder&apos;, &apos;return function (&apos; + boundArgs.join(&apos;,&apos;) + &apos;){ return binder.apply(this, arguments); }&apos;)(binder);
+
+    if (target.prototype) {
+        Empty.prototype = target.prototype;
+        bound.prototype = new Empty();
+        Empty.prototype = null;
+    }
+    return bound;
+}
+</code></pre><p>看到了这样的实现，心中的困惑太多，不禁觉得我看了“假源码”。但是仔细分析一下，剩下就是一个大写的 。。。服！<br>这里先留一个悬念，不进行源码分析。读者可以自己先研究一下。如果想看源码分析，点击<a href="https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/">这篇文章的后续－源码解读</a>。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过比对几版的polyfill实现，对于bind应该有了比较深刻的认识。作为这道面试题的考察点，肯定不是让面试者实现低版本浏览器的向下兼容，因为我们有了es5-shim,es5-sham处理兼容性问题，并且无脑兼容我也认为是历史的倒退。<br>回到这道题考查点上，他有效的考察了很重要的知识点：比如this的指向，JS的闭包，原型原型链功力，设计程序上的兼容考虑等等硬素质。<br>在前端技术快速发展迭代的今天，在“前端市场是否饱和”“前端求职火爆异常”“前端入门简单，钱多人傻”的浮躁环境下，对基础内功的修炼就显得尤为重要，这也是你在前端路上能走多远、走多久的关键。</p>
+<p>PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;今天想谈谈一道前端面试题，我做面试官的时候经常喜欢用它来考察面试者的基础是否扎实，以及逻辑、思维能力和临场表现，题目是：“模拟实现ES5中原生bind函数”。&lt;br&gt;也许这道题目已经不再新鲜，部分读者也会有思路来解答。社区上关于原生bind的研究也很多，比如用它来实现函数“
+    
+    </summary>
+    
+      <category term="js" scheme="https://exp-team.github.io/categories/js/"/>
+    
+    
+      <category term="js" scheme="https://exp-team.github.io/tags/js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>从一道面试题的进阶，到“我可能看了假源码”（2）</title>
+    <link href="https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/"/>
+    <id>https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/</id>
+    <published>2017-02-19T16:00:00.000Z</published>
+    <updated>2017-02-20T00:47:13.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>上一篇<a href="https://exp-team.github.io/blog/2017/01/20/js/bind/">从一道面试题的进阶，到“我可能看了假源码”</a>中，由浅入深介绍了关于一篇经典面试题的解法。<br>最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。</p>
+<p>如果你还没有看过<a href="https://exp-team.github.io/blog/2017/01/20/js/bind/">前传</a>，可以参看前情回顾：</p>
+<p>回顾1. 题目是模拟实现ES5中原生bind函数；<br>回顾2. 我们通过4种递进实现达到了完美状态；<br>回顾3. 可是ES5-shim中的实现，又让我们大跌眼镜…</p>
+<h2 id="ES5-shim的悬念"><a href="#ES5-shim的悬念" class="headerlink" title="ES5-shim的悬念"></a>ES5-shim的悬念</h2><p>ES5-shim实现方式源码贴在了最后，我们看看他做了什么奇怪的事情：<br>1）从结果上看，返回了bound函数。<br>2）bound函数是这样子声明的：</p>
+<pre><code>bound = Function(&apos;binder&apos;, &apos;return function (&apos; + boundArgs.join(&apos;,&apos;) + &apos;){ return binder.apply(this, arguments); }&apos;)(binder);
+</code></pre><p>3）bound使用了系统自己的构造函数Function来声明，第一个参数是binder，函数体内又binder.apply(this, arguments)。<br>我们知道这种动态创建函数的方式，类似eval。最好不要使用它，因为用它定义函数比用传统方式要慢得多。<br>4）那么ES5-shim抽风了吗？</p>
+<h2 id="追根问底"><a href="#追根问底" class="headerlink" title="追根问底"></a>追根问底</h2><p>答案肯定是没抽风，他这样做是有理由的。</p>
+<h3 id="神秘的函数的length属性"><a href="#神秘的函数的length属性" class="headerlink" title="神秘的函数的length属性"></a>神秘的函数的length属性</h3><p>你可能不知道，每个函数都有length属性。对，就像数组和字符串那样。函数的length属性，用于表示函数的形参个数。更重要的是函数的length属性值是不可重写的。我写了个测试代码来证明：</p>
+<pre><code>function test (){}
+test.length  // 输出0
+test.hasOwnProperty(&apos;length&apos;)  // 输出true
+Object.getOwnPropertyDescriptor(&apos;test&apos;, &apos;length&apos;) 
+// 输出：
+// configurable: false, 
+// enumerable: false,
+// value: 4, 
+// writable: false 
+</code></pre><h3 id="拨云见日"><a href="#拨云见日" class="headerlink" title="拨云见日"></a>拨云见日</h3><p>说到这里，那就好解释了。<br>ES5-shim是为了最大限度的进行兼容，包括对返回函数length属性的还原。如果按照我们之前实现的那种方式，length值始终为零。<br>所以：既然不能修改length的属性值，那么在初始化时赋值总可以吧！<br>于是我们可通过eval和new Function的方式动态定义函数来。<br>同时，很有意思的是，源码里有这样的注释：</p>
+<pre><code>// XXX Build a dynamic function with desired amount of arguments is the only
+// way to set the length property of a function.
+// In environments where Content Security Policies enabled (Chrome extensions,
+// for ex.) all use of eval or Function costructor throws an exception.
+// However in all of these environments Function.prototype.bind exists
+// and so this code will never be executed.
+</code></pre><p>他解释了为什么要使用动态函数，就如同我们上边所讲的那样，是为了保证length属性的合理值。但是在一些浏览器中出于安全考虑，使用eval或者Function构造器都会被抛出异常。但是，巧合也就是这些浏览器基本上都实现了bind函数，这些异常又不会被触发。</p>
+<p>So, What a coincidence!</p>
+<h3 id="叹为观止"><a href="#叹为观止" class="headerlink" title="叹为观止"></a>叹为观止</h3><p>我们明白了这些，再看他的进一步实现：</p>
+<pre><code>if (!isCallable(target)) {
+    throw new TypeError(&apos;Function.prototype.bind called on incompatible &apos; + target);
+}
+</code></pre><p>这是为了保证调用的正确性，他使用了isCallable做判断，isCallable很好实现：</p>
+<pre><code>isCallable = function isCallable(value) { 
+    if (typeof value !== &apos;function&apos;) { 
+        return false; 
+    }
+}
+</code></pre><p>重设绑定函数的length属性：</p>
+<pre><code>var boundLength = max(0, target.length - args.length);
+</code></pre><p>构造函数调用情况，在binder中也有效兼容。如果你不明白什么是构造函数调用情况，可以参考<a href="https://exp-team.github.io/blog/2017/01/20/js/bind/">上一篇</a>。</p>
+<pre><code>if (this instanceof bound) { 
+    ... // 构造函数调用情况
+} else {
+    ... // 正常方式调用
+}
+
+if (target.prototype) {
+    Empty.prototype = target.prototype;
+    bound.prototype = new Empty();
+    // Clean up dangling references.
+    Empty.prototype = null;
+}
+</code></pre><h2 id="无穷无尽"><a href="#无穷无尽" class="headerlink" title="无穷无尽"></a>无穷无尽</h2><p>当然，ES5-shim里还归纳了几项todo…</p>
+<pre><code>// TODO
+// 18. Set the [[Extensible]] internal property of F to true.
+// 19. Let thrower be the [[ThrowTypeError]] function Object (13.2.3).
+// 20. Call the [[DefineOwnProperty]] internal method of F with
+//   arguments &quot;caller&quot;, PropertyDescriptor {[[Get]]: thrower, [[Set]]:
+//   thrower, [[Enumerable]]: false, [[Configurable]]: false}, and
+//   false.
+// 21. Call the [[DefineOwnProperty]] internal method of F with
+//   arguments &quot;arguments&quot;, PropertyDescriptor {[[Get]]: thrower,
+//   [[Set]]: thrower, [[Enumerable]]: false, [[Configurable]]: false},
+//   and false.
+// 22. Return F.
+</code></pre><p>比较简单，我就不再翻译了。</p>
+<h2 id="源码回放"><a href="#源码回放" class="headerlink" title="源码回放"></a>源码回放</h2><pre><code>bind: function bind(that) {
+    var target = this;
+    if (!isCallable(target)) {
+        throw new TypeError(&apos;Function.prototype.bind called on incompatible &apos; + target);
+    }
+    var args = array_slice.call(arguments, 1);
+    var bound;
+    var binder = function () {
+        if (this instanceof bound) {
+            var result = target.apply(
+                this,
+                array_concat.call(args, array_slice.call(arguments))
+            );
+            if ($Object(result) === result) {
+                return result;
+            }
+            return this;
+        } else {
+            return target.apply(
+                that,
+                array_concat.call(args, array_slice.call(arguments))
+            );
+        }
+    };
+    var boundLength = max(0, target.length - args.length);
+    var boundArgs = [];
+    for (var i = 0; i &lt; boundLength; i++) {
+        array_push.call(boundArgs, &apos;$&apos; + i);
+    }
+    bound = Function(&apos;binder&apos;, &apos;return function (&apos; + boundArgs.join(&apos;,&apos;) + &apos;){ return binder.apply(this, arguments); }&apos;)(binder);
+
+    if (target.prototype) {
+        Empty.prototype = target.prototype;
+        bound.prototype = new Empty();
+        Empty.prototype = null;
+    }
+    return bound;
+}
+</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过学习ES5-shim的源码实现bind方法，结合前一篇，希望读者能对bind和JS包括闭包，原型原型链，this等一系列知识点能有更深刻的理解。<br>同时在程序设计上，尤其是逻辑的严密性上，有所积累。</p>
+<p>PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;上一篇&lt;a href=&quot;https://exp-team.github.io/blog/2017/01/20/js/bind/&quot;&gt;从一道面试题的进阶，到“我可能看了假源码”&lt;/a&gt;中，由浅入深介绍了关于一篇经典面试题的解法。&lt;br&gt;最后在皆大欢喜的结尾中，突生变化，悬念又起
+    
+    </summary>
+    
+      <category term="js" scheme="https://exp-team.github.io/categories/js/"/>
+    
+    
+      <category term="js" scheme="https://exp-team.github.io/tags/js/"/>
+    
+  </entry>
   
   <entry>
     <title>expfe技术周刊第10101期</title>
@@ -133,247 +375,6 @@
       <category term="other" scheme="https://exp-team.github.io/tags/other/"/>
     
       <category term="summary" scheme="https://exp-team.github.io/tags/summary/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>从一道面试题的进阶，到“我可能看了假源码”</title>
-    <link href="https://exp-team.github.io/blog/2017/01/20/js/bind/"/>
-    <id>https://exp-team.github.io/blog/2017/01/20/js/bind/</id>
-    <published>2017-01-19T16:00:00.000Z</published>
-    <updated>2017-02-19T14:24:04.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>今天想谈谈一道前端面试题，我做面试官的时候经常喜欢用它来考察面试者的基础是否扎实，以及逻辑、思维能力和临场表现，题目是：“模拟实现ES5中原生bind函数”。<br>也许这道题目已经不再新鲜，部分读者也会有思路来解答。社区上关于原生bind的研究也很多，比如用它来实现函数“颗粒化（currying）”，<br>或者“反颗粒化（uncurrying）”。<br>但是，我确信有很多细节是您注意不到的，也是社区上关于这个话题普遍缺失的。<br>这篇文章面向有较牢固JS基础的读者，会从最基本的理解入手，一直到分析ES5-shim实现bind源码，相信不同程度的读者都能有所收获。<br>也欢迎大家与我讨论。</p>
-<h2 id="bind函数究竟是什么"><a href="#bind函数究竟是什么" class="headerlink" title="bind函数究竟是什么?"></a>bind函数究竟是什么?</h2><p>在开启我们的探索之前，有必要先明确一下bind到底实现了什么：<br>1）简单粗暴地来说，bind是用于绑定this指向的。（如果你还不了解JS中this的指向问题，以及执行环境上下文的奥秘，这篇文章暂时就不太适合阅读）。</p>
-<p>2）bind使用语法：</p>
-<pre><code>fun.bind(thisArg[, arg1[, arg2[, ...]]])
-</code></pre><p>bind方法会创建一个新函数。当这个新函数被调用时，bind的第一个参数将作为它运行时的this，之后的一序列参数将会在传递的实参前传入作为它的参数。本文不打算科普基础，如果您还不清楚，请<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind" target="_blank" rel="external">参考MDN内容</a>。</p>
-<p>3)bind返回的绑定函数也能使用new操作符创建对象：这种行为就像把原函数当成构造器。提供的this值被忽略，同时调用时的参数被提供给模拟函数。</p>
-<h2 id="初级实现"><a href="#初级实现" class="headerlink" title="初级实现"></a>初级实现</h2><p>了解了以上内容，我们来实现一个初级的bind函数Polyfill:</p>
-<pre><code>Function.prototype.bind = function (context) {
-    var me = this;
-    var argsArray = Array.prototype.slice.call(arguments);
-    return function () {
-        return me.apply(context, argsArray.slice(1))
-    }
-}
-</code></pre><p>这是一般“表现良好”的面试者所能给我提供的答案，如果面试者能写到这里，我会给他60分。<br>我们先简要解读一下：<br>基本原理是使用apply进行模拟。函数体内的this，就是需要绑定this的实例函数，或者说是原函数。最后我们使用apply来进行参数（context）绑定，并返回。<br>同时，将第一个参数（context）以外的其他参数，作为提供给原函数的预设参数，这也是基本的“颗粒化（curring）”基础。</p>
-<h2 id="初级实现的加分项"><a href="#初级实现的加分项" class="headerlink" title="初级实现的加分项"></a>初级实现的加分项</h2><p>上面的实现（包括后面的实现），其实是一个典型的<a href="https://en.wikipedia.org/wiki/Monkey_patch" target="_blank" rel="external">“Monkey patching(猴子补丁)”</a>，即“给内置对象扩展方法”。所以，如果面试者能进行一下“嗅探”，进行兼容处理，就是锦上添花了，我会给10分的附加分。</p>
-<pre><code>Function.prototype.bind = Function.prototype.bind || function (context) {
-    ...
-}
-</code></pre><h2 id="颗粒化（curring）实现"><a href="#颗粒化（curring）实现" class="headerlink" title="颗粒化（curring）实现"></a>颗粒化（curring）实现</h2><p>上述的实现方式中，我们返回的参数列表里包含：atgsArray.slice(1)，他的问题在于存在预置参数功能丢失的现象。<br>想象我们返回的绑定函数中，如果想实现预设传参（就像bind所实现的那样），就面临尴尬的局面。真正实现颗粒化的“完美方式”是：</p>
-<pre><code>Function.prototype.bind = Function.prototype.bind || function (context) {
-    var me = this;
-    var args = Array.prototype.slice.call(arguments, 1);
-    return function () {
-        var innerArgs = Array.prototype.slice.call(arguments);
-        var finalArgs = args.concat(innerArgs);
-        return me.apply(contenxt, finalArgs);
-    }
-}
-</code></pre><p>如果面试者能够给出这样的答案，我内心独白会是“不错啊，貌似你就是我要找的那个TA～”。但是，我们注意在上边bind方法介绍的第三条提到：bind返回的函数如果作为构造函数，搭配new关键字出现的话，我们的绑定this就需要“被忽略”。</p>
-<h2 id="构造函数场景下的兼容"><a href="#构造函数场景下的兼容" class="headerlink" title="构造函数场景下的兼容"></a>构造函数场景下的兼容</h2><p>有了上边的讲解，不难理解需要兼容构造函数场景的实现：</p>
-<pre><code>Function.prototype.bind = Function.prototype.bind || function (context) {
-    var me = this;
-    var args = Array.prototype.slice.call(arguments, 1);
-    var F = function () {};
-    F.prototype = this.prototype;
-    var bound = function () {
-        var innerArgs = Array.prototype.slice.call(arguments);
-        var finalArgs = args.contact(innerArgs);
-        return me.apply(this instanceof F ? this : context || this, finalArgs);
-    }
-    bound.prototype = new fNOP();
-    return bound;
-}
-</code></pre><p>如果面试者能够写成这样，我几乎要给满分，会帮忙联系HR谈薪酬了。当然，还可以做的更加严谨。</p>
-<h2 id="更严谨的做法"><a href="#更严谨的做法" class="headerlink" title="更严谨的做法"></a>更严谨的做法</h2><p>我们需要调用bind方法的一定要是一个函数，所以可以在函数体内做一个判断：</p>
-<pre><code>if (typeof this !== &quot;function&quot;) {
-  throw new TypeError(&quot;Function.prototype.bind - what is trying to be bound is not callable&quot;);
-}
-</code></pre><p>做到所有这一切，我会很开心的给满分。其实MDN上有个自己实现的polyfill，就是如此实现的。<br>另外，《JavaScript Web Application》一书中对bind()的实现，也是如此。</p>
-<p>故事貌似要画上休止符了——</p>
-<h2 id="一切还没完，高潮即将上演"><a href="#一切还没完，高潮即将上演" class="headerlink" title="一切还没完，高潮即将上演"></a>一切还没完，高潮即将上演</h2><p>如果你认为这样就完了，其实我会告诉你说，高潮才刚要上演。曾经的我也认为上述方法已经比较完美了，直到我看了es5-shim源码（已适当删减）：</p>
-<pre><code>bind: function bind(that) {
-    var target = this;
-    if (!isCallable(target)) {
-        throw new TypeError(&apos;Function.prototype.bind called on incompatible &apos; + target);
-    }
-    var args = array_slice.call(arguments, 1);
-    var bound;
-    var binder = function () {
-        if (this instanceof bound) {
-            var result = target.apply(
-                this,
-                array_concat.call(args, array_slice.call(arguments))
-            );
-            if ($Object(result) === result) {
-                return result;
-            }
-            return this;
-        } else {
-            return target.apply(
-                that,
-                array_concat.call(args, array_slice.call(arguments))
-            );
-        }
-    };
-    var boundLength = max(0, target.length - args.length);
-    var boundArgs = [];
-    for (var i = 0; i &lt; boundLength; i++) {
-        array_push.call(boundArgs, &apos;$&apos; + i);
-    }
-    bound = Function(&apos;binder&apos;, &apos;return function (&apos; + boundArgs.join(&apos;,&apos;) + &apos;){ return binder.apply(this, arguments); }&apos;)(binder);
-
-    if (target.prototype) {
-        Empty.prototype = target.prototype;
-        bound.prototype = new Empty();
-        Empty.prototype = null;
-    }
-    return bound;
-}
-</code></pre><p>看到了这样的实现，心中的困惑太多，不禁觉得我看了“假源码”。但是仔细分析一下，剩下就是一个大写的 。。。服！<br>这里先留一个悬念，不进行源码分析。读者可以自己先研究一下。如果想看源码分析，点击<a href="">这篇文章的后续－源码解读</a>。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过比对几版的polyfill实现，对于bind应该有了比较深刻的认识。作为这道面试题的考察点，肯定不是让面试者实现低版本浏览器的向下兼容，因为我们有了es5-shim,es5-sham处理兼容性问题，并且无脑兼容我也认为是历史的倒退。<br>回到这道题考查点上，他有效的考察了很重要的知识点：比如this的指向，JS的闭包，原型原型链功力，设计程序上的兼容考虑等等硬素质。<br>在前端技术快速发展迭代的今天，在“前端市场是否饱和”“前端求职火爆异常”“前端入门简单，钱多人傻”的浮躁环境下，对基础内功的修炼就显得尤为重要，这也是你在前端路上能走多远、走多久的关键。</p>
-<p>PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;今天想谈谈一道前端面试题，我做面试官的时候经常喜欢用它来考察面试者的基础是否扎实，以及逻辑、思维能力和临场表现，题目是：“模拟实现ES5中原生bind函数”。&lt;br&gt;也许这道题目已经不再新鲜，部分读者也会有思路来解答。社区上关于原生bind的研究也很多，比如用它来实现函数“
-    
-    </summary>
-    
-      <category term="js" scheme="https://exp-team.github.io/categories/js/"/>
-    
-    
-      <category term="js" scheme="https://exp-team.github.io/tags/js/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>从一道面试题的进阶，到“我可能看了假源码”（2）</title>
-    <link href="https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/"/>
-    <id>https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/</id>
-    <published>2017-01-19T16:00:00.000Z</published>
-    <updated>2017-02-19T14:25:59.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>上一篇<a href="https://exp-team.github.io/blog/2017/01/20/js/bind/">从一道面试题的进阶，到“我可能看了假源码”</a>中，由浅入深介绍了关于一篇经典面试题的解法。<br>最后在皆大欢喜的结尾中，突生变化，悬念又起。这一篇，就是为了解开这个悬念。</p>
-<p>如果你还没有看过<a href="https://exp-team.github.io/blog/2017/01/20/js/bind/">前传</a>，可以参看前情回顾：<br>回顾1. 题目是模拟实现ES5中原生bind函数；<br>回顾2. 我们通过4种递进实现达到了完美状态；<br>回顾3. 可是ES5-shim中的实现，又让我们大跌眼镜…</p>
-<h2 id="ES5-shim的悬念"><a href="#ES5-shim的悬念" class="headerlink" title="ES5-shim的悬念"></a>ES5-shim的悬念</h2><p>ES5-shim实现方式源码贴在了最后，我们看看他做了什么奇怪的事情：<br>1）从结果上看，返回了bound函数。<br>2）bound函数是这样子声明的：</p>
-<pre><code>bound = Function(&apos;binder&apos;, &apos;return function (&apos; + boundArgs.join(&apos;,&apos;) + &apos;){ return binder.apply(this, arguments); }&apos;)(binder);
-</code></pre><p>3）bound使用了系统自己的构造函数Function来声明，第一个参数是binder，函数体内又binder.apply(this, arguments)。<br>我们知道这种动态创建函数的方式，类似eval。最好不要使用它，因为用它定义函数比用传统方式要慢得多。<br>4）那么ES5-shim抽风了吗？</p>
-<h2 id="追根问底"><a href="#追根问底" class="headerlink" title="追根问底"></a>追根问底</h2><p>答案肯定是没抽风，他这样做是有理由的。</p>
-<h3 id="神秘的函数的length属性"><a href="#神秘的函数的length属性" class="headerlink" title="神秘的函数的length属性"></a>神秘的函数的length属性</h3><p>你可能不知道，每个函数都有length属性。对，就像数组和字符串那样。函数的length属性，用于表示函数的形参个数。更重要的是函数的length属性值是不可重写的。我写了个测试代码来证明：</p>
-<pre><code>function test (){}
-test.length  // 输出0
-test.hasOwnProperty(&apos;length&apos;)  // 输出true
-Object.getOwnPropertyDescriptor(&apos;test&apos;, &apos;length&apos;) 
-// 输出：
-// configurable: false, 
-// enumerable: false,
-// value: 4, 
-// writable: false 
-</code></pre><h3 id="拨云见日"><a href="#拨云见日" class="headerlink" title="拨云见日"></a>拨云见日</h3><p>说到这里，那就好解释了。<br>ES5-shim为了最大限度的进行兼容，包括对返回函数length属性的还原。如果按照我们之前实现的那种方式，length值始终为零。<br>所以：既然不能修改length的属性值，那么在初始化时赋值总可以吧！<br>于是我们可通过eval和new Function的方式动态定义函数来。<br>同时，很有意思的是，源码里有这样的注释：</p>
-<pre><code>// XXX Build a dynamic function with desired amount of arguments is the only
-// way to set the length property of a function.
-// In environments where Content Security Policies enabled (Chrome extensions,
-// for ex.) all use of eval or Function costructor throws an exception.
-// However in all of these environments Function.prototype.bind exists
-// and so this code will never be executed.
-</code></pre><p>他解释了为什么要使用动态函数，就如同我们上边所讲的那样，是为了保证length属性的合理值。但是在一些浏览器中出于安全考虑，使用eval或者Function构造器都会被抛出异常。但是，巧合也就是这些浏览器基本上都实现了bind函数，这些异常又不会被执行。</p>
-<p>So, What a coincidence!</p>
-<h3 id="叹为观止"><a href="#叹为观止" class="headerlink" title="叹为观止"></a>叹为观止</h3><p>我们明白了这些，再看他的进一步实现：</p>
-<pre><code>if (!isCallable(target)) {
-    throw new TypeError(&apos;Function.prototype.bind called on incompatible &apos; + target);
-}
-</code></pre><p>这是为了保证调用的正确性，他使用了isCallable做判断，isCallable很好实现：</p>
-<pre><code>isCallable = function isCallable(value) { 
-    if (typeof value !== &apos;function&apos;) { 
-        return false; 
-    }
-}
-</code></pre><p>重设绑定函数的length属性：</p>
-<pre><code>var boundLength = max(0, target.length - args.length);
-</code></pre><p>构造函数调用情况，在binder中也有效兼容。如果你不明白什么是构造函数调用情况，可以参考<a href="https://exp-team.github.io/blog/2017/01/20/js/bind/">上一篇</a>。</p>
-<pre><code>if (this instanceof bound) { 
-    ... // 构造函数调用情况
-} else {
-    ... // 正常方式调用
-}
-
-if (target.prototype) {
-    Empty.prototype = target.prototype;
-    bound.prototype = new Empty();
-    // Clean up dangling references.
-    Empty.prototype = null;
-}
-</code></pre><h2 id="无穷无尽"><a href="#无穷无尽" class="headerlink" title="无穷无尽"></a>无穷无尽</h2><p>当然，ES5-shim里还归纳了几项todo…</p>
-<pre><code>// TODO
-// 18. Set the [[Extensible]] internal property of F to true.
-// 19. Let thrower be the [[ThrowTypeError]] function Object (13.2.3).
-// 20. Call the [[DefineOwnProperty]] internal method of F with
-//   arguments &quot;caller&quot;, PropertyDescriptor {[[Get]]: thrower, [[Set]]:
-//   thrower, [[Enumerable]]: false, [[Configurable]]: false}, and
-//   false.
-// 21. Call the [[DefineOwnProperty]] internal method of F with
-//   arguments &quot;arguments&quot;, PropertyDescriptor {[[Get]]: thrower,
-//   [[Set]]: thrower, [[Enumerable]]: false, [[Configurable]]: false},
-//   and false.
-// 22. Return F.
-</code></pre><p>比较简单，我就不再翻译了。</p>
-<h2 id="源码回放"><a href="#源码回放" class="headerlink" title="源码回放"></a>源码回放</h2><pre><code>bind: function bind(that) {
-    var target = this;
-    if (!isCallable(target)) {
-        throw new TypeError(&apos;Function.prototype.bind called on incompatible &apos; + target);
-    }
-    var args = array_slice.call(arguments, 1);
-    var bound;
-    var binder = function () {
-        if (this instanceof bound) {
-            var result = target.apply(
-                this,
-                array_concat.call(args, array_slice.call(arguments))
-            );
-            if ($Object(result) === result) {
-                return result;
-            }
-            return this;
-        } else {
-            return target.apply(
-                that,
-                array_concat.call(args, array_slice.call(arguments))
-            );
-        }
-    };
-    var boundLength = max(0, target.length - args.length);
-    var boundArgs = [];
-    for (var i = 0; i &lt; boundLength; i++) {
-        array_push.call(boundArgs, &apos;$&apos; + i);
-    }
-    bound = Function(&apos;binder&apos;, &apos;return function (&apos; + boundArgs.join(&apos;,&apos;) + &apos;){ return binder.apply(this, arguments); }&apos;)(binder);
-
-    if (target.prototype) {
-        Empty.prototype = target.prototype;
-        bound.prototype = new Empty();
-        Empty.prototype = null;
-    }
-    return bound;
-}
-</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过学习ES5-shim的源码实现bind方法，结合前一篇，希望读者能对bind和JS包括闭包，原型原型链，this等一系列知识点能有更深刻的理解。<br>同时在程序设计上，尤其是逻辑的严密性上，有所积累。</p>
-<p>PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;上一篇&lt;a href=&quot;https://exp-team.github.io/blog/2017/01/20/js/bind/&quot;&gt;从一道面试题的进阶，到“我可能看了假源码”&lt;/a&gt;中，由浅入深介绍了关于一篇经典面试题的解法。&lt;br&gt;最后在皆大欢喜的结尾中，突生变化，悬念又起
-    
-    </summary>
-    
-      <category term="js" scheme="https://exp-team.github.io/categories/js/"/>
-    
-    
-      <category term="js" scheme="https://exp-team.github.io/tags/js/"/>
     
   </entry>
   
