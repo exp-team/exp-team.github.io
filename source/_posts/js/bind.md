@@ -58,7 +58,7 @@ bind方法会创建一个新函数。当这个新函数被调用时，bind的第
         return function () {
             var innerArgs = Array.prototype.slice.call(arguments);
             var finalArgs = args.concat(innerArgs);
-            return me.apply(contenxt, finalArgs);
+            return me.apply(context, finalArgs);
         }
     }
 
@@ -74,10 +74,10 @@ bind方法会创建一个新函数。当这个新函数被调用时，bind的第
         F.prototype = this.prototype;
         var bound = function () {
             var innerArgs = Array.prototype.slice.call(arguments);
-            var finalArgs = args.contact(innerArgs);
+            var finalArgs = args.concat(innerArgs);
             return me.apply(this instanceof F ? this : context || this, finalArgs);
         }
-        bound.prototype = new fNOP();
+        bound.prototype = new F();
         return bound;
     }
 
@@ -138,7 +138,7 @@ bind方法会创建一个新函数。当这个新函数被调用时，bind的第
     }
 
 看到了这样的实现，心中的困惑太多，不禁觉得我看了“假源码”。但是仔细分析一下，剩下就是一个大写的 。。。服！
-这里先留一个悬念，不进行源码分析。读者可以自己先研究一下。如果想看源码分析，点击[这篇文章的后续－源码解读](https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/)。
+这里先留一个悬念，不进行源码分析。读者可以自己先研究一下。如果想看源码分析，点击[这篇文章的后续－源码解读](https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/)。
 
 
 ## 总结
@@ -147,7 +147,6 @@ bind方法会创建一个新函数。当这个新函数被调用时，bind的第
 在前端技术快速发展迭代的今天，在“前端市场是否饱和”“前端求职火爆异常”“前端入门简单，钱多人傻”的浮躁环境下，对基础内功的修炼就显得尤为重要，这也是你在前端路上能走多远、走多久的关键。
 
 PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。
-
 
 
 
