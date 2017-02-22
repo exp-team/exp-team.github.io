@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://exp-team.github.io/"/>
-  <updated>2017-02-20T00:47:41.000Z</updated>
+  <updated>2017-02-22T13:52:41.000Z</updated>
   <id>https://exp-team.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://exp-team.github.io/blog/2017/02/20/js/bind/"/>
     <id>https://exp-team.github.io/blog/2017/02/20/js/bind/</id>
     <published>2017-02-19T16:00:00.000Z</published>
-    <updated>2017-02-20T00:47:41.000Z</updated>
+    <updated>2017-02-22T13:52:41.000Z</updated>
     
     <content type="html"><![CDATA[<p>今天想谈谈一道前端面试题，我做面试官的时候经常喜欢用它来考察面试者的基础是否扎实，以及逻辑、思维能力和临场表现，题目是：“模拟实现ES5中原生bind函数”。<br>也许这道题目已经不再新鲜，部分读者也会有思路来解答。社区上关于原生bind的研究也很多，比如用它来实现函数“颗粒化（currying）”，<br>或者“反颗粒化（uncurrying）”。<br>但是，我确信有很多细节是您注意不到的，也是社区上关于这个话题普遍缺失的。<br>这篇文章面向有较牢固JS基础的读者，会从最基本的理解入手，一直到分析ES5-shim实现bind源码，相信不同程度的读者都能有所收获。<br>也欢迎大家与我讨论。</p>
 <h2 id="bind函数究竟是什么"><a href="#bind函数究竟是什么" class="headerlink" title="bind函数究竟是什么?"></a>bind函数究竟是什么?</h2><p>在开启我们的探索之前，有必要先明确一下bind到底实现了什么：<br>1）简单粗暴地来说，bind是用于绑定this指向的。（如果你还不了解JS中this的指向问题，以及执行环境上下文的奥秘，这篇文章暂时就不太适合阅读）。</p>
@@ -48,7 +48,7 @@
     return function () {
         var innerArgs = Array.prototype.slice.call(arguments);
         var finalArgs = args.concat(innerArgs);
-        return me.apply(contenxt, finalArgs);
+        return me.apply(context, finalArgs);
     }
 }
 </code></pre><p>如果面试者能够给出这样的答案，我内心独白会是“不错啊，貌似你就是我要找的那个TA～”。但是，我们注意在上边bind方法介绍的第三条提到：bind返回的函数如果作为构造函数，搭配new关键字出现的话，我们的绑定this就需要“被忽略”。</p>
@@ -60,10 +60,10 @@
     F.prototype = this.prototype;
     var bound = function () {
         var innerArgs = Array.prototype.slice.call(arguments);
-        var finalArgs = args.contact(innerArgs);
+        var finalArgs = args.concat(innerArgs);
         return me.apply(this instanceof F ? this : context || this, finalArgs);
     }
-    bound.prototype = new fNOP();
+    bound.prototype = new F();
     return bound;
 }
 </code></pre><p>如果面试者能够写成这样，我几乎要给满分，会帮忙联系HR谈薪酬了。当然，还可以做的更加严谨。</p>
@@ -112,7 +112,7 @@
     }
     return bound;
 }
-</code></pre><p>看到了这样的实现，心中的困惑太多，不禁觉得我看了“假源码”。但是仔细分析一下，剩下就是一个大写的 。。。服！<br>这里先留一个悬念，不进行源码分析。读者可以自己先研究一下。如果想看源码分析，点击<a href="https://exp-team.github.io/blog/2017/01/20/js/es5-shim-bind/">这篇文章的后续－源码解读</a>。</p>
+</code></pre><p>看到了这样的实现，心中的困惑太多，不禁觉得我看了“假源码”。但是仔细分析一下，剩下就是一个大写的 。。。服！<br>这里先留一个悬念，不进行源码分析。读者可以自己先研究一下。如果想看源码分析，点击<a href="https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/">这篇文章的后续－源码解读</a>。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过比对几版的polyfill实现，对于bind应该有了比较深刻的认识。作为这道面试题的考察点，肯定不是让面试者实现低版本浏览器的向下兼容，因为我们有了es5-shim,es5-sham处理兼容性问题，并且无脑兼容我也认为是历史的倒退。<br>回到这道题考查点上，他有效的考察了很重要的知识点：比如this的指向，JS的闭包，原型原型链功力，设计程序上的兼容考虑等等硬素质。<br>在前端技术快速发展迭代的今天，在“前端市场是否饱和”“前端求职火爆异常”“前端入门简单，钱多人傻”的浮躁环境下，对基础内功的修炼就显得尤为重要，这也是你在前端路上能走多远、走多久的关键。</p>
 <p>PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。</p>
 ]]></content>
