@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://exp-team.github.io/"/>
-  <updated>2017-02-25T07:10:26.000Z</updated>
+  <updated>2017-02-25T07:25:19.000Z</updated>
   <id>https://exp-team.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://exp-team.github.io/blog/2017/02/25/js/infinite-scroll/"/>
     <id>https://exp-team.github.io/blog/2017/02/25/js/infinite-scroll/</id>
     <published>2017-02-24T16:00:00.000Z</published>
-    <updated>2017-02-25T07:10:26.000Z</updated>
+    <updated>2017-02-25T07:25:19.000Z</updated>
     
     <content type="html"><![CDATA[<p>UX Planet论坛上有过这么一篇<a href="https://uxplanet.org/infinite-scrolling-best-practices-c7f24c9af1d#.6vfij8d11" target="_blank" rel="external">热门文章: Infinite Scrolling Best Practices</a>，它从UX角度分析了无限滚动加载的设计实践。</p>
 <p>无限滚动加载在互联网上到处都有应用：<br>豆瓣首页是一个，Facebook的Timeline是一个，Tweeter的话题列表也是一个。当你向下滚动，新的内容就神奇的“无中生有”了。这是一个得到广泛赞扬的用户体验。</p>
@@ -39,8 +39,10 @@
 <p>2）但是观察页面布局，很明显图片较多，每一个block-item区块都有一张配图。当加载后的内容插入到页面中时，浏览器就开始获取图片。这意味着所有的图像同时下载，浏览器中的下载通道将被占满。同时，由于内容优先于用户浏览而加载，所以可能被迫下载底部那些永远也不会被用户浏览到的图像。<br>所以，我们需要设计一个懒加载效果，使得页面速度更快，并且节省用户的流量费用和延长电池寿命。</p>
 <p>3）上一条提到的懒加载实现上，为了避免到真正的页面底部时才进行加载和渲染，而造成用户较长时间等待。我们可以设置一个合理阈值，在用户滚动到页面底部之前，先进行提前加载。</p>
 <p>4）另外，页面滚动的事件肯定是需要监听的。同时，页面滚动问题也比较棘手，后面将专为滚动进行分析。</p>
-<p>5）DOM操作我们知道是及其缓慢而低效的，有兴趣的同学可以研究一下jsPerf上一些经典的benchmark，比如<a href="http://jsperf.com/jquery-cache-vs-dom-querying" target="_blank" rel="external">这篇</a>。关于造成这种缓慢的原因，社区上同样有很多文章有过分析，这里就不再深入。但我想总结并补充的是：DOM操作，光是为了找一个节点，就从本质上比简单的检索内存中的值要慢。一些DOM操作还需要重新计算样式来读取或检索一个值。更突出的问题在于：DOM操作是阻塞的，所以当有一个DOM操作在进行时，其他的什么都不能做，包括用户与页面的交互（除了滚动）。这是一个极度伤害用户体验的事实。<br>所以，在下面的效果实现中，我采用了大量“不可思议”的DOM缓存，甚至极端的缓存everything。当然，这样做的收益也在最后部分有所展现。</p>
-<h3 id="滚动问题"><a href="#滚动问题" class="headerlink" title="滚动问题"></a>滚动问题</h3><p>滚动问题不难想象在于高频率的触发滚动事件处理上。具我亲测，在极端case下，滚动及其卡顿。即使滚动不卡顿，你可以打开Chrome控制台发现，帧速率也非常慢。关于帧速率的问题，我们有著名的16.7毫秒理论。关于这个时间分析，社区上也有不少文章阐述，这里不再展开。针对于此，有很多读者会立刻想到“截流和防抖动函数”（Throttle和Debounce）。<br>简单总结一下：</p>
+<p>5）DOM操作我们知道是及其缓慢而低效的，有兴趣的同学可以研究一下jsPerf上一些经典的benchmark，比如<a href="http://jsperf.com/jquery-cache-vs-dom-querying" target="_blank" rel="external">这篇</a>。关于造成这种缓慢的原因，社区上同样有很多文章有过分析，这里就不再深入。但我想总结并补充的是：DOM操作，光是为了找一个节点，就从本质上比简单的检索内存中的值要慢。一些DOM操作还需要重新计算样式来读取或检索一个值。更突出的问题在于：DOM操作是阻塞的，所以当有一个DOM操作在进行时，其他的什么都不能做，包括用户与页面的交互（除了滚动）。这是一个极度伤害用户体验的事实。</p>
+<p>所以，在下面的效果实现中，我采用了大量“不可思议”的DOM缓存，甚至极端的缓存everything。当然，这样做的收益也在最后部分有所展现。</p>
+<h3 id="滚动问题"><a href="#滚动问题" class="headerlink" title="滚动问题"></a>滚动问题</h3><p>滚动问题不难想象在于高频率的触发滚动事件处理上。具我亲测，在极端case下，滚动及其卡顿。即使滚动不卡顿，你可以打开Chrome控制台发现，帧速率也非常慢。关于帧速率的问题，我们有著名的16.7毫秒理论。关于这个时间分析，社区上也有不少文章阐述，这里不再展开。</p>
+<p>针对于此，有很多读者会立刻想到“截流和防抖动函数”（Throttle和Debounce）。<br>简单总结一下：</p>
 <p>1）Throttle允许我们限制激活响应的数量。我们可以限制每秒回调的数量。反过来，也就是说在激活下一个回调之前要等待多少时间;</p>
 <p>2）Debounce意味着当事件发生时，我们不会立即激活回调。相反，我们等待一定的时间并检查相同的事件是否再次触发。如果是，我们重置定时器，并再次等待。如果在等待期间没有发生相同的事件，我们就立即激活回调。</p>
 <p>具体这里就不代码实现了。原理明白之后，应该不难写出。</p>
@@ -52,254 +54,39 @@
 <h3 id="用户体验优化小窍门"><a href="#用户体验优化小窍门" class="headerlink" title="用户体验优化小窍门"></a>用户体验优化小窍门</h3><p>在图像加载完成时，使用淡入（fade in）效果出现。这在实际情况上会稍微慢一下，应该慢一个过渡执行时间。但用户体验上感觉会更快。这是已经被证实且普遍应用的小“trick”。但是据我感觉，它确实有效。我们的代码实现也采用了这个小窍门。不过类似这种“社会心理学”范畴的东西，显然不是本文研究的重点。</p>
 <h3 id="总结一下"><a href="#总结一下" class="headerlink" title="总结一下"></a>总结一下</h3><p>代码上将会采用：超前阈值的懒加载＋DOM Cache和图片Cache＋滚动throttle模拟＋CSS fadeIn动画。<br>具体功能封装上和一些实现层面的东西，请您继续阅读。</p>
 <h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><h3 id="DOM结构"><a href="#DOM结构" class="headerlink" title="DOM结构"></a>DOM结构</h3><p>整体结构如下：</p>
-<pre><code>&lt;div class=&quot;exp-list-box&quot; id=&quot;expListBox&quot;&gt;
-    &lt;ul class=&quot;exp-list&quot; id=&quot;expList&quot;&gt;
-    &lt;/ul&gt;
-    &lt;div class=&quot;ui-refresh-down&quot;&gt;&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><p>主体内容放在id为“expListBox”的container里面，id为“expList”的ul是页面加载内容的容器。<br>因为每次加载并append进入HTML的内容相对较多。我使用了模版来取代传统的字符串拼接。前端模版这次选用了我的同事<a href="https://github.com/yanhaijing/template.js" target="_blank" rel="external">颜海镜大神的开源作品</a>，模版结构为：</p>
-<pre><code>&lt;#dataList.forEach(function (v) )#&gt;
-</code></pre><p>以上模版内容由每次ajax请求到的数据填充，并添加进入页面，构成每个block-item。<br>这里需要注意观察，有助于对后面逻辑的理解。页面中一个block-item下div属性存有该block-item的eid值，对应class叫做”slide”，子孙节点包含有一个image标签，src初始赋值为1px的空白图进行占位。真实图片资源位置存储在”data-src”中。<br>另外，请求返回的数据dataList可以理解为由9个对象构成的数组，也就是说，每次请求加载9个block-item。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"exp-list-box"</span> <span class="attr">id</span>=<span class="string">"expListBox"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">ul</span> <span class="attr">class</span>=<span class="string">"exp-list"</span> <span class="attr">id</span>=<span class="string">"expList"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"ui-refresh-down"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>主体内容放在id为“expListBox”的container里面，id为“expList”的ul是页面加载内容的容器。<br>因为每次加载并append进入HTML的内容相对较多。我使用了模版来取代传统的字符串拼接。前端模版这次选用了我的同事<a href="https://github.com/yanhaijing/template.js" target="_blank" rel="external">颜海镜大神的开源作品</a>，模版结构为：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"> <span class="tag">&lt;<span class="name">#dataList.forEach(function</span> (<span class="attr">v</span>) &#123;#&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"s-&lt;#=v.eid#&gt;"</span> <span class="attr">class</span>=<span class="string">"slide"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">li</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"&lt;#=v.href#&gt;"</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">img</span> <span class="attr">class</span>=<span class="string">"img"</span> <span class="attr">src</span>=<span class="string">"data:image/gif;base64,R0lGODdhAQABAPAAAP%2F%2F%2FwAAACwAAAAAAQABAEACAkQBADs%3D"</span> </span></div><div class="line">                <span class="attr">data-src</span>=<span class="string">"&lt;#=v.src#&gt;"</span>&gt;</div><div class="line">                <span class="tag">&lt;/<span class="name">img</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">strong</span>&gt;</span><span class="tag">&lt;<span class="name">#=v.title#</span>&gt;</span><span class="tag">&lt;/<span class="name">strong</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"writer"</span>&gt;</span><span class="tag">&lt;<span class="name">#=v.writer#</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"good-num"</span>&gt;</span><span class="tag">&lt;<span class="name">#=v.succNum#</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="name">a</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">#&#125;)#</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>以上模版内容由每次ajax请求到的数据填充，并添加进入页面，构成每个block-item。<br>这里需要注意观察，有助于对后面逻辑的理解。页面中一个block-item下div属性存有该block-item的eid值，对应class叫做”slide”，子孙节点包含有一个image标签，src初始赋值为1px的空白图进行占位。真实图片资源位置存储在”data-src”中。<br>另外，请求返回的数据dataList可以理解为由9个对象构成的数组，也就是说，每次请求加载9个block-item。</p>
 <h3 id="样式亮点"><a href="#样式亮点" class="headerlink" title="样式亮点"></a>样式亮点</h3><p>样式方面不是这篇文章的重点，挑选最核心的一行来说明一下：</p>
-<pre><code>.slide .img{
-    display: inline-block;
-    width: 90px;
-    height: 90px;
-    margin: 0 auto;
-    opacity: 0;
-    -webkit-transition: opacity 0.25s ease-in-out;
-    -moz-transition: opacity 0.25s ease-in-out;
-    -o-transition: opacity 0.25s ease-in-out;
-    transition: opacity 0.25s ease-in-out;
-}
-</code></pre><p>唯一需要注意的是image的opacity设置为0，图片将会在成功请求并渲染后调整为1，辅助transition属性实现一个fade in效果。<br>对应我们上面所提到的那个“trick”</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="selector-class">.slide</span> <span class="selector-class">.img</span>&#123;</div><div class="line">    <span class="attribute">display</span>: inline-block;</div><div class="line">    <span class="attribute">width</span>: <span class="number">90px</span>;</div><div class="line">    <span class="attribute">height</span>: <span class="number">90px</span>;</div><div class="line">    <span class="attribute">margin</span>: <span class="number">0</span> auto;</div><div class="line">    <span class="attribute">opacity</span>: <span class="number">0</span>;</div><div class="line">    <span class="attribute">-webkit-transition</span>: opacity <span class="number">0.25s</span> ease-in-out;</div><div class="line">    <span class="attribute">-moz-transition</span>: opacity <span class="number">0.25s</span> ease-in-out;</div><div class="line">    <span class="attribute">-o-transition</span>: opacity <span class="number">0.25s</span> ease-in-out;</div><div class="line">    <span class="attribute">transition</span>: opacity <span class="number">0.25s</span> ease-in-out;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>唯一需要注意的是image的opacity设置为0，图片将会在成功请求并渲染后调整为1，辅助transition属性实现一个fade in效果。<br>对应我们上面所提到的那个“trick”</p>
 <h3 id="逻辑部分"><a href="#逻辑部分" class="headerlink" title="逻辑部分"></a>逻辑部分</h3><p>我是完全按照业务需求来设计，并没有做抽象。其实这样的一个下拉加载功能完全可以抽象出来。有兴趣的读者可以下去自己进行封装和抽象。<br>我们先把精力集中在逻辑处理上。<br>下面进入我们最核心的逻辑部分，为了防止全局污染，我把它放入了一个立即执行函数中：</p>
-<pre><code>(function() {
-    var fetching = false; 
-    var page = 1;
-    var slideCache = [];
-    var itemMap = {};
-    var lastScrollY = window.pageYOffset;
-    var scrollY = window.pageYOffset;
-    var innerHeight;
-    var topViewPort;
-    var bottomViewPort;
-
-    function isVisible (id) {
-        // ...判断元素是否在可见区域
-    }
-
-    function updateItemCache (node) {
-        // ....更新DOM缓存
-    }
-
-    function fetchContent () {
-        // ...ajax请求数据
-    }
-
-
-    function handleDefer () {
-        // ...懒加载实现
-    }
-
-    function handleScroll (e, force) {
-        // ...滚动处理程序
-    } 
-
-    window.setTimeout(handleScroll, 100);
-    fetchContent();
-}());
-</code></pre><p>我认为好的编程习惯是在程序开头部分便声明所有的变量，防止“变量提升”带来的潜在困扰，并且也有利于程序的整体把控。<br>我们来看一下变量设置：</p>
-<pre><code>// 加载中状态锁
-1）var fetching = false;
-// 用于加载时发送请求参数，表示第几屏内容，初始为1，以后每请求一次，递增1
-2）var page = 1; 
-// 只缓存最新一次下拉数据生成的DOM节点，即需要插入的dom缓存数组
-3）var slideCache = []; 
-// 用于已经生成的DOM节点储存，存有item的offsetTop，offsetHeight
-4) var slideMap = {}; 
-// pageYOffset设置或返回当前页面相对于窗口显示区左上角的Y位置。
-5）var lastScrollY = window.pageYOffset; var scrollY = window.pageYOffset;
-// 浏览器窗口的视口（viewport）高度
-6）var innerHeight;
-// isVisible的上下阈值边界
-7) var topViewPort; 
-8) var bottomViewPort; 
-</code></pre><p>关于DOM cache的变量详细说明，在后文有提供。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> fetching = <span class="literal">false</span>; </div><div class="line">    <span class="keyword">var</span> page = <span class="number">1</span>;</div><div class="line">    <span class="keyword">var</span> slideCache = [];</div><div class="line">    <span class="keyword">var</span> itemMap = &#123;&#125;;</div><div class="line">    <span class="keyword">var</span> lastScrollY = <span class="built_in">window</span>.pageYOffset;</div><div class="line">    <span class="keyword">var</span> scrollY = <span class="built_in">window</span>.pageYOffset;</div><div class="line">    <span class="keyword">var</span> innerHeight;</div><div class="line">    <span class="keyword">var</span> topViewPort;</div><div class="line">    <span class="keyword">var</span> bottomViewPort;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">isVisible</span> (<span class="params">id</span>) </span>&#123;</div><div class="line">        <span class="comment">// ...判断元素是否在可见区域</span></div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">updateItemCache</span> (<span class="params">node</span>) </span>&#123;</div><div class="line">        <span class="comment">// ....更新DOM缓存</span></div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">fetchContent</span> (<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="comment">// ...ajax请求数据</span></div><div class="line">    &#125;</div><div class="line">    </div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">handleDefer</span> (<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="comment">// ...懒加载实现</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">handleScroll</span> (<span class="params">e, force</span>) </span>&#123;</div><div class="line">        <span class="comment">// ...滚动处理程序</span></div><div class="line">    &#125; </div><div class="line">    </div><div class="line">    <span class="built_in">window</span>.setTimeout(handleScroll, <span class="number">100</span>);</div><div class="line">    fetchContent();</div><div class="line">&#125;());</div></pre></td></tr></table></figure>
+<p>我认为好的编程习惯是在程序开头部分便声明所有的变量，防止“变量提升”带来的潜在困扰，并且也有利于程序的整体把控。<br>我们来看一下变量设置：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 加载中状态锁</span></div><div class="line"><span class="number">1</span>）<span class="keyword">var</span> fetching = <span class="literal">false</span>;</div><div class="line"><span class="comment">// 用于加载时发送请求参数，表示第几屏内容，初始为1，以后每请求一次，递增1</span></div><div class="line"><span class="number">2</span>）<span class="keyword">var</span> page = <span class="number">1</span>; </div><div class="line"><span class="comment">// 只缓存最新一次下拉数据生成的DOM节点，即需要插入的dom缓存数组</span></div><div class="line"><span class="number">3</span>）<span class="keyword">var</span> slideCache = []; </div><div class="line"><span class="comment">// 用于已经生成的DOM节点储存，存有item的offsetTop，offsetHeight</span></div><div class="line"><span class="number">4</span>) <span class="keyword">var</span> slideMap = &#123;&#125;; </div><div class="line"><span class="comment">// pageYOffset设置或返回当前页面相对于窗口显示区左上角的Y位置。</span></div><div class="line"><span class="number">5</span>）<span class="keyword">var</span> lastScrollY = <span class="built_in">window</span>.pageYOffset; <span class="keyword">var</span> scrollY = <span class="built_in">window</span>.pageYOffset;</div><div class="line"><span class="comment">// 浏览器窗口的视口（viewport）高度</span></div><div class="line"><span class="number">6</span>）<span class="keyword">var</span> innerHeight;</div><div class="line"><span class="comment">// isVisible的上下阈值边界</span></div><div class="line"><span class="number">7</span>) <span class="keyword">var</span> topViewPort; </div><div class="line"><span class="number">8</span>) <span class="keyword">var</span> bottomViewPort;</div></pre></td></tr></table></figure>
+<p>关于DOM cache的变量详细说明，在后文有提供。</p>
 <p>同样，我们有5个函数。在上面的代码中，注释已经写明白了每个方法的具体作用。接下来，我们逐个分析。</p>
 <h4 id="滚动处理程序handleScroll"><a href="#滚动处理程序handleScroll" class="headerlink" title="滚动处理程序handleScroll"></a>滚动处理程序handleScroll</h4><p>它接受两个变量，第二个是一个布尔值force，表示是否强制触发滚动程序执行。</p>
 <p>核心思路是：如果时间间隔100毫秒内，没有发生滚动，且并未强制触发，则do nothing，间隔100毫秒之后再次查询，然后直接return。<br>其中，是否发生滚动由lastScrollY === window.scrollY来判断。<br>在100毫秒之内发生滚动或者强制触发时，需要判断是否滚动已接近页面底部。如果是，则拉取数据，调用fetchContent方法，并调用懒加载方法handleDefer。<br>并且在这个处理程序中，我们计算出来了isVisible区域的上下阈值。我们使用600作为浮动区间，这么做的目的是在一定范围内提前加载图片，节省用户等待时间。当然，如果我们进行抽象时，可以把这个值进行参数化。</p>
-<pre><code>function handleScroll (e, force) {
-    // 如果时间间隔内，没有发生滚动，且并未强制触发加载，则do nothing，再次间隔100毫秒之后查询
-    if (!force &amp;&amp; lastScrollY === window.scrollY) {
-        window.setTimeout(handleScroll, 100);
-        return;
-    }
-    else {
-        // 更新文档滚动位置
-        lastScrollY = window.scrollY;
-    }
-    scrollY = window.scrollY;
-    // 浏览器窗口的视口（viewport）高度赋值
-    innerHeight = window.innerHeight;
-    // 计算isVisible上下阈值
-    topViewPort = scrollY - 1000;
-    bottomViewPort = scrollY + innerHeight + 600;
-
-    // 判断是否需要加载
-    // document.body.offsetHeight;返回当前网页高度 
-    if (window.scrollY + innerHeight + 200 &gt; document.body.offsetHeight) {
-        fetchContent();
-    }
-    // 实现懒加载
-    handleDefer();
-    window.setTimeout(handleScroll, 100);
-} 
-</code></pre><h4 id="拉取数据"><a href="#拉取数据" class="headerlink" title="拉取数据"></a>拉取数据</h4><p>这里我用到了自己封装的ajax接口方法，它基于zepto的ajax方法，只不过又手动采用了promise包装一层。实现比较简单，当然有兴趣可以找我要一下代码，这里不再详细说了。<br>我们使用前端模版进行HTML渲染，同时调用updateItemCache，将此次数据拉取生成的DOM节点缓存。之后手动触发handleScroll，更新文档滚动位置和懒加载处理。</p>
-<pre><code>function fetchContent () {
-    // 设置加载状态锁
-    if (fetching) {
-        return;
-    }
-    else {
-        fetching = true;
-    }
-    ajax({
-        url: (!location.pathname.indexOf(&apos;/m/&apos;) ? &apos;/m&apos; : &apos;&apos;)
-            + &apos;/list/asyn?page=&apos; + page + (+new Date),
-        timeout: 300000,
-        dataType: &apos;json&apos;
-    }).then(function (data) {
-        if (data.errno) {
-            return;
-        }
-        console.time(&apos;render&apos;);
-
-        var dataList = data.data.list;
-        var len = dataList.length;
-        var ulContainer = document.getElementById(&apos;expList&apos;);
-        var str = &apos;&apos;;
-        var frag = document.createElement(&apos;div&apos;);
-
-        var tpl = __inline(&apos;content.tmpl&apos;);
-        for (var i = 0; i &lt; len; i++) {
-            str = tpl({dataList: dataList});
-        }
-        frag.innerHTML = str;
-        ulContainer.appendChild(frag);
-        // 更新缓存
-        updateItemCache(frag);
-        // 已经拉去完毕，设置标识为true
-        fetching = false;
-        // 强制触发
-        handleScroll(null, true);
-        page++;
-        console.timeEnd(&apos;render&apos;);
-    }, function (xhr, type) {
-        console.log(&apos;Refresh:Ajax Error!&apos;);
-    });
-}
-</code></pre><h4 id="缓存对象"><a href="#缓存对象" class="headerlink" title="缓存对象"></a>缓存对象</h4><p>之前参数里提到过，一共有两个用于缓存的对象／数组：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">handleScroll</span> (<span class="params">e, force</span>) </span>&#123;</div><div class="line">    <span class="comment">// 如果时间间隔内，没有发生滚动，且并未强制触发加载，则do nothing，再次间隔100毫秒之后查询</span></div><div class="line">    <span class="keyword">if</span> (!force &amp;&amp; lastScrollY === <span class="built_in">window</span>.scrollY) &#123;</div><div class="line">        <span class="built_in">window</span>.setTimeout(handleScroll, <span class="number">100</span>);</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line">        <span class="comment">// 更新文档滚动位置</span></div><div class="line">        lastScrollY = <span class="built_in">window</span>.scrollY;</div><div class="line">    &#125;</div><div class="line">    scrollY = <span class="built_in">window</span>.scrollY;</div><div class="line">    <span class="comment">// 浏览器窗口的视口（viewport）高度赋值</span></div><div class="line">    innerHeight = <span class="built_in">window</span>.innerHeight;</div><div class="line">    <span class="comment">// 计算isVisible上下阈值</span></div><div class="line">    topViewPort = scrollY - <span class="number">1000</span>;</div><div class="line">    bottomViewPort = scrollY + innerHeight + <span class="number">600</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 判断是否需要加载</span></div><div class="line">    <span class="comment">// document.body.offsetHeight;返回当前网页高度 </span></div><div class="line">    <span class="keyword">if</span> (<span class="built_in">window</span>.scrollY + innerHeight + <span class="number">200</span> &gt; <span class="built_in">document</span>.body.offsetHeight) &#123;</div><div class="line">        fetchContent();</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 实现懒加载</span></div><div class="line">    handleDefer();</div><div class="line">    <span class="built_in">window</span>.setTimeout(handleScroll, <span class="number">100</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="拉取数据"><a href="#拉取数据" class="headerlink" title="拉取数据"></a>拉取数据</h4><p>这里我用到了自己封装的ajax接口方法，它基于zepto的ajax方法，只不过又手动采用了promise包装一层。实现比较简单，当然有兴趣可以找我要一下代码，这里不再详细说了。<br>我们使用前端模版进行HTML渲染，同时调用updateItemCache，将此次数据拉取生成的DOM节点缓存。之后手动触发handleScroll，更新文档滚动位置和懒加载处理。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">fetchContent</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="comment">// 设置加载状态锁</span></div><div class="line">    <span class="keyword">if</span> (fetching) &#123;</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line">        fetching = <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">    ajax(&#123;</div><div class="line">        <span class="attr">url</span>: (!location.pathname.indexOf(<span class="string">'/m/'</span>) ? <span class="string">'/m'</span> : <span class="string">''</span>)</div><div class="line">            + <span class="string">'/list/asyn?page='</span> + page + (+<span class="keyword">new</span> <span class="built_in">Date</span>),</div><div class="line">        <span class="attr">timeout</span>: <span class="number">300000</span>,</div><div class="line">        <span class="attr">dataType</span>: <span class="string">'json'</span></div><div class="line">    &#125;).then(<span class="function"><span class="keyword">function</span> (<span class="params">data</span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (data.errno) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="built_in">console</span>.time(<span class="string">'render'</span>);</div><div class="line"></div><div class="line">        <span class="keyword">var</span> dataList = data.data.list;</div><div class="line">        <span class="keyword">var</span> len = dataList.length;</div><div class="line">        <span class="keyword">var</span> ulContainer = <span class="built_in">document</span>.getElementById(<span class="string">'expList'</span>);</div><div class="line">        <span class="keyword">var</span> str = <span class="string">''</span>;</div><div class="line">        <span class="keyword">var</span> frag = <span class="built_in">document</span>.createElement(<span class="string">'div'</span>);</div><div class="line"></div><div class="line">        <span class="keyword">var</span> tpl = __inline(<span class="string">'content.tmpl'</span>);</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</div><div class="line">            str = tpl(&#123;<span class="attr">dataList</span>: dataList&#125;);</div><div class="line">        &#125;</div><div class="line">        frag.innerHTML = str;</div><div class="line">        ulContainer.appendChild(frag);</div><div class="line">        <span class="comment">// 更新缓存</span></div><div class="line">        updateItemCache(frag);</div><div class="line">        <span class="comment">// 已经拉去完毕，设置标识为true</span></div><div class="line">        fetching = <span class="literal">false</span>;</div><div class="line">        <span class="comment">// 强制触发</span></div><div class="line">        handleScroll(<span class="literal">null</span>, <span class="literal">true</span>);</div><div class="line">        page++;</div><div class="line">        <span class="built_in">console</span>.timeEnd(<span class="string">'render'</span>);</div><div class="line">    &#125;, <span class="function"><span class="keyword">function</span> (<span class="params">xhr, type</span>) </span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(<span class="string">'Refresh:Ajax Error!'</span>);</div><div class="line">    &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="缓存对象"><a href="#缓存对象" class="headerlink" title="缓存对象"></a>缓存对象</h4><p>之前参数里提到过，一共有两个用于缓存的对象／数组：</p>
 <p>1）slideCache：缓存最近一次加载过的数据生成的DOM内容，缓存方式为数组储存：</p>
-<pre><code>slideCache = [
-    {
-        id: &quot;s-97r45&quot;,
-        img: img DOM节点,
-        node: 父容器DOM node,类似&lt;div id=&quot;s-&lt;#=v.eid#&gt;&quot; class=&quot;slide&quot;&gt;&lt;/div&gt;,
-        src: 图片资源地址
-    },
-    ...
-]
-</code></pre><p>slideCache由updateItemCache函数更新，主要用于懒加载时的赋值src。这样我们做到“只写入DOM”原则，不需要再从DOM读取。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">slideCache = [</div><div class="line">    &#123;</div><div class="line">        <span class="attr">id</span>: <span class="string">"s-97r45"</span>,</div><div class="line">        <span class="attr">img</span>: img DOM节点,</div><div class="line">        <span class="attr">node</span>: 父容器DOM node,类似&lt;div id=<span class="string">"s-&lt;#=v.eid#&gt;"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"slide"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span>,</div><div class="line">        <span class="attr">src</span>: 图片资源地址</div><div class="line">    &#125;,</div><div class="line">    ...</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>slideCache由updateItemCache函数更新，主要用于懒加载时的赋值src。这样我们做到“只写入DOM”原则，不需要再从DOM读取。</p>
 <p>2）slideMap：缓存DOM节点的高度和offsetTop，以DOM节点的id为索引。存储方式：</p>
-<pre><code>slideMap = {
-    s-97r45: {
-        node: DOM node,类似&lt;div id=&quot;s-&lt;#=v.eid#&gt;&quot; class=&quot;slide&quot;&gt;&lt;/div&gt;,
-        offTop: 300,
-        offsetHeight: 90
-    }
-}
-</code></pre><p>slideMap根据isVisible方法的参数进行更新和读取。使得我们在判断是否isVisible时，大量减少读取DOM的操作。   </p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">slideMap = &#123;</div><div class="line">    s<span class="number">-97</span>r45: &#123;</div><div class="line">        <span class="attr">node</span>: DOM node,类似&lt;div id=<span class="string">"s-&lt;#=v.eid#&gt;"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"slide"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span>,</div><div class="line">        <span class="attr">offTop</span>: <span class="number">300</span>,</div><div class="line">        <span class="attr">offsetHeight</span>: <span class="number">90</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>slideMap根据isVisible方法的参数进行更新和读取。使得我们在判断是否isVisible时，大量减少读取DOM的操作。   </p>
 <h4 id="懒加载程序"><a href="#懒加载程序" class="headerlink" title="懒加载程序"></a>懒加载程序</h4><p>在上面的滚动处理程序中，我们调用了handleDefer函数。我们看一下这个函数的实现：</p>
-<pre><code>function handleDefer () {
-    // 时间记录
-    console.time(&apos;defer&apos;);
-
-    // 获取dom缓存
-    var list = slideCache;
-    // 对于遍历list里的每一项，都使用一个变量，而不是在循环内部声明。节省内存，把性能高效，做到极致。
-    var thisImg;
-
-    for (var i = 0, len = list.length; i &lt; len; i++) {
-        thisImg = list[i].img; // 这里我们都是从内存中读取，而不用读取DOM节点
-        var deferSrc = list[i].src; // 这里我们都是从内存中读取，而不用读取DOM节点
-        // 判断元素是否可见
-        if (isVisible(list[i].id)) {
-            // 这个函数是图片onload逻辑
-            var handler = function () {
-                var node = thisImg;
-                var src = deferSrc;
-                // 创建一个闭包
-                return function () {
-                    node.src = src;
-                    node.style.opacity = 1;
-                }
-            }
-            var img = new Image();
-            img.onload = handler();
-            img.src = list[i].src;
-        }
-    }
-    console.timeEnd(&apos;defer&apos;);
-}
-</code></pre><p>主要思路就是对DOM缓存中的每一项进行循环遍历。在循环中，判断每一项是否已经进入isVisible区域。如果进入isVisible区域，则对当前项进行真实src赋值，并设置opacity为1。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">handleDefer</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="comment">// 时间记录</span></div><div class="line">    <span class="built_in">console</span>.time(<span class="string">'defer'</span>);</div><div class="line"></div><div class="line">    <span class="comment">// 获取dom缓存</span></div><div class="line">    <span class="keyword">var</span> list = slideCache;</div><div class="line">    <span class="comment">// 对于遍历list里的每一项，都使用一个变量，而不是在循环内部声明。节省内存，把性能高效，做到极致。</span></div><div class="line">    <span class="keyword">var</span> thisImg;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, len = list.length; i &lt; len; i++) &#123;</div><div class="line">        thisImg = list[i].img; <span class="comment">// 这里我们都是从内存中读取，而不用读取DOM节点</span></div><div class="line">        <span class="keyword">var</span> deferSrc = list[i].src; <span class="comment">// 这里我们都是从内存中读取，而不用读取DOM节点</span></div><div class="line">        <span class="comment">// 判断元素是否可见</span></div><div class="line">        <span class="keyword">if</span> (isVisible(list[i].id)) &#123;</div><div class="line">            <span class="comment">// 这个函数是图片onload逻辑</span></div><div class="line">            <span class="keyword">var</span> handler = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">                <span class="keyword">var</span> node = thisImg;</div><div class="line">                <span class="keyword">var</span> src = deferSrc;</div><div class="line">                <span class="comment">// 创建一个闭包</span></div><div class="line">                <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">                    node.src = src;</div><div class="line">                    node.style.opacity = <span class="number">1</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">var</span> img = <span class="keyword">new</span> Image();</div><div class="line">            img.onload = handler();</div><div class="line">            img.src = list[i].src;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">console</span>.timeEnd(<span class="string">'defer'</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>主要思路就是对DOM缓存中的每一项进行循环遍历。在循环中，判断每一项是否已经进入isVisible区域。如果进入isVisible区域，则对当前项进行真实src赋值，并设置opacity为1。</p>
 <h4 id="更新拉取数据生成的DOM缓存"><a href="#更新拉取数据生成的DOM缓存" class="headerlink" title="更新拉取数据生成的DOM缓存"></a>更新拉取数据生成的DOM缓存</h4><p>针对每一个slide类，我们缓存对应DOM节、id、子元素img DOM节点：</p>
-<pre><code>function updateItemCache (node) {
-    var list = node.querySelectorAll(&apos;.slide&apos;);
-    var len = list.length;
-    slideCache = [];
-    var obj;
-
-    for (var i=0; i &lt; len; i++) {
-        obj = {
-            node: list[i],
-            id: list[i].getAttribute(&apos;id&apos;),
-            img: list[i].querySelector(&apos;.img&apos;)
-        }
-        obj.src = obj.img.getAttribute(&apos;data-src&apos;);
-        slideCache.push(obj);
-    };
-}
-</code></pre><h4 id="是否在isVisible区域判断"><a href="#是否在isVisible区域判断" class="headerlink" title="是否在isVisible区域判断"></a>是否在isVisible区域判断</h4><p>该函数接受相应DOM id，并进行判断。<br>如果判断条件晦涩难懂的话，你一定要手动画画图理解一下。如果你就是懒得画图，那么也没关系，我帮你画好了，只是丑一些。。。</p>
-<pre><code>function isVisible (id) {
-    var offTop;
-    var offsetHeight;
-    var data;
-    var node;
-
-    // 判断此元素是否已经懒加载正确渲染，分为在屏幕之上（已经懒加载完毕）和屏幕外，已经添加到dom中，但是还未请求图片（懒加载之前）
-    if (itemMap[id]) {
-        // 直接获取offTop，offsetHeight值
-        offTop = itemMap[id].offTop;
-        offsetHeight = itemMap[id].offsetHeight;
-    }
-    else {
-        // 设置该节点，并且设置节点属性：node，offTop，offsetHeight
-        node = document.getElementById(id);
-        // offsetHeight是自身元素的高度
-        offsetHeight = parseInt(node.offsetHeight);
-        // 元素的上外缘距离最近采用定位父元素内壁的距离
-        offTop = parseInt(node.offsetTop);
-    }
-
-    if (offTop + offsetHeight &gt; topViewPort &amp;&amp; offTop &lt; bottomViewPort) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-</code></pre><p><img src="/bimg/s2.jpg" alt=""></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateItemCache</span> (<span class="params">node</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> list = node.querySelectorAll(<span class="string">'.slide'</span>);</div><div class="line">    <span class="keyword">var</span> len = list.length;</div><div class="line">    slideCache = [];</div><div class="line">    <span class="keyword">var</span> obj;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i &lt; len; i++) &#123;</div><div class="line">        obj = &#123;</div><div class="line">            <span class="attr">node</span>: list[i],</div><div class="line">            <span class="attr">id</span>: list[i].getAttribute(<span class="string">'id'</span>),</div><div class="line">            <span class="attr">img</span>: list[i].querySelector(<span class="string">'.img'</span>)</div><div class="line">        &#125;</div><div class="line">        obj.src = obj.img.getAttribute(<span class="string">'data-src'</span>);</div><div class="line">        slideCache.push(obj);</div><div class="line">    &#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="是否在isVisible区域判断"><a href="#是否在isVisible区域判断" class="headerlink" title="是否在isVisible区域判断"></a>是否在isVisible区域判断</h4><p>该函数接受相应DOM id，并进行判断。<br>如果判断条件晦涩难懂的话，你一定要手动画画图理解一下。如果你就是懒得画图，那么也没关系，我帮你画好了，只是丑一些。。。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">isVisible</span> (<span class="params">id</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> offTop;</div><div class="line">    <span class="keyword">var</span> offsetHeight;</div><div class="line">    <span class="keyword">var</span> data;</div><div class="line">    <span class="keyword">var</span> node;</div><div class="line"></div><div class="line">    <span class="comment">// 判断此元素是否已经懒加载正确渲染，分为在屏幕之上（已经懒加载完毕）和屏幕外，已经添加到dom中，但是还未请求图片（懒加载之前）</span></div><div class="line">    <span class="keyword">if</span> (itemMap[id]) &#123;</div><div class="line">        <span class="comment">// 直接获取offTop，offsetHeight值</span></div><div class="line">        offTop = itemMap[id].offTop;</div><div class="line">        offsetHeight = itemMap[id].offsetHeight;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line">        <span class="comment">// 设置该节点，并且设置节点属性：node，offTop，offsetHeight</span></div><div class="line">        node = <span class="built_in">document</span>.getElementById(id);</div><div class="line">        <span class="comment">// offsetHeight是自身元素的高度</span></div><div class="line">        offsetHeight = <span class="built_in">parseInt</span>(node.offsetHeight);</div><div class="line">        <span class="comment">// 元素的上外缘距离最近采用定位父元素内壁的距离</span></div><div class="line">        offTop = <span class="built_in">parseInt</span>(node.offsetTop);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (offTop + offsetHeight &gt; topViewPort &amp;&amp; offTop &lt; bottomViewPort) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="/bimg/s2.jpg" alt=""></p>
 <h3 id="性能收益"><a href="#性能收益" class="headerlink" title="性能收益"></a>性能收益</h3><p>如上代码，我们主要进行了两方面的性能考量：</p>
 <p>1）延迟加载时间</p>
 <p>2）渲染DOM时间</p>

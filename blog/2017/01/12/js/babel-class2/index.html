@@ -5,25 +5,16 @@
   
   <title>揭秘babel的魔法之class继承的处理 | exp team</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="如果你已经看过第一篇揭秘babel的魔法之class魔法处理，这篇将会是一个延伸；如果你还没看过，并且也不想现在就去读一下，单独看这篇也没有关系，并不存在理解上的障碍。
-上一篇针对Babel对ES6里面基础“class”的编译进行了分析。这一篇将会对class的继承，包括extends和super进行讲解。
-什么？你还不了解ES6如何实现继承？没关系，下文内容也有详细示例。
-再啰嗦一句，这一系列的">
+  <meta name="description" content="如果你已经看过第一篇揭秘babel的魔法之class魔法处理，这篇将">
 <meta property="og:type" content="article">
 <meta property="og:title" content="揭秘babel的魔法之class继承的处理">
 <meta property="og:url" content="https://exp-team.github.io/blog/2017/01/12/js/babel-class2/index.html">
 <meta property="og:site_name" content="exp team">
-<meta property="og:description" content="如果你已经看过第一篇揭秘babel的魔法之class魔法处理，这篇将会是一个延伸；如果你还没看过，并且也不想现在就去读一下，单独看这篇也没有关系，并不存在理解上的障碍。
-上一篇针对Babel对ES6里面基础“class”的编译进行了分析。这一篇将会对class的继承，包括extends和super进行讲解。
-什么？你还不了解ES6如何实现继承？没关系，下文内容也有详细示例。
-再啰嗦一句，这一系列的">
+<meta property="og:description" content="如果你已经看过第一篇揭秘babel的魔法之class魔法处理，这篇将">
 <meta property="og:updated_time" content="2017-01-16T07:13:59.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="揭秘babel的魔法之class继承的处理">
-<meta name="twitter:description" content="如果你已经看过第一篇揭秘babel的魔法之class魔法处理，这篇将会是一个延伸；如果你还没看过，并且也不想现在就去读一下，单独看这篇也没有关系，并不存在理解上的障碍。
-上一篇针对Babel对ES6里面基础“class”的编译进行了分析。这一篇将会对class的继承，包括extends和super进行讲解。
-什么？你还不了解ES6如何实现继承？没关系，下文内容也有详细示例。
-再啰嗦一句，这一系列的">
+<meta name="twitter:description" content="如果你已经看过第一篇揭秘babel的魔法之class魔法处理，这篇将">
   
     <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
   
