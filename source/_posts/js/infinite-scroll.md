@@ -47,10 +47,13 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
 4）另外，页面滚动的事件肯定是需要监听的。同时，页面滚动问题也比较棘手，后面将专为滚动进行分析。
 
 5）DOM操作我们知道是及其缓慢而低效的，有兴趣的同学可以研究一下jsPerf上一些经典的benchmark，比如[这篇](http://jsperf.com/jquery-cache-vs-dom-querying)。关于造成这种缓慢的原因，社区上同样有很多文章有过分析，这里就不再深入。但我想总结并补充的是：DOM操作，光是为了找一个节点，就从本质上比简单的检索内存中的值要慢。一些DOM操作还需要重新计算样式来读取或检索一个值。更突出的问题在于：DOM操作是阻塞的，所以当有一个DOM操作在进行时，其他的什么都不能做，包括用户与页面的交互（除了滚动）。这是一个极度伤害用户体验的事实。
+
 所以，在下面的效果实现中，我采用了大量“不可思议”的DOM缓存，甚至极端的缓存everything。当然，这样做的收益也在最后部分有所展现。
 
 ### 滚动问题
-滚动问题不难想象在于高频率的触发滚动事件处理上。具我亲测，在极端case下，滚动及其卡顿。即使滚动不卡顿，你可以打开Chrome控制台发现，帧速率也非常慢。关于帧速率的问题，我们有著名的16.7毫秒理论。关于这个时间分析，社区上也有不少文章阐述，这里不再展开。针对于此，有很多读者会立刻想到“截流和防抖动函数”（Throttle和Debounce）。
+滚动问题不难想象在于高频率的触发滚动事件处理上。具我亲测，在极端case下，滚动及其卡顿。即使滚动不卡顿，你可以打开Chrome控制台发现，帧速率也非常慢。关于帧速率的问题，我们有著名的16.7毫秒理论。关于这个时间分析，社区上也有不少文章阐述，这里不再展开。
+
+针对于此，有很多读者会立刻想到“截流和防抖动函数”（Throttle和Debounce）。
 简单总结一下：
 
 1）Throttle允许我们限制激活响应的数量。我们可以限制每秒回调的数量。反过来，也就是说在激活下一个回调之前要等待多少时间;
@@ -81,15 +84,18 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
 ### DOM结构
 整体结构如下：
 
+```html
     <div class="exp-list-box" id="expListBox">
         <ul class="exp-list" id="expList">
         </ul>
         <div class="ui-refresh-down"></div>
     </div>
+```
 
 主体内容放在id为“expListBox”的container里面，id为“expList”的ul是页面加载内容的容器。
 因为每次加载并append进入HTML的内容相对较多。我使用了模版来取代传统的字符串拼接。前端模版这次选用了我的同事[颜海镜大神的开源作品](https://github.com/yanhaijing/template.js)，模版结构为：
 
+```html
      <#dataList.forEach(function (v) {#>
         <div id="s-<#=v.eid#>" class="slide">
             <li>
@@ -104,6 +110,7 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
             </li>
         </div>
     <#})#>
+```
 
 以上模版内容由每次ajax请求到的数据填充，并添加进入页面，构成每个block-item。
 这里需要注意观察，有助于对后面逻辑的理解。页面中一个block-item下div属性存有该block-item的eid值，对应class叫做"slide"，子孙节点包含有一个image标签，src初始赋值为1px的空白图进行占位。真实图片资源位置存储在"data-src"中。
@@ -112,6 +119,7 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
 ### 样式亮点
 样式方面不是这篇文章的重点，挑选最核心的一行来说明一下：
 
+```css
     .slide .img{
         display: inline-block;
         width: 90px;
@@ -123,6 +131,7 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
         -o-transition: opacity 0.25s ease-in-out;
         transition: opacity 0.25s ease-in-out;
     }
+```
 
 唯一需要注意的是image的opacity设置为0，图片将会在成功请求并渲染后调整为1，辅助transition属性实现一个fade in效果。
 对应我们上面所提到的那个“trick”
@@ -132,6 +141,7 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
 我们先把精力集中在逻辑处理上。
 下面进入我们最核心的逻辑部分，为了防止全局污染，我把它放入了一个立即执行函数中：
 
+```javascript
     (function() {
         var fetching = false; 
         var page = 1;
@@ -167,10 +177,12 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
         window.setTimeout(handleScroll, 100);
         fetchContent();
     }());
+```
 
 我认为好的编程习惯是在程序开头部分便声明所有的变量，防止“变量提升”带来的潜在困扰，并且也有利于程序的整体把控。
 我们来看一下变量设置：
 
+```javascript
     // 加载中状态锁
     1）var fetching = false;
     // 用于加载时发送请求参数，表示第几屏内容，初始为1，以后每请求一次，递增1
@@ -186,6 +198,7 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
     // isVisible的上下阈值边界
     7) var topViewPort; 
     8) var bottomViewPort; 
+```
 
 关于DOM cache的变量详细说明，在后文有提供。
 
@@ -199,6 +212,7 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
 在100毫秒之内发生滚动或者强制触发时，需要判断是否滚动已接近页面底部。如果是，则拉取数据，调用fetchContent方法，并调用懒加载方法handleDefer。
 并且在这个处理程序中，我们计算出来了isVisible区域的上下阈值。我们使用600作为浮动区间，这么做的目的是在一定范围内提前加载图片，节省用户等待时间。当然，如果我们进行抽象时，可以把这个值进行参数化。
 
+```javascript
     function handleScroll (e, force) {
         // 如果时间间隔内，没有发生滚动，且并未强制触发加载，则do nothing，再次间隔100毫秒之后查询
         if (!force && lastScrollY === window.scrollY) {
@@ -225,12 +239,14 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
         handleDefer();
         window.setTimeout(handleScroll, 100);
     } 
+```
  
 
 #### 拉取数据
 这里我用到了自己封装的ajax接口方法，它基于zepto的ajax方法，只不过又手动采用了promise包装一层。实现比较简单，当然有兴趣可以找我要一下代码，这里不再详细说了。
 我们使用前端模版进行HTML渲染，同时调用updateItemCache，将此次数据拉取生成的DOM节点缓存。之后手动触发handleScroll，更新文档滚动位置和懒加载处理。
 
+```javascript
     function fetchContent () {
         // 设置加载状态锁
         if (fetching) {
@@ -274,6 +290,7 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
             console.log('Refresh:Ajax Error!');
         });
     }
+```
 
 
 #### 缓存对象
@@ -281,6 +298,7 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
 
 1）slideCache：缓存最近一次加载过的数据生成的DOM内容，缓存方式为数组储存：
 
+```javascript
     slideCache = [
         {
             id: "s-97r45",
@@ -290,11 +308,13 @@ HTML5带来的performance API功能强大。我们可以使用其performance.now
         },
         ...
     ]
+```
 
 slideCache由updateItemCache函数更新，主要用于懒加载时的赋值src。这样我们做到“只写入DOM”原则，不需要再从DOM读取。
 
 2）slideMap：缓存DOM节点的高度和offsetTop，以DOM节点的id为索引。存储方式：
 
+```javascript
     slideMap = {
         s-97r45: {
             node: DOM node,类似<div id="s-<#=v.eid#>" class="slide"></div>,
@@ -302,6 +322,7 @@ slideCache由updateItemCache函数更新，主要用于懒加载时的赋值src�
             offsetHeight: 90
         }
     }
+```
 
 slideMap根据isVisible方法的参数进行更新和读取。使得我们在判断是否isVisible时，大量减少读取DOM的操作。   
 
@@ -309,6 +330,7 @@ slideMap根据isVisible方法的参数进行更新和读取。使得我们在判
 #### 懒加载程序
 在上面的滚动处理程序中，我们调用了handleDefer函数。我们看一下这个函数的实现：
 
+```javascript
     function handleDefer () {
         // 时间记录
         console.time('defer');
@@ -340,6 +362,7 @@ slideMap根据isVisible方法的参数进行更新和读取。使得我们在判
         }
         console.timeEnd('defer');
     }
+```
 
 主要思路就是对DOM缓存中的每一项进行循环遍历。在循环中，判断每一项是否已经进入isVisible区域。如果进入isVisible区域，则对当前项进行真实src赋值，并设置opacity为1。
 
@@ -347,6 +370,7 @@ slideMap根据isVisible方法的参数进行更新和读取。使得我们在判
 #### 更新拉取数据生成的DOM缓存
 针对每一个slide类，我们缓存对应DOM节、id、子元素img DOM节点：
 
+```javascript
     function updateItemCache (node) {
         var list = node.querySelectorAll('.slide');
         var len = list.length;
@@ -363,12 +387,14 @@ slideMap根据isVisible方法的参数进行更新和读取。使得我们在判
             slideCache.push(obj);
         };
     }
+```
 
 
 #### 是否在isVisible区域判断
 该函数接受相应DOM id，并进行判断。
 如果判断条件晦涩难懂的话，你一定要手动画画图理解一下。如果你就是懒得画图，那么也没关系，我帮你画好了，只是丑一些。。。
 
+```javascript
     function isVisible (id) {
         var offTop;
         var offsetHeight;
@@ -397,6 +423,7 @@ slideMap根据isVisible方法的参数进行更新和读取。使得我们在判
             return false;
         }
     }
+```
 
 
 ![](/bimg/s2.jpg)
