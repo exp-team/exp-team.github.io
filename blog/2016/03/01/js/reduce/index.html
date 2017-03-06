@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>面试题里“别有洞天” 谈数组，ES6，Redux和Pollyfill | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="之前的一篇文章：从一道面试题，到“我可能看了假源码”讨论了bind方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="面试题里“别有洞天” 谈数组，ES6，Redux和Pollyfill">
+<meta property="og:url" content="https://exp-team.github.io/blog/2016/03/01/js/reduce/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="之前的一篇文章：从一道面试题，到“我可能看了假源码”讨论了bind方">
+<meta property="og:updated_time" content="2017-03-06T10:31:09.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="面试题里“别有洞天” 谈数组，ES6，Redux和Pollyfill">
+<meta name="twitter:description" content="之前的一篇文章：从一道面试题，到“我可能看了假源码”讨论了bind方">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/reduce" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2016/03/01/js/reduce/" class="article-date">
+  <time datetime="2016-02-29T16:00:00.000Z" itemprop="datePublished">2016-03-01</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      面试题里“别有洞天” 谈数组，ES6，Redux和Pollyfill
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>之前的<a href="http://www.jianshu.com/p/6958f99db769" target="_blank" rel="external">一篇文章：从一道面试题，到“我可能看了假源码”</a>讨论了bind方法的Pollyfill，今天再分享一个有意思的题目。</p>
+<p>从解这道题目出发，我们会谈到数组的Reduce方法，ES6特性和Redux数据流框架的核心Reducer的命名等等。就如唐代诗人章碣《对月》诗中所云：“别有洞天三十六，水晶台殿冷层层。”</p>
+<h2 id="题目背景"><a href="#题目背景" class="headerlink" title="题目背景"></a>题目背景</h2><p>完成一个’flatten’的函数，实现“拍平”一个多维数组。示例如下：</p>
+<p>```javascript<br>    var testArr1 = [[0, 1], [2, 3], [4, 5]];<br>    var testArr2 = [0, [1, [2, [3, [4, [5]]]]]];<br>    flatten(testArr1) // [0, 1, 2, 3, 4, 5]<br>    flatten(testArr2) // [0, 1, 2, 3, 4, 5]</p>
+<h2 id="解法"><a href="#解法" class="headerlink" title="解法"></a>解法</h2><p>先看一眼最终解法：</p>
+<p>```javascript<br>    const flatten = arr =&gt; arr.reduce((pre, val) =&gt; acc.concat(Array.isArray(pre) ? flatten(val) : val), []);</p>
+<p>如果你一眼能看明白，也建议继续往下读。因为会有“不一样”的东西和知识点。<br>如果你看不明白，更不要畏惧。我先用ES5的思路“翻译”一下，你很快就能看懂。</p>
+<p>因为目标数组可能是多维，所以想到第一个念头是递归，递归自然就想到递归的“尽头”，那就要判断变量是否是数组类型。<br>好吧，我们开始动手实现一个方案：</p>
+<p>```javascript<br>    var flatten = function(array) {<br>        return array.reduce(function(previous, val) {<br>            if (Object.prototype.toString.call(val) !== ‘[object Array]’) {<br>                return (previous.push(val), previous);<br>            }<br>            return (Array.prototype.push.apply(previous, flatten(val)), previous);<br>        }, []);<br>    };</p>
+<p>可能这样写，对于很多人来说，并不能完全理解。千万不要灰心，更不能放弃。我会帮您深入分析。</p>
+<h3 id="return的到底是什么？"><a href="#return的到底是什么？" class="headerlink" title="return的到底是什么？"></a>return的到底是什么？</h3><p>我们注意到上面的写法return使用了（）表达式。括号内容前半句是为了执行。这样写也许稍微晦涩难懂一些。请看下面的代码示例：</p>
+<p>```javascript<br>    function t() {<br>        var a = 1;<br>        return (a++, a);<br>    }<br>    t(); // 2</p>
+<h3 id="Object-prototype-toString-call是什么？"><a href="#Object-prototype-toString-call是什么？" class="headerlink" title="Object.prototype.toString.call是什么？"></a>Object.prototype.toString.call是什么？</h3><p>Object.prototype.toString.call可以认为是功能最强大的类型判断语句。在对数组类型进行判断时，需要格外小心：</p>
+<p>```javascript<br>    var a = [];<br>    typeof a; // “object”<br>    a instanceof Array; // true;<br>    Object.prototype.toString.call(a); // “[object Array]”</p>
+<h3 id="reduce方法到底做了什么？"><a href="#reduce方法到底做了什么？" class="headerlink" title="reduce方法到底做了什么？"></a>reduce方法到底做了什么？</h3><p>现在到了最关键的地方，reduce方法是ES5引入，很多人使用它的场景并不多。但是了解他的特性却是必须的。遗憾的是，社区上对于它的内容似乎都不是太重视。这里我简要进行“科普”，因为下面我要围绕它进行延伸：</p>
+<p>reduce在英文中译为“减少; 缩小; 使还原; 使变弱”，MDN对方法直述为：“The reduce method applies a function against an accumulator and each value of the array (from left-to-right) to reduce it to a single value.”<br>我并不打算对他直接翻译，因为这样会变的更加晦涩难懂。</p>
+<p>我们看他的使用语法：</p>
+<p>```javascript<br>    array1.reduce(callbackfn[, initialValue])</p>
+<p>参数分析：</p>
+<p>1）array1必需。</p>
+<p>一个数组对象。即调用reduce方法的必须是一个数组类型。</p>
+<p>2）callbackfn必需。</p>
+<p>一个接受最多四个参数的函数。对于数组中的每个元素，reduce方法都会调用 callbackfn 函数一次。<br>这个callback的4个参数为：</p>
+<p>```javascript<br>    accumulator // 上一次调用回调返回的值，或者是提供的初始值（initialValue）<br>    currentValue // 数组中正在处理的元素<br>    currentIndex // 数据中正在处理的元素索引，如果提供了initialValue ，从0开始；否则从1开始<br>    array // 调用reduce的数组</p>
+<p>3)initialValue可选项。</p>
+<p>其值用于第一次调用callback的第一个参数。</p>
+<p>比如，我们分析一个常用用法：</p>
+<p>```javascript<br>    [0,1,2,3,4].reduce(function(previous, item, currentIndex, array){<br>      return previous + item;<br>    });<br>    // 10</p>
+<p>这里并未提供reduce的第二个参数initialValue，所以从数组第一项开始进行回调函数的执行。并且每次回调函数执行完之后的结果，作为下一次的previous执行回调。</p>
+<p>所以，上述代码便是一个累加器的实现。</p>
+<h2 id="ES6写法"><a href="#ES6写法" class="headerlink" title="ES6写法"></a>ES6写法</h2><p>现在理解了Reduce函数，再结合ES6特性，使解法更加优雅：</p>
+<p>```javascript<br>    const flatten = arr =&gt; arr.reduce((pre, val) =&gt; acc.concat(Array.isArray(pre) ? flatten(val) : val), []);</p>
+<p>这样写是不是太“函数式”了，但是思路跟之前解法完全一样。我只不过充分使用了箭头函数带来的便利。并且使用了更便捷的isArray对数组类型进行判断。这是开篇提到的解法，也是MDN最新版的实现。</p>
+<h2 id="如何实现一个reduce的pollyfill"><a href="#如何实现一个reduce的pollyfill" class="headerlink" title="如何实现一个reduce的pollyfill"></a>如何实现一个reduce的pollyfill</h2><p>现在明白了reduce的秘密，接下来我们需要充分发挥对JS的理解，来手动实现一个reduce函数。毕竟，reduce是ES5带来的数组新特性，在不使用ES5-shim的情况下，需要手动兼容。</p>
+<p>同样，在MDN上也有实现，但是我觉得下面的代码实现更加优雅和清晰：</p>
+<p>```javascript<br>    var reduce = function(arr, func, initialValue) {<br>        var base = typeof initialValue === ‘undefined’ ? arr[0] : initialValue;<br>        var startPoint = typeof initialValue === ‘undefined’ ? 1 : 0;<br>        arr.slice(startPoint)<br>            .forEach(function(val, index) {<br>                base = func(base, val, index + startPoint, arr);<br>            });<br>        return base;<br>    };</p>
+<p>如果读者有不同实现思路，也欢迎与我讨论。</p>
+<p>我也同样看了下ES5-shim里的pollyfill，跟我的思路基本完全一致。唯一有一点区别的地方在于我用了forEach迭代而ES5-shim使用的是简单for循环。</p>
+<p>当然，数组的forEach方法也是ES5新增的。单纯从pollyfill兼容角度来看是应该使用for循环。但我这里是为了用简单明了的思路，实现reduce方法，根本目的还是希望对reduce有一个全面透彻的了解。</p>
+<p>好了，话不多说，我们来看具体实现：</p>
+<p>我们声明一个base并在最后返回。当initialValue未声明时，base为数组对象的第一个值，否则为initialValue。</p>
+<p>之后使用slice方法，把数组切割为去除base之后的子数组。这个子数组可能和原数组是等值的，这是在提供initialValue情况下；未提供initialValue时，这个子数组去除了已经作为base的第一项元素。</p>
+<p>之后对子数组使用forEach方法，调用func回调函数，并更新base的值。</p>
+<p>如果您还不明白，我认为还是对于reduce方法没有掌握透彻。建议在梳理一遍。</p>
+<h2 id="Redux中的reducer"><a href="#Redux中的reducer" class="headerlink" title="Redux中的reducer"></a>Redux中的reducer</h2><p>明白了reduce函数，我们再来看一下Redux中的reducer和这个reduce有什么命名上的关联。</p>
+<p>熟悉Redux数据流架构的同学理解reducer做了什么，关于这个纯函数的命名，也有一个<a href="https://github.com/reactjs/redux/blob/master/docs/basics/Reducers.md" target="_blank" rel="external">官方解释</a>：“It’s called a reducer because it’s the type of function you would pass to Array.prototype.reduce(reducer, ?initialValue)”，虽然是一笔带过，但是总结的恰到好处。</p>
+<p>我详细说一下：Reducers其实是根据之前的状态（previous state）和现有的action（current action）更新state这个累加器（accumulation）。每次redux reducer被执行时，state和action被传入，这个state根据action进行累加或者是“自身消减”（reduce），进而返回最新的state。这符合一个典型reduce函数的用法：state -&gt; action -&gt; state.</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章对于如何优雅地“扁平化”一个多维数组进行了解法分析。并且对于reduce方法进行了深入讨论，我们还实现了reduce的pollyfill。在充分理解的基础上，有简要延伸到redux数据架构里面reducer的命名。希望对读者有所启发，也欢迎同我讨论。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2016/03/01/js/reduce/" data-id="cizxyw5u30001sqwhbuzsl1xt" class="article-share-link">Share</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2016/03/01/js/reduce/" data-title="面试题里“别有洞天” 谈数组，ES6，Redux和Pollyfill" data-url="https://exp-team.github.io/blog/2016/03/01/js/reduce/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2016/07/28/hexo/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Hello World
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2016/02/28/js/inNetwork/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">由浅入深的前端面试题 和矫情的“浪漫主义”诗句</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 17.5px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 15px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 12.5px;">tool</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/03/04/weekly/weekly-10111/">expfe技术周刊第10111期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/02/25/js/infinite-scroll/">设计高性能无限滚动加载，了解高效页面秘密</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/02/24/weekly/weekly-10110/">expfe技术周刊第10110期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/02/20/js/es5-shim-bind/">从一道面试题的进阶，到“我可能看了假源码”（2）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/02/20/js/bind/">从一道面试题的进阶，到“我可能看了假源码”</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>由浅入深的前端面试题 和矫情的“浪漫主义”诗句 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="好吧，我承认太标题党了，这篇文章是通过一道前端面试题引出的纯技术讨论。我先要矫情无比的从中外诗歌说起。
+传统的佛学经典里，被世人熟知的有这样一句话：“一花一世界，一叶一菩提，一木一浮生，一草一天堂，一砂一极乐，一方一净土">
+<meta property="og:type" content="article">
+<meta property="og:title" content="由浅入深的前端面试题 和矫情的“浪漫主义”诗句">
+<meta property="og:url" content="https://exp-team.github.io/blog/2016/02/28/js/inNetwork/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="好吧，我承认太标题党了，这篇文章是通过一道前端面试题引出的纯技术讨论。我先要矫情无比的从中外诗歌说起。
+传统的佛学经典里，被世人熟知的有这样一句话：“一花一世界，一叶一菩提，一木一浮生，一草一天堂，一砂一极乐，一方一净土">
+<meta property="og:image" content="https://exp-team.github.io/bimg/network.png">
+<meta property="og:updated_time" content="2017-03-06T10:31:09.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="由浅入深的前端面试题 和矫情的“浪漫主义”诗句">
+<meta name="twitter:description" content="好吧，我承认太标题党了，这篇文章是通过一道前端面试题引出的纯技术讨论。我先要矫情无比的从中外诗歌说起。
+传统的佛学经典里，被世人熟知的有这样一句话：“一花一世界，一叶一菩提，一木一浮生，一草一天堂，一砂一极乐，一方一净土">
+<meta name="twitter:image" content="https://exp-team.github.io/bimg/network.png">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/inNetwork" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2016/02/28/js/inNetwork/" class="article-date">
+  <time datetime="2016-02-27T16:00:00.000Z" itemprop="datePublished">2016-02-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      由浅入深的前端面试题 和矫情的“浪漫主义”诗句
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>好吧，我承认太标题党了，这篇文章是通过一道前端面试题引出的纯技术讨论。我先要矫情无比的从中外诗歌说起。</p>
+<p>传统的佛学经典里，被世人熟知的有这样一句话：“一花一世界，一叶一菩提，一木一浮生，一草一天堂，一砂一极乐，一方一净土，一笑一尘缘，一念一清静。”。</p>
+<p>昔时佛祖拈花，惟迦叶微笑，既而步往极乐。从一朵花中便能悟出整个世界，得升天堂，佛祖就是佛祖，谁人能有这样的境界。</p>
+<p>同时，早在18世纪，英国伟大的浪漫主义诗人Black名为《天真的暗示》的诗中，也类似写道：”To see a world in a grain of sand, and a heaven in a wild flower”，一颗沙里一个世界，一朵野花一座天堂。</p>
+<p>转念，虽卑为码农，我们写出的代码，却彰显了功力：菜鸟和大神之间的差距，往往工程线上卑微的几行代码，便有天壤之差。</p>
+<p>一道系列面试题，在JS知识体系中虽沧海一粟，但考察点充分评判面试者的能力。<br>管中窥豹，期待读者有不同想法与我讨论。</p>
+<h2 id="题目背景"><a href="#题目背景" class="headerlink" title="题目背景"></a>题目背景</h2><p>题目是我在《effective javascript》一书中提取的。这一星期陆陆续续面试了不少于10个人，其中不乏工作履历突出的候选者。<br>但是很遗憾没有能完全在较短时间内有较高质量的回答。</p>
+<h2 id="题目前身"><a href="#题目前身" class="headerlink" title="题目前身"></a>题目前身</h2><p>这道题可以分为前后两个部分，第一部分很简单，一般有一定JS OOP基础的候选者应该都可以答好：</p>
+<p>一个社交网络有一组成员（member），每个成员有一个自己的名字，和存储其朋友信息的列表。请实现这样一个Member构造器。</p>
+<p>正确答案不难理解：</p>
+<p>```javascript<br>    function Member (name) {<br>        this.name = name;<br>        this.friends = [];<br>    }</p>
+<p>是不是非常简单。它的典型错误包括但是不限于：</p>
+<p>```javascript<br>    function Member (name) {<br>        this.name = name;<br>    }<br>    Member.prototype.friends = [];</p>
+<p>关于方法和属性是应该放在原型上，还是构造函数中，如果您不明白的话，是时候补一补原型原型链的知识了。推荐给大家看一下我的同事颜海镜早在3年前的<a href="http://yanhaijing.com/javascript/2014/05/15/a-code-explain-javascript-oop/" target="_blank" rel="external">一篇文章</a></p>
+<p>同样，这道题上我会顺便考察一下面试者对JS中变量的存储方式，包括堆栈存储的不同情况和引用赋值的掌握情况。</p>
+<h2 id="题目变身"><a href="#题目变身" class="headerlink" title="题目变身"></a>题目变身</h2><p>以上是对JS基础的考察，但是在这道题目的基础上，我进行了更深一步提问。希望对候选者的临场思维、JS基础甚至一些设计能力，又更进一步认识。</p>
+<p>我要实现一个带环社交网络（社交圈）：</p>
+<p>```javascript<br>    var a = new Member(‘Alice’);<br>    var b = new Member(‘Bob’);<br>    var c = new Member(‘Carol’);<br>    var d = new Member(‘Dieter’);<br>    var e = new Member(‘Eli’);<br>    var f = new Member(‘Fatima’);</p>
+<pre><code>a.friends.push(b);
+b.friends.push(c);
+c.friends.push(e);
+d.friends.push(b);
+e.friends.push(d, f);
+</code></pre><p>这种情况下，需要实现一个inNetwork方法，判断某目标成员是否在另一个对象成员的社交圈中。规定：顺着社交链能找到目标成员，就认为在社交圈中。否则，不在其社交圈。</p>
+<h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>如果刚接触到这样的题目，尤其是在面试现场，作为面试者很可能会慌乱一下。这时候，需要做的就是先准确分析题目。<br>根据题目，画出符合上述题目代码的实例化网络：</p>
+<p><img src="/bimg/network.png" alt="实例社交圈图示"></p>
+<p>接下来思考，搜索意味着需要遍历整个社交网络。我们应该：</p>
+<p>1）以单个根节点开始，</p>
+<p>2）然后添加发现的节点，</p>
+<p>3）移除访问过的节点，防止死环</p>
+<p>最终实现：</p>
+<p>```javascript<br>    Member.prototype.inNetwork = function (target) {<br>        var visited = {};<br>        var worklist = [this]; // 用于存放社交链上的个体信息，初始时以“自己”作为根节点</p>
+<pre><code>    while (worklist.length &gt; 0) {
+        // 将worklist里的最后一项成员删除并取出
+        var member = worklist.pop();
+        // 如果存在环的情况，需要避免重复访问
+        if (member.name in visited) {
+             continue;
+        }
+        visited[member.name] = member;
+        if (member === target) {
+            return true;
+        }
+        // 将当前成员的朋友列表加入worklist当中，他们都在根节点的社交链上
+        member.friends.forEach(function(friend) {
+            worklist.push(friend);
+        })
+    }
+    return false;
+}
+</code></pre><p>我在代码中加上了注释，如果您还不明白也没有关系。建议去跑一下程序，进行debugger和console，尝试去理解。</p>
+<p>一道简单的题却覆盖了很多知识点，比如：while循环中的流程控制（continue），数组的基本方法（pop,forEach,push），for…in等等。</p>
+<p>它的典型错误包括但是不限于：使用对象承载worklist，然后用for…in循环遍历worklist。</p>
+<p>这样做的问题在于：for…in循环并没有要求枚举对象的修改与当前循环保持一致。事实上，标准规范规定了：</p>
+<p>“如果被枚举对象在枚举期间添加了新的属性，那么枚举期间并不能保证新添加的属性能够访问”。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这道题考察了面试者包括JS OOP在内的多项基础，尤其是后半道考察了候选者的思维能力、反应能力。</p>
+<p>扯回原诗句，谈一下感悟，在天体的转动和岁月的轮回中，我们分明的感受到每一个个体所拥有生命周期的单薄无力，在宏大的宇宙观中恐怕渺小不及沧海一粟。诗句的后半句拿出来共勉：“Hold infinity in the palm of your hand, and eternity in an hour 把无限放在你的手上，永恒在一刹那里收藏”。</p>
+<p>在前端快速迭代发展的学习中，作为初学者，往往面对浩瀚的知识海洋望洋兴叹，此时基础便是那能够收藏“永恒和无限”的潘多拉魔盒。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2016/02/28/js/inNetwork/" data-id="cizxyw5ts0000sqwhvf2usfip" class="article-share-link">Share</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2016/02/28/js/inNetwork/" data-title="由浅入深的前端面试题 和矫情的“浪漫主义”诗句" data-url="https://exp-team.github.io/blog/2016/02/28/js/inNetwork/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2016/03/01/js/reduce/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          面试题里“别有洞天” 谈数组，ES6，Redux和Pollyfill
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 17.5px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 15px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 12.5px;">tool</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">二月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/03/04/weekly/weekly-10111/">expfe技术周刊第10111期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/02/25/js/infinite-scroll/">设计高性能无限滚动加载，了解高效页面秘密</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/02/24/weekly/weekly-10110/">expfe技术周刊第10110期</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/02/20/js/es5-shim-bind/">从一道面试题的进阶，到“我可能看了假源码”（2）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/02/20/js/bind/">从一道面试题的进阶，到“我可能看了假源码”</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
