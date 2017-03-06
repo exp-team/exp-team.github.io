@@ -14,7 +14,7 @@
 <meta property="og:description" content="好吧，我承认太标题党了，这篇文章是通过一道前端面试题引出的纯技术讨论。我先要矫情无比的从中外诗歌说起。
 传统的佛学经典里，被世人熟知的有这样一句话：“一花一世界，一叶一菩提，一木一浮生，一草一天堂，一砂一极乐，一方一净土">
 <meta property="og:image" content="https://exp-team.github.io/bimg/network.png">
-<meta property="og:updated_time" content="2017-03-06T10:35:03.000Z">
+<meta property="og:updated_time" content="2017-03-06T11:14:08.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="由浅入深的前端面试题 和矫情的“浪漫主义”诗句">
 <meta name="twitter:description" content="好吧，我承认太标题党了，这篇文章是通过一道前端面试题引出的纯技术讨论。我先要矫情无比的从中外诗歌说起。
@@ -122,15 +122,27 @@ var _hmt = _hmt || [];
 <h2 id="题目前身"><a href="#题目前身" class="headerlink" title="题目前身"></a>题目前身</h2><p>这道题可以分为前后两个部分，第一部分很简单，一般有一定JS OOP基础的候选者应该都可以答好：</p>
 <p>一个社交网络有一组成员（member），每个成员有一个自己的名字，和存储其朋友信息的列表。请实现这样一个Member构造器。</p>
 <p>正确答案不难理解：</p>
-<p>```javascript<br>    function Member (name) {<br>        this.name = name;<br>        this.friends = [];<br>    }</p>
-<p>是不是非常简单。它的典型错误包括但是不限于：</p>
-<p>```javascript<br>    function Member (name) {<br>        this.name = name;<br>    }<br>    Member.prototype.friends = [];</p>
-<p>关于方法和属性是应该放在原型上，还是构造函数中，如果您不明白的话，是时候补一补原型原型链的知识了。推荐给大家看一下我的同事颜海镜早在3年前的<a href="http://yanhaijing.com/javascript/2014/05/15/a-code-explain-javascript-oop/" target="_blank" rel="external">一篇文章</a></p>
+<pre><code>function Member (name) {
+    this.name = name;
+    this.friends = [];
+}
+</code></pre><p>是不是非常简单。它的典型错误包括但是不限于：</p>
+<pre><code>function Member (name) {
+    this.name = name;
+}
+Member.prototype.friends = [];
+</code></pre><p>关于方法和属性是应该放在原型上，还是构造函数中，如果您不明白的话，是时候补一补原型原型链的知识了。推荐给大家看一下我的同事颜海镜早在3年前的<a href="http://yanhaijing.com/javascript/2014/05/15/a-code-explain-javascript-oop/" target="_blank" rel="external">一篇文章</a></p>
 <p>同样，这道题上我会顺便考察一下面试者对JS中变量的存储方式，包括堆栈存储的不同情况和引用赋值的掌握情况。</p>
 <h2 id="题目变身"><a href="#题目变身" class="headerlink" title="题目变身"></a>题目变身</h2><p>以上是对JS基础的考察，但是在这道题目的基础上，我进行了更深一步提问。希望对候选者的临场思维、JS基础甚至一些设计能力，又更进一步认识。</p>
 <p>我要实现一个带环社交网络（社交圈）：</p>
-<p>```javascript<br>    var a = new Member(‘Alice’);<br>    var b = new Member(‘Bob’);<br>    var c = new Member(‘Carol’);<br>    var d = new Member(‘Dieter’);<br>    var e = new Member(‘Eli’);<br>    var f = new Member(‘Fatima’);</p>
-<pre><code>a.friends.push(b);
+<pre><code>var a = new Member(&apos;Alice&apos;);
+var b = new Member(&apos;Bob&apos;);
+var c = new Member(&apos;Carol&apos;);
+var d = new Member(&apos;Dieter&apos;);
+var e = new Member(&apos;Eli&apos;);
+var f = new Member(&apos;Fatima&apos;);
+
+a.friends.push(b);
 b.friends.push(c);
 c.friends.push(e);
 d.friends.push(b);
@@ -143,8 +155,11 @@ e.friends.push(d, f);
 <p>2）然后添加发现的节点，</p>
 <p>3）移除访问过的节点，防止死环</p>
 <p>最终实现：</p>
-<p>```javascript<br>    Member.prototype.inNetwork = function (target) {<br>        var visited = {};<br>        var worklist = [this]; // 用于存放社交链上的个体信息，初始时以“自己”作为根节点</p>
-<pre><code>    while (worklist.length &gt; 0) {
+<pre><code>Member.prototype.inNetwork = function (target) {
+    var visited = {};
+    var worklist = [this]; // 用于存放社交链上的个体信息，初始时以“自己”作为根节点
+
+    while (worklist.length &gt; 0) {
         // 将worklist里的最后一项成员删除并取出
         var member = worklist.pop();
         // 如果存在环的情况，需要避免重复访问
@@ -163,6 +178,10 @@ e.friends.push(d, f);
     return false;
 }
 </code></pre><p>我在代码中加上了注释，如果您还不明白也没有关系。建议去跑一下程序，进行debugger和console，尝试去理解。</p>
+<p>测试：</p>
+<pre><code>a.inNetwork(f) // true
+f.inNetwork(a) //false
+</code></pre><p>哈哈，果然Alice能通过朋友圈查找到Fatima，而Fatima却不能反向找到Alice!当然，这样我认为是违反人类社会常识的。但是，谁让他是题目呢？</p>
 <p>一道简单的题却覆盖了很多知识点，比如：while循环中的流程控制（continue），数组的基本方法（pop,forEach,push），for…in等等。</p>
 <p>它的典型错误包括但是不限于：使用对象承载worklist，然后用for…in循环遍历worklist。</p>
 <p>这样做的问题在于：for…in循环并没有要求枚举对象的修改与当前循环保持一致。事实上，标准规范规定了：</p>
