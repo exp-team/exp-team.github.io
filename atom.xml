@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://exp-team.github.io/"/>
-  <updated>2017-03-06T10:31:09.000Z</updated>
+  <updated>2017-03-06T10:35:03.000Z</updated>
   <id>https://exp-team.github.io/</id>
   
   <author>
@@ -14,6 +14,88 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>由浅入深的前端面试题 和矫情的“浪漫主义”诗句</title>
+    <link href="https://exp-team.github.io/blog/2017/03/06/js/inNetwork/"/>
+    <id>https://exp-team.github.io/blog/2017/03/06/js/inNetwork/</id>
+    <published>2017-03-05T16:00:00.000Z</published>
+    <updated>2017-03-06T10:35:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>好吧，我承认太标题党了，这篇文章是通过一道前端面试题引出的纯技术讨论。我先要矫情无比的从中外诗歌说起。</p>
+<p>传统的佛学经典里，被世人熟知的有这样一句话：“一花一世界，一叶一菩提，一木一浮生，一草一天堂，一砂一极乐，一方一净土，一笑一尘缘，一念一清静。”。</p>
+<p>昔时佛祖拈花，惟迦叶微笑，既而步往极乐。从一朵花中便能悟出整个世界，得升天堂，佛祖就是佛祖，谁人能有这样的境界。</p>
+<p>同时，早在18世纪，英国伟大的浪漫主义诗人Black名为《天真的暗示》的诗中，也类似写道：”To see a world in a grain of sand, and a heaven in a wild flower”，一颗沙里一个世界，一朵野花一座天堂。</p>
+<p>转念，虽卑为码农，我们写出的代码，却彰显了功力：菜鸟和大神之间的差距，往往工程线上卑微的几行代码，便有天壤之差。</p>
+<p>一道系列面试题，在JS知识体系中虽沧海一粟，但考察点充分评判面试者的能力。<br>管中窥豹，期待读者有不同想法与我讨论。</p>
+<h2 id="题目背景"><a href="#题目背景" class="headerlink" title="题目背景"></a>题目背景</h2><p>题目是我在《effective javascript》一书中提取的。这一星期陆陆续续面试了不少于10个人，其中不乏工作履历突出的候选者。<br>但是很遗憾没有能完全在较短时间内有较高质量的回答。</p>
+<h2 id="题目前身"><a href="#题目前身" class="headerlink" title="题目前身"></a>题目前身</h2><p>这道题可以分为前后两个部分，第一部分很简单，一般有一定JS OOP基础的候选者应该都可以答好：</p>
+<p>一个社交网络有一组成员（member），每个成员有一个自己的名字，和存储其朋友信息的列表。请实现这样一个Member构造器。</p>
+<p>正确答案不难理解：</p>
+<p>```javascript<br>    function Member (name) {<br>        this.name = name;<br>        this.friends = [];<br>    }</p>
+<p>是不是非常简单。它的典型错误包括但是不限于：</p>
+<p>```javascript<br>    function Member (name) {<br>        this.name = name;<br>    }<br>    Member.prototype.friends = [];</p>
+<p>关于方法和属性是应该放在原型上，还是构造函数中，如果您不明白的话，是时候补一补原型原型链的知识了。推荐给大家看一下我的同事颜海镜早在3年前的<a href="http://yanhaijing.com/javascript/2014/05/15/a-code-explain-javascript-oop/" target="_blank" rel="external">一篇文章</a></p>
+<p>同样，这道题上我会顺便考察一下面试者对JS中变量的存储方式，包括堆栈存储的不同情况和引用赋值的掌握情况。</p>
+<h2 id="题目变身"><a href="#题目变身" class="headerlink" title="题目变身"></a>题目变身</h2><p>以上是对JS基础的考察，但是在这道题目的基础上，我进行了更深一步提问。希望对候选者的临场思维、JS基础甚至一些设计能力，又更进一步认识。</p>
+<p>我要实现一个带环社交网络（社交圈）：</p>
+<p>```javascript<br>    var a = new Member(‘Alice’);<br>    var b = new Member(‘Bob’);<br>    var c = new Member(‘Carol’);<br>    var d = new Member(‘Dieter’);<br>    var e = new Member(‘Eli’);<br>    var f = new Member(‘Fatima’);</p>
+<pre><code>a.friends.push(b);
+b.friends.push(c);
+c.friends.push(e);
+d.friends.push(b);
+e.friends.push(d, f);
+</code></pre><p>这种情况下，需要实现一个inNetwork方法，判断某目标成员是否在另一个对象成员的社交圈中。规定：顺着社交链能找到目标成员，就认为在社交圈中。否则，不在其社交圈。</p>
+<h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>如果刚接触到这样的题目，尤其是在面试现场，作为面试者很可能会慌乱一下。这时候，需要做的就是先准确分析题目。<br>根据题目，画出符合上述题目代码的实例化网络：</p>
+<p><img src="/bimg/network.png" alt="实例社交圈图示"></p>
+<p>接下来思考，搜索意味着需要遍历整个社交网络。我们应该：</p>
+<p>1）以单个根节点开始，</p>
+<p>2）然后添加发现的节点，</p>
+<p>3）移除访问过的节点，防止死环</p>
+<p>最终实现：</p>
+<p>```javascript<br>    Member.prototype.inNetwork = function (target) {<br>        var visited = {};<br>        var worklist = [this]; // 用于存放社交链上的个体信息，初始时以“自己”作为根节点</p>
+<pre><code>    while (worklist.length &gt; 0) {
+        // 将worklist里的最后一项成员删除并取出
+        var member = worklist.pop();
+        // 如果存在环的情况，需要避免重复访问
+        if (member.name in visited) {
+             continue;
+        }
+        visited[member.name] = member;
+        if (member === target) {
+            return true;
+        }
+        // 将当前成员的朋友列表加入worklist当中，他们都在根节点的社交链上
+        member.friends.forEach(function(friend) {
+            worklist.push(friend);
+        })
+    }
+    return false;
+}
+</code></pre><p>我在代码中加上了注释，如果您还不明白也没有关系。建议去跑一下程序，进行debugger和console，尝试去理解。</p>
+<p>一道简单的题却覆盖了很多知识点，比如：while循环中的流程控制（continue），数组的基本方法（pop,forEach,push），for…in等等。</p>
+<p>它的典型错误包括但是不限于：使用对象承载worklist，然后用for…in循环遍历worklist。</p>
+<p>这样做的问题在于：for…in循环并没有要求枚举对象的修改与当前循环保持一致。事实上，标准规范规定了：</p>
+<p>“如果被枚举对象在枚举期间添加了新的属性，那么枚举期间并不能保证新添加的属性能够访问”。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这道题考察了面试者包括JS OOP在内的多项基础，尤其是后半道考察了候选者的思维能力、反应能力。</p>
+<p>扯回原诗句，谈一下感悟，在天体的转动和岁月的轮回中，我们分明的感受到每一个个体所拥有生命周期的单薄无力，在宏大的宇宙观中恐怕渺小不及沧海一粟。诗句的后半句拿出来共勉：“Hold infinity in the palm of your hand, and eternity in an hour 把无限放在你的手上，永恒在一刹那里收藏”。</p>
+<p>在前端快速迭代发展的学习中，作为初学者，往往面对浩瀚的知识海洋望洋兴叹，此时基础便是那能够收藏“永恒和无限”的潘多拉魔盒。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;好吧，我承认太标题党了，这篇文章是通过一道前端面试题引出的纯技术讨论。我先要矫情无比的从中外诗歌说起。&lt;/p&gt;
+&lt;p&gt;传统的佛学经典里，被世人熟知的有这样一句话：“一花一世界，一叶一菩提，一木一浮生，一草一天堂，一砂一极乐，一方一净土，一笑一尘缘，一念一清静。”。&lt;/p&gt;
+
+    
+    </summary>
+    
+      <category term="js" scheme="https://exp-team.github.io/categories/js/"/>
+    
+    
+      <category term="js" scheme="https://exp-team.github.io/tags/js/"/>
+    
+  </entry>
   
   <entry>
     <title>expfe技术周刊第10111期</title>
@@ -1311,36 +1393,6 @@ var Person = (function () {
 &lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;ES6-的模块系统&quot;&gt;&lt;a href=&quot;#ES6-的模块系统&quot; class=&quot;headerlink&quot; title=&quot;ES6 的模块系统&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://segmentfault.com/a/1190000003410285&quot;&gt;ES6 的模块系统&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;在任何发型项目中，模块化都是非常常见，也是非常有必要的，es6为JavaScript带来了模块特性，对比JavaScript模块系统的现状，es的模块系统在规范上与其他的模块系统衔接得非常好，以至于大家对他的学习成本很低，这篇文章不但在语法上讲得非常详细透彻，在原理上也分析得浅显易懂，没有很多晦涩的语法个名词，对于理解ES6模块化非常有帮助。&lt;/p&gt;
 &lt;h3 id=&quot;CSS-方法论的选择&quot;&gt;&lt;a href=&quot;#CSS-方法论的选择&quot; class=&quot;headerlink&quot; title=&quot;CSS 方法论的选择&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://zcfy.cc/article/when-to-use-which-css-methodology-1828.html&quot;&gt;CSS 方法论的选择&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;相信各路前端大神对css方法论的选择都有自己的想法，对于我个人而言，没有最好的，只有最适合自己的，去争论其中的好坏并没有什么意义，还不如脚踏实地的做好自己技术选型。&lt;/p&gt;
 &lt;h3 id=&quot;美团点评酒旅前端的技术体系&quot;&gt;&lt;a href=&quot;#美团点评酒旅前端的技术体系&quot; class=&quot;headerlink&quot; title=&quot;美团点评酒旅前端的技术体系&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/23976121&quot;&gt;美团点评酒旅前端的技术体系&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;当我们沉浸在自己所在团队的技术体系下的同时也要多看看外面的世界，对比自己所在的技术体系，或许有相似之处，也有很多值得我们学习和思考的point~&lt;br&gt;
-    
-    </summary>
-    
-      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
-    
-    
-      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>expfe技术周刊第1101期</title>
-    <link href="https://exp-team.github.io/blog/2016/11/26/weekly/weekly-1101/"/>
-    <id>https://exp-team.github.io/blog/2016/11/26/weekly/weekly-1101/</id>
-    <published>2016-11-25T16:00:00.000Z</published>
-    <updated>2017-01-13T08:09:51.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>11.7-11.26，“宫城团回凛严光，白天碎碎堕琼芳”。<br>本周帝都迎来了入冬初雪：四季变换如若总让人猝不及防，那么技术更迭却总能够如约而至。</p>
-<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="JS-5种不同的方法实现装饰者模式（译）"><a href="#JS-5种不同的方法实现装饰者模式（译）" class="headerlink" title="JS 5种不同的方法实现装饰者模式（译）"></a><a href="https://zhuanlan.zhihu.com/p/20743493?from=singlemessage&amp;isappinstalled=0" target="_blank" rel="external">JS 5种不同的方法实现装饰者模式（译）</a></h3><p>不错的一篇文章，为了自身乐趣和加强理解使用闭包、猴子补丁、原型、代理和中间件5种不同方式在 javascript 中实现装饰者模式。</p>
-<h3 id="2016-JavaScript-发展现状大调查"><a href="#2016-JavaScript-发展现状大调查" class="headerlink" title="2016 JavaScript 发展现状大调查"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224014&amp;idx=1&amp;sn=25ee1479f8c00fda80afae6fa5413ef1&amp;chksm=bd49ae4a8a3e275c2bd13d64983385748aa783321b98e2d98d2dda508127c90906903ea2ddb5&amp;mpshare=1&amp;scene=1&amp;srcid=1121ZEDSvG9GXWCr22ho8UGo#rd" target="_blank" rel="external">2016 JavaScript 发展现状大调查</a></h3><p>一旦临近年底，各种总结，各种评选颁奖。那么作为有点“乱”的前端界，也不能少。</p>
-<a id="more"></a>
-<h2 id="前端新潮"><a href="#前端新潮" class="headerlink" title="前端新潮"></a>前端新潮</h2><h3 id="组件化——前端编程的选择"><a href="#组件化——前端编程的选择" class="headerlink" title="组件化——前端编程的选择"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224143&amp;idx=2&amp;sn=b2f3457ee7fc5f81858886efb7be0374&amp;chksm=bd49a1cb8a3e28dd1dcebea92d0ac6aa61aa4df2061b47f0b00956aa0111f838dfa29e4f3a1e&amp;mpshare=1&amp;scene=1&amp;srcid=1125IIjmzOrdk0m7t3HpYkuy#rd" target="_blank" rel="external">组件化——前端编程的选择</a></h3><p>不管是迭代型产品还是日常的运营活动页，总会遇到蛮多重复的工作，如果能站在比业务层高一点的角度来看的话，就很有必要做到”服务”，这样不管是对项目还是自身来说都是利大于弊。对自己来说意义更大，有沉淀，有影响力。今天的文章由EAII企业架构创新研究院@郭怀成带来授权分享。</p>
-<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="既然写-CSS-很容易，那为什么大家还是把-CSS-写的那么烂呢？"><a href="#既然写-CSS-很容易，那为什么大家还是把-CSS-写的那么烂呢？" class="headerlink" title="既然写 CSS 很容易，那为什么大家还是把 CSS 写的那么烂呢？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963848&amp;idx=1&amp;sn=946969566285d2023b3dc1e49721a03b&amp;chksm=843a13eeb34d9af8afed798ef742d937e07ee35b4a65182786a27d758cb45e488ab2505ec194&amp;mpshare=1&amp;scene=1&amp;srcid=1122XbVzsEaIA8HN8RIiUVxm#rd" target="_blank" rel="external">既然写 CSS 很容易，那为什么大家还是把 CSS 写的那么烂呢？</a></h3><p>Why CSS still sucks in 2016???</p>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="程序员提交代码的-emoji-指南"><a href="#程序员提交代码的-emoji-指南" class="headerlink" title="程序员提交代码的 emoji 指南"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963837&amp;idx=1&amp;sn=6417ad5d02622fb2b4f765170e95dfa7&amp;chksm=843a131bb34d9a0d5c05eac862140d1b6fb564705f429c04130e76665565219ec901b80b5dbf&amp;mpshare=1&amp;scene=1&amp;srcid=1119QJckFwjEboCtC0mGYyzK#rd" target="_blank" rel="external">程序员提交代码的 emoji 指南</a></h3><h3 id="谈谈主动工作"><a href="#谈谈主动工作" class="headerlink" title="谈谈主动工作"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651223990&amp;idx=1&amp;sn=bd8613aa2a6d088ff1b9dc290bccef3d&amp;chksm=bd49ae328a3e27249a2da8b06737be5f28df53edca946e041c17788c70763c35cb817bf465db&amp;mpshare=1&amp;scene=1&amp;srcid=1119aU3KMPedMEwelSDQZvJb#rd" target="_blank" rel="external">谈谈主动工作</a></h3><h3 id="各种编程语言都是什么星座？"><a href="#各种编程语言都是什么星座？" class="headerlink" title="各种编程语言都是什么星座？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963854&amp;idx=1&amp;sn=2ff451c6638da8be0dff5f3cbdc88a29&amp;chksm=843a13e8b34d9afe84d23accc9a75cdc31df611b80c7be6cba21b5f7c17d2f7c5572743ba4ea&amp;mpshare=1&amp;scene=1&amp;srcid=11248LjhWF3vScFZKDscmjWM#rd" target="_blank" rel="external">各种编程语言都是什么星座？</a></h3><h3 id="我们应该先学习哪种语言-ʇdiɹosavaɾ-ɹeʍsua"><a href="#我们应该先学习哪种语言-ʇdiɹosavaɾ-ɹeʍsua" class="headerlink" title="我们应该先学习哪种语言 ʇdıɹɔsɐʌɐɾ :ɹǝʍsuɐ"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963827&amp;idx=1&amp;sn=2a327830a340d5efdfbf43135b5f495d&amp;chksm=843a1315b34d9a031832b37e7c1a3d90a84631b0bcf7749e06f413c903cc4fa9f348ebaeba95&amp;mpshare=1&amp;scene=1&amp;srcid=1124xQOI9SRb5TGicdbsxS3L#rd" target="_blank" rel="external">我们应该先学习哪种语言 ʇdıɹɔsɐʌɐɾ :ɹǝʍsuɐ</a></h3>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;11.7-11.26，“宫城团回凛严光，白天碎碎堕琼芳”。&lt;br&gt;本周帝都迎来了入冬初雪：四季变换如若总让人猝不及防，那么技术更迭却总能够如约而至。&lt;/p&gt;
-&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;JS-5种不同的方法实现装饰者模式（译）&quot;&gt;&lt;a href=&quot;#JS-5种不同的方法实现装饰者模式（译）&quot; class=&quot;headerlink&quot; title=&quot;JS 5种不同的方法实现装饰者模式（译）&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/20743493?from=singlemessage&amp;amp;isappinstalled=0&quot;&gt;JS 5种不同的方法实现装饰者模式（译）&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;不错的一篇文章，为了自身乐趣和加强理解使用闭包、猴子补丁、原型、代理和中间件5种不同方式在 javascript 中实现装饰者模式。&lt;/p&gt;
-&lt;h3 id=&quot;2016-JavaScript-发展现状大调查&quot;&gt;&lt;a href=&quot;#2016-JavaScript-发展现状大调查&quot; class=&quot;headerlink&quot; title=&quot;2016 JavaScript 发展现状大调查&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;amp;mid=2651224014&amp;amp;idx=1&amp;amp;sn=25ee1479f8c00fda80afae6fa5413ef1&amp;amp;chksm=bd49ae4a8a3e275c2bd13d64983385748aa783321b98e2d98d2dda508127c90906903ea2ddb5&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1121ZEDSvG9GXWCr22ho8UGo#rd&quot;&gt;2016 JavaScript 发展现状大调查&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;一旦临近年底，各种总结，各种评选颁奖。那么作为有点“乱”的前端界，也不能少。&lt;/p&gt;
     
     </summary>
     
