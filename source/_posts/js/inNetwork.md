@@ -30,7 +30,6 @@ author: 侯策
 
 正确答案不难理解：
 
-```javascript
     function Member (name) {
         this.name = name;
         this.friends = [];
@@ -38,7 +37,6 @@ author: 侯策
 
 是不是非常简单。它的典型错误包括但是不限于：
 
-```javascript
     function Member (name) {
         this.name = name;
     }
@@ -54,7 +52,6 @@ author: 侯策
 
 我要实现一个带环社交网络（社交圈）：
 
-```javascript
     var a = new Member('Alice');
     var b = new Member('Bob');
     var c = new Member('Carol');
@@ -87,7 +84,6 @@ author: 侯策
 
 最终实现：
 
-```javascript
     Member.prototype.inNetwork = function (target) {
         var visited = {};
         var worklist = [this]; // 用于存放社交链上的个体信息，初始时以“自己”作为根节点
@@ -112,6 +108,14 @@ author: 侯策
     }
 
 我在代码中加上了注释，如果您还不明白也没有关系。建议去跑一下程序，进行debugger和console，尝试去理解。
+
+测试：
+
+    a.inNetwork(f) // true
+    f.inNetwork(a) //false
+
+哈哈，果然Alice能通过朋友圈查找到Fatima，而Fatima却不能反向找到Alice!当然，这样我认为是违反人类社会常识的。但是，谁让他是题目呢？
+
 
 一道简单的题却覆盖了很多知识点，比如：while循环中的流程控制（continue），数组的基本方法（pop,forEach,push），for...in等等。
 
