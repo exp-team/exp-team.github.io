@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://exp-team.github.io/"/>
-  <updated>2017-03-06T11:14:08.000Z</updated>
+  <updated>2017-03-09T06:43:42.000Z</updated>
   <id>https://exp-team.github.io/</id>
   
   <author>
@@ -14,6 +14,103 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>面试题目别有洞天 -&gt; 从es6优雅解法，到降级polyfill，再到redux reducer迷之命名</title>
+    <link href="https://exp-team.github.io/blog/2017/03/09/js/reduce/"/>
+    <id>https://exp-team.github.io/blog/2017/03/09/js/reduce/</id>
+    <published>2017-03-08T16:00:00.000Z</published>
+    <updated>2017-03-09T06:43:42.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>之前的<a href="http://www.jianshu.com/p/6958f99db769" target="_blank" rel="external">一篇文章：从一道面试题，到“我可能看了假源码”</a>讨论了bind方法的各种进阶Pollyfill，今天再分享一个有意思的题目。</p>
+<p>从解这道题目出发，我会谈到数组的Reduce方法，ES6特性和Redux数据流框架中Reducer的命名等等。一道典型的题目，却如唐代诗人章碣《对月》诗中所云：“别有洞天三十六，水晶台殿冷层层。”</p>
+<h2 id="题目背景"><a href="#题目背景" class="headerlink" title="题目背景"></a>题目背景</h2><p>完成一个’flatten’的函数，实现“拍平”一个多维数组为一维。示例如下：</p>
+<pre><code>var testArr1 = [[0, 1], [2, 3], [4, 5]];
+var testArr2 = [0, [1, [2, [3, [4, [5]]]]]];
+flatten(testArr1) // [0, 1, 2, 3, 4, 5]
+flatten(testArr2) // [0, 1, 2, 3, 4, 5]
+</code></pre><h2 id="解法先睹为快"><a href="#解法先睹为快" class="headerlink" title="解法先睹为快"></a>解法先睹为快</h2><p>先看一眼比较优雅的ES6解法：</p>
+<pre><code>const flatten = arr =&gt; arr.reduce((pre, val) =&gt; acc.concat(Array.isArray(pre) ? flatten(val) : val), []);
+</code></pre><p>如果你看不明白，不要放弃。我会用ES5的思路“翻译”一下，相信你很快就能看懂。</p>
+<p>如果你一眼能看明白，也建议继续往下读。因为会有“不一样”的知识点。</p>
+<h2 id="深入解读"><a href="#深入解读" class="headerlink" title="深入解读"></a>深入解读</h2><p>第一个想到的念头肯定是递归，递归自然就想到递归的“尽头”，那就要判断数组某项元素是否还是数组类型。<br>好吧，我们开始动手实现一个方案，其实是上面解法的ES5版本：</p>
+<pre><code>var flatten = function(array) {
+    return array.reduce(function(previous, val) {
+        if (Object.prototype.toString.call(val) !== &apos;[object Array]&apos;) {
+            return (previous.push(val), previous);
+        }
+        return (Array.prototype.push.apply(previous, flatten(val)), previous);
+    }, []);
+};
+</code></pre><p>可能这样写，对于很多人来说，并不能完全理解。因为我们使用了较多JS高级用法。关键核心还用到了类似“函数式”思想的reduce方法。<br>千万不要灰心，继续往下看。</p>
+<h3 id="return的到底是什么？"><a href="#return的到底是什么？" class="headerlink" title="return的到底是什么？"></a>return的到底是什么？</h3><p>我们注意到上面的写法return使用了（）表达式。括号内容前半句是为了执行。这样写也许稍微晦涩难懂一些。请看下面的代码示例，你就会明白：</p>
+<pre><code>function t() {
+    var a = 1;
+    return (a++, a);
+}
+t(); // 2
+</code></pre><h3 id="Object-prototype-toString-call是什么？"><a href="#Object-prototype-toString-call是什么？" class="headerlink" title="Object.prototype.toString.call是什么？"></a>Object.prototype.toString.call是什么？</h3><p>Object.prototype.toString.call可以暂且认为是“功能最强大”的类型判断语句。在对数组类型进行判断时，需要格外小心，比如这样几个“陷阱”：</p>
+<pre><code>var a = [];
+typeof a; // &quot;object&quot;
+a instanceof Array; // true;
+Object.prototype.toString.call(a); // &quot;[object Array]&quot;
+</code></pre><h3 id="reduce方法到底做了什么？"><a href="#reduce方法到底做了什么？" class="headerlink" title="reduce方法到底做了什么？"></a>reduce方法到底做了什么？</h3><p>现在到了最关键的地方。reduce方法是ES5引入，很多人使用它的场景并不多。但是了解他的特性却是必须的。遗憾的是，社区上对于它的内容似乎都不是“太重视”。“函数式“思想也让一些初学者望而却步。这里我简要进行“科普”，因为下面我要围绕它进行延伸：</p>
+<p>reduce在英文中译为“减少; 缩小; 使还原; 使变弱”，MDN对方法直述为：“The reduce method applies a function against an accumulator and each value of the array (from left-to-right) to reduce it to a single value.”<br>我并不打算对他直接翻译，因为这样会变的更加晦涩难懂。</p>
+<p>我们看他的使用语法：</p>
+<pre><code>array1.reduce(callbackfn[, initialValue])
+</code></pre><p>参数分析：</p>
+<p>1）array1：必需。<br>一个数组对象。即调用reduce方法的必须是一个数组类型。</p>
+<p>2）callbackfn：必需。<br>一个接受最多四个参数的函数。对于数组中的每个元素，reduce方法都会调用 callbackfn 函数一次。<br>这个callback的4个参数为：</p>
+<pre><code>accumulator // 上一次调用回调返回的值，或者是提供的初始值（initialValue）
+currentValue // 数组中正在处理的元素
+currentIndex // 数据中正在处理的元素索引，如果提供了initialValue ，从0开始；否则从1开始
+array // 调用reduce的数组
+</code></pre><p>3)initialValue可选项。<br>其值用于第一次调用callback的第一个参数。如果此参数为空，则拿数组第一项来作为第一次调用callback的第一个参数。</p>
+<p>比如，我们分析一个常用用法：</p>
+<pre><code>[0,1,2,3,4].reduce(function(previous, item, currentIndex, array){
+  return previous + item;
+});
+// 10
+</code></pre><p>这里并未提供reduce的第二个参数initialValue，所以从数组第一项开始进行回调函数的执行。并且每次回调函数执行完之后的结果，作为下一次的previous执行回调。</p>
+<p>所以，上述代码便是一个累加器的实现。</p>
+<h2 id="ES6写法"><a href="#ES6写法" class="headerlink" title="ES6写法"></a>ES6写法</h2><p>现在理解了Reduce函数，再结合ES6特性，使解法更加优雅：</p>
+<pre><code>const flatten = arr =&gt; arr.reduce((pre, val) =&gt; acc.concat(Array.isArray(pre) ? flatten(val) : val), []);
+</code></pre><p>这样写是不是太“函数式”了，但是思路跟之前解法完全一样。我只不过充分使用了箭头函数带来的便利。并且使用了更便捷的isArray对数组类型进行判断。这是开篇提到的解法，也是MDN最新版的实现。</p>
+<h2 id="如何实现一个reduce的pollyfill"><a href="#如何实现一个reduce的pollyfill" class="headerlink" title="如何实现一个reduce的pollyfill"></a>如何实现一个reduce的pollyfill</h2><p>现在明白了reduce的秘密，接下来我们需要充分发挥对JS的理解，来手动实现一个reduce函数。毕竟，reduce是ES5带来的数组新特性，在不使用ES5-shim的情况下，需要手动兼容。另外，其实reduce方法可以实现的逻辑，大多都能够使用循环来实现。但是了解这样一个优雅的方法，不管是在程序的可读性上，还是在设计理解层面上，还是很有必要的。</p>
+<p>同样，在MDN上也有实现，但是我觉得下面的代码实现更加优雅和清晰：</p>
+<pre><code>var reduce = function(arr, func, initialValue) {
+    var base = typeof initialValue === &apos;undefined&apos; ? arr[0] : initialValue;
+    var startPoint = typeof initialValue === &apos;undefined&apos; ? 1 : 0;
+    arr.slice(startPoint)
+        .forEach(function(val, index) {
+            base = func(base, val, index + startPoint, arr);
+        });
+    return base;
+};
+</code></pre><p>如果读者有不同实现思路，也欢迎与我讨论。</p>
+<h2 id="ES5-shim的pollyfill"><a href="#ES5-shim的pollyfill" class="headerlink" title="ES5-shim的pollyfill"></a>ES5-shim的pollyfill</h2><p>我也同样看了下ES5-shim里的pollyfill，跟我的思路基本完全一致。唯一有一点区别的地方在于我用了forEach迭代而ES5-shim使用的是简单for循环。</p>
+<p>当然，数组的forEach方法也是ES5新增的。但我这里是为了用简单明了的思路，实现reduce方法，根本目的还是希望对reduce有一个全面透彻的了解。</p>
+<p>如果您还不明白，我认为还是对于reduce方法没有掌握透彻。建议再梳理一遍。</p>
+<h2 id="Redux中的reducer"><a href="#Redux中的reducer" class="headerlink" title="Redux中的reducer"></a>Redux中的reducer</h2><p>明白了reduce函数，我们再来看一下Redux中的reducer和这个reduce有什么命名上的关联。</p>
+<p>熟悉Redux数据流架构的同学理解reducer做了什么，关于这个纯函数的命名，在redux源码github仓库上也有一个<a href="https://github.com/reactjs/redux/blob/master/docs/basics/Reducers.md" target="_blank" rel="external">官方解释</a>：“It’s called a reducer because it’s the type of function you would pass to Array.prototype.reduce(reducer, ?initialValue)”，虽然是一笔带过，但是总结的恰到好处。</p>
+<p>我详细说一下：Redux数据流里，reducers其实是根据之前的状态（previous state）和现有的action（current action）更新state（这个state可以理解为上文累加器的结果（accumulation））。每次redux reducer被执行时，state和action被传入，这个state根据action进行累加或者是“自身消减”（reduce，英文原意），进而返回最新的state。这符合一个典型reduce函数的用法：state -&gt; action -&gt; state.</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章对于如何优雅地“扁平化”一个多维数组进行了解法分析。并且对于秉承函数式编程思想的reduce方法进行了深入讨论，我们还实现了reduce的pollyfill。在充分理解的基础上，又简要延伸到redux数据架构里面reducer的命名。熟悉Redux的同学一定会有所感触。</p>
+<p>最后希望对读者有所启发，也欢迎同我讨论。</p>
+<p>PS：百度知识搜索部大前端继续招兵买马，高级工程师、实习生职位均有，有意向者火速联系。。。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;之前的&lt;a href=&quot;http://www.jianshu.com/p/6958f99db769&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;一篇文章：从一道面试题，到“我可能看了假源码”&lt;/a&gt;讨论了bind方法的各种进阶Pollyfill，今天再分
+    
+    </summary>
+    
+      <category term="js" scheme="https://exp-team.github.io/categories/js/"/>
+    
+    
+      <category term="js" scheme="https://exp-team.github.io/tags/js/"/>
+    
+  </entry>
   
   <entry>
     <title>由浅入深的前端面试题 和矫情的“浪漫主义”诗句</title>
@@ -288,6 +385,121 @@ f.inNetwork(a) //false
   </entry>
   
   <entry>
+    <title>从一道面试题的进阶，到“我可能看了假源码”</title>
+    <link href="https://exp-team.github.io/blog/2017/02/20/js/bind/"/>
+    <id>https://exp-team.github.io/blog/2017/02/20/js/bind/</id>
+    <published>2017-02-19T16:00:00.000Z</published>
+    <updated>2017-02-22T13:52:41.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>今天想谈谈一道前端面试题，我做面试官的时候经常喜欢用它来考察面试者的基础是否扎实，以及逻辑、思维能力和临场表现，题目是：“模拟实现ES5中原生bind函数”。<br>也许这道题目已经不再新鲜，部分读者也会有思路来解答。社区上关于原生bind的研究也很多，比如用它来实现函数“颗粒化（currying）”，<br>或者“反颗粒化（uncurrying）”。<br>但是，我确信有很多细节是您注意不到的，也是社区上关于这个话题普遍缺失的。<br>这篇文章面向有较牢固JS基础的读者，会从最基本的理解入手，一直到分析ES5-shim实现bind源码，相信不同程度的读者都能有所收获。<br>也欢迎大家与我讨论。</p>
+<h2 id="bind函数究竟是什么"><a href="#bind函数究竟是什么" class="headerlink" title="bind函数究竟是什么?"></a>bind函数究竟是什么?</h2><p>在开启我们的探索之前，有必要先明确一下bind到底实现了什么：<br>1）简单粗暴地来说，bind是用于绑定this指向的。（如果你还不了解JS中this的指向问题，以及执行环境上下文的奥秘，这篇文章暂时就不太适合阅读）。</p>
+<p>2）bind使用语法：</p>
+<pre><code>fun.bind(thisArg[, arg1[, arg2[, ...]]])
+</code></pre><p>bind方法会创建一个新函数。当这个新函数被调用时，bind的第一个参数将作为它运行时的this，之后的一序列参数将会在传递的实参前传入作为它的参数。本文不打算科普基础，如果您还不清楚，请<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind" target="_blank" rel="external">参考MDN内容</a>。</p>
+<p>3)bind返回的绑定函数也能使用new操作符创建对象：这种行为就像把原函数当成构造器。提供的this值被忽略，同时调用时的参数被提供给模拟函数。</p>
+<h2 id="初级实现"><a href="#初级实现" class="headerlink" title="初级实现"></a>初级实现</h2><p>了解了以上内容，我们来实现一个初级的bind函数Polyfill:</p>
+<pre><code>Function.prototype.bind = function (context) {
+    var me = this;
+    var argsArray = Array.prototype.slice.call(arguments);
+    return function () {
+        return me.apply(context, argsArray.slice(1))
+    }
+}
+</code></pre><p>这是一般“表现良好”的面试者所能给我提供的答案，如果面试者能写到这里，我会给他60分。<br>我们先简要解读一下：<br>基本原理是使用apply进行模拟。函数体内的this，就是需要绑定this的实例函数，或者说是原函数。最后我们使用apply来进行参数（context）绑定，并返回。<br>同时，将第一个参数（context）以外的其他参数，作为提供给原函数的预设参数，这也是基本的“颗粒化（curring）”基础。</p>
+<h2 id="初级实现的加分项"><a href="#初级实现的加分项" class="headerlink" title="初级实现的加分项"></a>初级实现的加分项</h2><p>上面的实现（包括后面的实现），其实是一个典型的<a href="https://en.wikipedia.org/wiki/Monkey_patch" target="_blank" rel="external">“Monkey patching(猴子补丁)”</a>，即“给内置对象扩展方法”。所以，如果面试者能进行一下“嗅探”，进行兼容处理，就是锦上添花了，我会给10分的附加分。</p>
+<pre><code>Function.prototype.bind = Function.prototype.bind || function (context) {
+    ...
+}
+</code></pre><h2 id="颗粒化（curring）实现"><a href="#颗粒化（curring）实现" class="headerlink" title="颗粒化（curring）实现"></a>颗粒化（curring）实现</h2><p>上述的实现方式中，我们返回的参数列表里包含：atgsArray.slice(1)，他的问题在于存在预置参数功能丢失的现象。<br>想象我们返回的绑定函数中，如果想实现预设传参（就像bind所实现的那样），就面临尴尬的局面。真正实现颗粒化的“完美方式”是：</p>
+<pre><code>Function.prototype.bind = Function.prototype.bind || function (context) {
+    var me = this;
+    var args = Array.prototype.slice.call(arguments, 1);
+    return function () {
+        var innerArgs = Array.prototype.slice.call(arguments);
+        var finalArgs = args.concat(innerArgs);
+        return me.apply(context, finalArgs);
+    }
+}
+</code></pre><p>如果面试者能够给出这样的答案，我内心独白会是“不错啊，貌似你就是我要找的那个TA～”。但是，我们注意在上边bind方法介绍的第三条提到：bind返回的函数如果作为构造函数，搭配new关键字出现的话，我们的绑定this就需要“被忽略”。</p>
+<h2 id="构造函数场景下的兼容"><a href="#构造函数场景下的兼容" class="headerlink" title="构造函数场景下的兼容"></a>构造函数场景下的兼容</h2><p>有了上边的讲解，不难理解需要兼容构造函数场景的实现：</p>
+<pre><code>Function.prototype.bind = Function.prototype.bind || function (context) {
+    var me = this;
+    var args = Array.prototype.slice.call(arguments, 1);
+    var F = function () {};
+    F.prototype = this.prototype;
+    var bound = function () {
+        var innerArgs = Array.prototype.slice.call(arguments);
+        var finalArgs = args.concat(innerArgs);
+        return me.apply(this instanceof F ? this : context || this, finalArgs);
+    }
+    bound.prototype = new F();
+    return bound;
+}
+</code></pre><p>如果面试者能够写成这样，我几乎要给满分，会帮忙联系HR谈薪酬了。当然，还可以做的更加严谨。</p>
+<h2 id="更严谨的做法"><a href="#更严谨的做法" class="headerlink" title="更严谨的做法"></a>更严谨的做法</h2><p>我们需要调用bind方法的一定要是一个函数，所以可以在函数体内做一个判断：</p>
+<pre><code>if (typeof this !== &quot;function&quot;) {
+  throw new TypeError(&quot;Function.prototype.bind - what is trying to be bound is not callable&quot;);
+}
+</code></pre><p>做到所有这一切，我会很开心的给满分。其实MDN上有个自己实现的polyfill，就是如此实现的。<br>另外，《JavaScript Web Application》一书中对bind()的实现，也是如此。</p>
+<p>故事貌似要画上休止符了——</p>
+<h2 id="一切还没完，高潮即将上演"><a href="#一切还没完，高潮即将上演" class="headerlink" title="一切还没完，高潮即将上演"></a>一切还没完，高潮即将上演</h2><p>如果你认为这样就完了，其实我会告诉你说，高潮才刚要上演。曾经的我也认为上述方法已经比较完美了，直到我看了es5-shim源码（已适当删减）：</p>
+<pre><code>bind: function bind(that) {
+    var target = this;
+    if (!isCallable(target)) {
+        throw new TypeError(&apos;Function.prototype.bind called on incompatible &apos; + target);
+    }
+    var args = array_slice.call(arguments, 1);
+    var bound;
+    var binder = function () {
+        if (this instanceof bound) {
+            var result = target.apply(
+                this,
+                array_concat.call(args, array_slice.call(arguments))
+            );
+            if ($Object(result) === result) {
+                return result;
+            }
+            return this;
+        } else {
+            return target.apply(
+                that,
+                array_concat.call(args, array_slice.call(arguments))
+            );
+        }
+    };
+    var boundLength = max(0, target.length - args.length);
+    var boundArgs = [];
+    for (var i = 0; i &lt; boundLength; i++) {
+        array_push.call(boundArgs, &apos;$&apos; + i);
+    }
+    bound = Function(&apos;binder&apos;, &apos;return function (&apos; + boundArgs.join(&apos;,&apos;) + &apos;){ return binder.apply(this, arguments); }&apos;)(binder);
+
+    if (target.prototype) {
+        Empty.prototype = target.prototype;
+        bound.prototype = new Empty();
+        Empty.prototype = null;
+    }
+    return bound;
+}
+</code></pre><p>看到了这样的实现，心中的困惑太多，不禁觉得我看了“假源码”。但是仔细分析一下，剩下就是一个大写的 。。。服！<br>这里先留一个悬念，不进行源码分析。读者可以自己先研究一下。如果想看源码分析，点击<a href="https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/">这篇文章的后续－源码解读</a>。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过比对几版的polyfill实现，对于bind应该有了比较深刻的认识。作为这道面试题的考察点，肯定不是让面试者实现低版本浏览器的向下兼容，因为我们有了es5-shim,es5-sham处理兼容性问题，并且无脑兼容我也认为是历史的倒退。<br>回到这道题考查点上，他有效的考察了很重要的知识点：比如this的指向，JS的闭包，原型原型链功力，设计程序上的兼容考虑等等硬素质。<br>在前端技术快速发展迭代的今天，在“前端市场是否饱和”“前端求职火爆异常”“前端入门简单，钱多人傻”的浮躁环境下，对基础内功的修炼就显得尤为重要，这也是你在前端路上能走多远、走多久的关键。</p>
+<p>PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;今天想谈谈一道前端面试题，我做面试官的时候经常喜欢用它来考察面试者的基础是否扎实，以及逻辑、思维能力和临场表现，题目是：“模拟实现ES5中原生bind函数”。&lt;br&gt;也许这道题目已经不再新鲜，部分读者也会有思路来解答。社区上关于原生bind的研究也很多，比如用它来实现函数“
+    
+    </summary>
+    
+      <category term="js" scheme="https://exp-team.github.io/categories/js/"/>
+    
+    
+      <category term="js" scheme="https://exp-team.github.io/tags/js/"/>
+    
+  </entry>
+  
+  <entry>
     <title>从一道面试题的进阶，到“我可能看了假源码”（2）</title>
     <link href="https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/"/>
     <id>https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/</id>
@@ -415,160 +627,6 @@ if (target.prototype) {
   </entry>
   
   <entry>
-    <title>从一道面试题的进阶，到“我可能看了假源码”</title>
-    <link href="https://exp-team.github.io/blog/2017/02/20/js/bind/"/>
-    <id>https://exp-team.github.io/blog/2017/02/20/js/bind/</id>
-    <published>2017-02-19T16:00:00.000Z</published>
-    <updated>2017-02-22T13:52:41.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>今天想谈谈一道前端面试题，我做面试官的时候经常喜欢用它来考察面试者的基础是否扎实，以及逻辑、思维能力和临场表现，题目是：“模拟实现ES5中原生bind函数”。<br>也许这道题目已经不再新鲜，部分读者也会有思路来解答。社区上关于原生bind的研究也很多，比如用它来实现函数“颗粒化（currying）”，<br>或者“反颗粒化（uncurrying）”。<br>但是，我确信有很多细节是您注意不到的，也是社区上关于这个话题普遍缺失的。<br>这篇文章面向有较牢固JS基础的读者，会从最基本的理解入手，一直到分析ES5-shim实现bind源码，相信不同程度的读者都能有所收获。<br>也欢迎大家与我讨论。</p>
-<h2 id="bind函数究竟是什么"><a href="#bind函数究竟是什么" class="headerlink" title="bind函数究竟是什么?"></a>bind函数究竟是什么?</h2><p>在开启我们的探索之前，有必要先明确一下bind到底实现了什么：<br>1）简单粗暴地来说，bind是用于绑定this指向的。（如果你还不了解JS中this的指向问题，以及执行环境上下文的奥秘，这篇文章暂时就不太适合阅读）。</p>
-<p>2）bind使用语法：</p>
-<pre><code>fun.bind(thisArg[, arg1[, arg2[, ...]]])
-</code></pre><p>bind方法会创建一个新函数。当这个新函数被调用时，bind的第一个参数将作为它运行时的this，之后的一序列参数将会在传递的实参前传入作为它的参数。本文不打算科普基础，如果您还不清楚，请<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind" target="_blank" rel="external">参考MDN内容</a>。</p>
-<p>3)bind返回的绑定函数也能使用new操作符创建对象：这种行为就像把原函数当成构造器。提供的this值被忽略，同时调用时的参数被提供给模拟函数。</p>
-<h2 id="初级实现"><a href="#初级实现" class="headerlink" title="初级实现"></a>初级实现</h2><p>了解了以上内容，我们来实现一个初级的bind函数Polyfill:</p>
-<pre><code>Function.prototype.bind = function (context) {
-    var me = this;
-    var argsArray = Array.prototype.slice.call(arguments);
-    return function () {
-        return me.apply(context, argsArray.slice(1))
-    }
-}
-</code></pre><p>这是一般“表现良好”的面试者所能给我提供的答案，如果面试者能写到这里，我会给他60分。<br>我们先简要解读一下：<br>基本原理是使用apply进行模拟。函数体内的this，就是需要绑定this的实例函数，或者说是原函数。最后我们使用apply来进行参数（context）绑定，并返回。<br>同时，将第一个参数（context）以外的其他参数，作为提供给原函数的预设参数，这也是基本的“颗粒化（curring）”基础。</p>
-<h2 id="初级实现的加分项"><a href="#初级实现的加分项" class="headerlink" title="初级实现的加分项"></a>初级实现的加分项</h2><p>上面的实现（包括后面的实现），其实是一个典型的<a href="https://en.wikipedia.org/wiki/Monkey_patch" target="_blank" rel="external">“Monkey patching(猴子补丁)”</a>，即“给内置对象扩展方法”。所以，如果面试者能进行一下“嗅探”，进行兼容处理，就是锦上添花了，我会给10分的附加分。</p>
-<pre><code>Function.prototype.bind = Function.prototype.bind || function (context) {
-    ...
-}
-</code></pre><h2 id="颗粒化（curring）实现"><a href="#颗粒化（curring）实现" class="headerlink" title="颗粒化（curring）实现"></a>颗粒化（curring）实现</h2><p>上述的实现方式中，我们返回的参数列表里包含：atgsArray.slice(1)，他的问题在于存在预置参数功能丢失的现象。<br>想象我们返回的绑定函数中，如果想实现预设传参（就像bind所实现的那样），就面临尴尬的局面。真正实现颗粒化的“完美方式”是：</p>
-<pre><code>Function.prototype.bind = Function.prototype.bind || function (context) {
-    var me = this;
-    var args = Array.prototype.slice.call(arguments, 1);
-    return function () {
-        var innerArgs = Array.prototype.slice.call(arguments);
-        var finalArgs = args.concat(innerArgs);
-        return me.apply(context, finalArgs);
-    }
-}
-</code></pre><p>如果面试者能够给出这样的答案，我内心独白会是“不错啊，貌似你就是我要找的那个TA～”。但是，我们注意在上边bind方法介绍的第三条提到：bind返回的函数如果作为构造函数，搭配new关键字出现的话，我们的绑定this就需要“被忽略”。</p>
-<h2 id="构造函数场景下的兼容"><a href="#构造函数场景下的兼容" class="headerlink" title="构造函数场景下的兼容"></a>构造函数场景下的兼容</h2><p>有了上边的讲解，不难理解需要兼容构造函数场景的实现：</p>
-<pre><code>Function.prototype.bind = Function.prototype.bind || function (context) {
-    var me = this;
-    var args = Array.prototype.slice.call(arguments, 1);
-    var F = function () {};
-    F.prototype = this.prototype;
-    var bound = function () {
-        var innerArgs = Array.prototype.slice.call(arguments);
-        var finalArgs = args.concat(innerArgs);
-        return me.apply(this instanceof F ? this : context || this, finalArgs);
-    }
-    bound.prototype = new F();
-    return bound;
-}
-</code></pre><p>如果面试者能够写成这样，我几乎要给满分，会帮忙联系HR谈薪酬了。当然，还可以做的更加严谨。</p>
-<h2 id="更严谨的做法"><a href="#更严谨的做法" class="headerlink" title="更严谨的做法"></a>更严谨的做法</h2><p>我们需要调用bind方法的一定要是一个函数，所以可以在函数体内做一个判断：</p>
-<pre><code>if (typeof this !== &quot;function&quot;) {
-  throw new TypeError(&quot;Function.prototype.bind - what is trying to be bound is not callable&quot;);
-}
-</code></pre><p>做到所有这一切，我会很开心的给满分。其实MDN上有个自己实现的polyfill，就是如此实现的。<br>另外，《JavaScript Web Application》一书中对bind()的实现，也是如此。</p>
-<p>故事貌似要画上休止符了——</p>
-<h2 id="一切还没完，高潮即将上演"><a href="#一切还没完，高潮即将上演" class="headerlink" title="一切还没完，高潮即将上演"></a>一切还没完，高潮即将上演</h2><p>如果你认为这样就完了，其实我会告诉你说，高潮才刚要上演。曾经的我也认为上述方法已经比较完美了，直到我看了es5-shim源码（已适当删减）：</p>
-<pre><code>bind: function bind(that) {
-    var target = this;
-    if (!isCallable(target)) {
-        throw new TypeError(&apos;Function.prototype.bind called on incompatible &apos; + target);
-    }
-    var args = array_slice.call(arguments, 1);
-    var bound;
-    var binder = function () {
-        if (this instanceof bound) {
-            var result = target.apply(
-                this,
-                array_concat.call(args, array_slice.call(arguments))
-            );
-            if ($Object(result) === result) {
-                return result;
-            }
-            return this;
-        } else {
-            return target.apply(
-                that,
-                array_concat.call(args, array_slice.call(arguments))
-            );
-        }
-    };
-    var boundLength = max(0, target.length - args.length);
-    var boundArgs = [];
-    for (var i = 0; i &lt; boundLength; i++) {
-        array_push.call(boundArgs, &apos;$&apos; + i);
-    }
-    bound = Function(&apos;binder&apos;, &apos;return function (&apos; + boundArgs.join(&apos;,&apos;) + &apos;){ return binder.apply(this, arguments); }&apos;)(binder);
-
-    if (target.prototype) {
-        Empty.prototype = target.prototype;
-        bound.prototype = new Empty();
-        Empty.prototype = null;
-    }
-    return bound;
-}
-</code></pre><p>看到了这样的实现，心中的困惑太多，不禁觉得我看了“假源码”。但是仔细分析一下，剩下就是一个大写的 。。。服！<br>这里先留一个悬念，不进行源码分析。读者可以自己先研究一下。如果想看源码分析，点击<a href="https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/">这篇文章的后续－源码解读</a>。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过比对几版的polyfill实现，对于bind应该有了比较深刻的认识。作为这道面试题的考察点，肯定不是让面试者实现低版本浏览器的向下兼容，因为我们有了es5-shim,es5-sham处理兼容性问题，并且无脑兼容我也认为是历史的倒退。<br>回到这道题考查点上，他有效的考察了很重要的知识点：比如this的指向，JS的闭包，原型原型链功力，设计程序上的兼容考虑等等硬素质。<br>在前端技术快速发展迭代的今天，在“前端市场是否饱和”“前端求职火爆异常”“前端入门简单，钱多人傻”的浮躁环境下，对基础内功的修炼就显得尤为重要，这也是你在前端路上能走多远、走多久的关键。</p>
-<p>PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;今天想谈谈一道前端面试题，我做面试官的时候经常喜欢用它来考察面试者的基础是否扎实，以及逻辑、思维能力和临场表现，题目是：“模拟实现ES5中原生bind函数”。&lt;br&gt;也许这道题目已经不再新鲜，部分读者也会有思路来解答。社区上关于原生bind的研究也很多，比如用它来实现函数“
-    
-    </summary>
-    
-      <category term="js" scheme="https://exp-team.github.io/categories/js/"/>
-    
-    
-      <category term="js" scheme="https://exp-team.github.io/tags/js/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>expfe技术周刊第10101期</title>
-    <link href="https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/"/>
-    <id>https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/</id>
-    <published>2017-01-20T16:00:00.000Z</published>
-    <updated>2017-02-19T12:29:49.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>1.16-1.21，马上要放假了，提前祝大家春节快乐，年终总结还没写的抓紧了，本期送个大家一副对联</p>
-<p>上联：微博知乎占头条谁与争锋</p>
-<p>下联：桌面移动待前端一统江湖</p>
-<p>横批：瞬息万变</p>
-<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="二十个令程序员泪流满面的瞬间"><a href="#二十个令程序员泪流满面的瞬间" class="headerlink" title="二十个令程序员泪流满面的瞬间"></a><a href="http://mp.weixin.qq.com/s?__biz=MzI2MzEzNzQ3MQ==&amp;mid=2650307110&amp;idx=1&amp;sn=e7a247e1dd3b86d3441806ad24cb094c&amp;chksm=f24cabf6c53b22e086a09b8481b10879f073e56073290e4f75dddb55cc74ff2b0d76ea15dad0&amp;mpshare=1&amp;scene=1&amp;srcid=0119Hrto64icL7EJf7WWxzwI#rd" target="_blank" rel="external">二十个令程序员泪流满面的瞬间</a></h3><p>只有程序员能看懂的gif图，感同身受，泪流满面啊，%&gt;_&lt;%</p>
-<h3 id="2017年的前端该学些什么-md"><a href="#2017年的前端该学些什么-md" class="headerlink" title="2017年的前端该学些什么.md"></a><a href="https://github.com/fezaoduke/TranslationInstitute/blob/master/2017%E5%B9%B4%E7%9A%84%E5%89%8D%E7%AB%AF%E8%AF%A5%E5%AD%A6%E4%BA%9B%E4%BB%80%E4%B9%88.md" target="_blank" rel="external">2017年的前端该学些什么.md</a></h3><p>17年你打算学点啥？给自己设定好规划了没？还在迷茫的同学看看这篇文章吧，2017一起加油</p>
-<h3 id="搜罗一切webpack的好文章好工具"><a href="#搜罗一切webpack的好文章好工具" class="headerlink" title="搜罗一切webpack的好文章好工具"></a><a href="https://github.com/webpack-china/awesome-webpack-cn" target="_blank" rel="external">搜罗一切webpack的好文章好工具</a></h3><p>webpakc2发布了，又到了伤筋动骨，加班熬夜的时候了，关于webpack的一切文章都在这里</p>
-<a id="more"></a>
-<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="掌握这5大核心概念，你就理解了React"><a href="#掌握这5大核心概念，你就理解了React" class="headerlink" title="掌握这5大核心概念，你就理解了React"></a><a href="https://zhuanlan.zhihu.com/p/24833815" target="_blank" rel="external">掌握这5大核心概念，你就理解了React</a></h3><p>react就这5个东西，还没入门的同学，或者深陷其中的同学快来围观，react不难，难得是用react做东西</p>
-<h3 id="一个react-redux工程实例"><a href="#一个react-redux工程实例" class="headerlink" title="一个react+redux工程实例"></a><a href="http://www.jianshu.com/p/8e28be0e7ab1?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends" target="_blank" rel="external">一个react+redux工程实例</a></h3><h3 id="揭秘babel的魔法之class继承的处理2"><a href="#揭秘babel的魔法之class继承的处理2" class="headerlink" title="揭秘babel的魔法之class继承的处理2"></a><a href="http://www.jianshu.com/p/95901615f322" target="_blank" rel="external">揭秘babel的魔法之class继承的处理2</a></h3><h3 id="全栈JS工程师的崛起"><a href="#全栈JS工程师的崛起" class="headerlink" title="全栈JS工程师的崛起"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651225356&amp;idx=1&amp;sn=4740cca7ab89b4449bfe5438e1427729&amp;chksm=bd49a4888a3e2d9e8c625d116fcc42db25c11421ba79d47dff272f0db8f6e5427d1bdbf3fe1b&amp;mpshare=1&amp;scene=1&amp;srcid=0120NQv87HQjc6Q50a1LLF0w#rd" target="_blank" rel="external">全栈JS工程师的崛起</a></h3><p>先精后广，一专多长，不想成为全栈的工程师，不是好工程师，一起加油</p>
-<h3 id="250行实现一个简单的MVVM"><a href="#250行实现一个简单的MVVM" class="headerlink" title="250行实现一个简单的MVVM"></a><a href="https://zhuanlan.zhihu.com/p/24475845" target="_blank" rel="external">250行实现一个简单的MVVM</a></h3><p>一直想动手写一个mvvm框架，就从这篇文章开始吧</p>
-<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="Google发布新的图像压缩技术，最高可节省75％带宽"><a href="#Google发布新的图像压缩技术，最高可节省75％带宽" class="headerlink" title="Google发布新的图像压缩技术，最高可节省75％带宽"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA5Nzc4OTA1Mw==&amp;mid=2659598877&amp;idx=1&amp;sn=704e7d5a05adaff567c9adf015753124&amp;chksm=8be9970fbc9e1e191b0f3cf92a9dd6e76ad4a8d0fff38a30ed772033eb0ac10f6356d2a4f528&amp;mpshare=1&amp;scene=1&amp;srcid=0118TvMOVHhoZN10kF4DDpc6#rd" target="_blank" rel="external">Google发布新的图像压缩技术，最高可节省75％带宽</a></h3><h3 id="Bluebird-是如何做到比原生实现更快的？"><a href="#Bluebird-是如何做到比原生实现更快的？" class="headerlink" title="Bluebird 是如何做到比原生实现更快的？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964223&amp;idx=1&amp;sn=f2c37c05fb6ad370a67c59ca745bd7bf&amp;chksm=843aec99b34d658f043acdea3a3c5b948d664cff48947f4616ccebac4548c5b57978c0d3be38&amp;mpshare=1&amp;scene=1&amp;srcid=0117zptRUZNoEger5avSAAem#rd" target="_blank" rel="external">Bluebird 是如何做到比原生实现更快的？</a></h3><h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="你可能不知道的-Mac-技巧-文本操作"><a href="#你可能不知道的-Mac-技巧-文本操作" class="headerlink" title="你可能不知道的 Mac 技巧 - 文本操作"></a><a href="https://zhuanlan.zhihu.com/p/24921055" target="_blank" rel="external">你可能不知道的 Mac 技巧 - 文本操作</a></h3>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;1.16-1.21，马上要放假了，提前祝大家春节快乐，年终总结还没写的抓紧了，本期送个大家一副对联&lt;/p&gt;
-&lt;p&gt;上联：微博知乎占头条谁与争锋&lt;/p&gt;
-&lt;p&gt;下联：桌面移动待前端一统江湖&lt;/p&gt;
-&lt;p&gt;横批：瞬息万变&lt;/p&gt;
-&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;二十个令程序员泪流满面的瞬间&quot;&gt;&lt;a href=&quot;#二十个令程序员泪流满面的瞬间&quot; class=&quot;headerlink&quot; title=&quot;二十个令程序员泪流满面的瞬间&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzI2MzEzNzQ3MQ==&amp;amp;mid=2650307110&amp;amp;idx=1&amp;amp;sn=e7a247e1dd3b86d3441806ad24cb094c&amp;amp;chksm=f24cabf6c53b22e086a09b8481b10879f073e56073290e4f75dddb55cc74ff2b0d76ea15dad0&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=0119Hrto64icL7EJf7WWxzwI#rd&quot;&gt;二十个令程序员泪流满面的瞬间&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;只有程序员能看懂的gif图，感同身受，泪流满面啊，%&amp;gt;_&amp;lt;%&lt;/p&gt;
-&lt;h3 id=&quot;2017年的前端该学些什么-md&quot;&gt;&lt;a href=&quot;#2017年的前端该学些什么-md&quot; class=&quot;headerlink&quot; title=&quot;2017年的前端该学些什么.md&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://github.com/fezaoduke/TranslationInstitute/blob/master/2017%E5%B9%B4%E7%9A%84%E5%89%8D%E7%AB%AF%E8%AF%A5%E5%AD%A6%E4%BA%9B%E4%BB%80%E4%B9%88.md&quot;&gt;2017年的前端该学些什么.md&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;17年你打算学点啥？给自己设定好规划了没？还在迷茫的同学看看这篇文章吧，2017一起加油&lt;/p&gt;
-&lt;h3 id=&quot;搜罗一切webpack的好文章好工具&quot;&gt;&lt;a href=&quot;#搜罗一切webpack的好文章好工具&quot; class=&quot;headerlink&quot; title=&quot;搜罗一切webpack的好文章好工具&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://github.com/webpack-china/awesome-webpack-cn&quot;&gt;搜罗一切webpack的好文章好工具&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;webpakc2发布了，又到了伤筋动骨，加班熬夜的时候了，关于webpack的一切文章都在这里&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
-    
-    
-      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
-    
-  </entry>
-  
-  <entry>
     <title>伍酱的2016</title>
     <link href="https://exp-team.github.io/blog/2017/01/21/other/wujiang-2016/"/>
     <id>https://exp-team.github.io/blog/2017/01/21/other/wujiang-2016/</id>
@@ -651,26 +709,34 @@ if (target.prototype) {
   </entry>
   
   <entry>
-    <title>expfe技术周刊第10100期</title>
-    <link href="https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/"/>
-    <id>https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/</id>
-    <published>2017-01-12T16:00:00.000Z</published>
-    <updated>2017-01-13T12:23:08.000Z</updated>
+    <title>expfe技术周刊第10101期</title>
+    <link href="https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/"/>
+    <id>https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/</id>
+    <published>2017-01-20T16:00:00.000Z</published>
+    <updated>2017-02-19T12:29:49.000Z</updated>
     
-    <content type="html"><![CDATA[<p>1.8-1.13，新的一期，继续积累！</p>
-<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="《JS-闯关记》之原型及原型链"><a href="#《JS-闯关记》之原型及原型链" class="headerlink" title="《JS 闯关记》之原型及原型链"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;mid=2650101216&amp;idx=1&amp;sn=dcc39636ebff46aca84df68533fb0742&amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;scene=0" target="_blank" rel="external">《JS 闯关记》之原型及原型链</a></h3><p>原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的<strong>proto</strong> 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、<strong>proto</strong> 这五个概念入手。</p>
-<h3 id="H5项目常见问题及注意事项"><a href="#H5项目常见问题及注意事项" class="headerlink" title="H5项目常见问题及注意事项"></a><a href="http://www.open-open.com/lib/view/open1449325854077.html" target="_blank" rel="external">H5项目常见问题及注意事项</a></h3><p>再也不用为PM嘴中的“H5”发愁了。</p>
+    <content type="html"><![CDATA[<p>1.16-1.21，马上要放假了，提前祝大家春节快乐，年终总结还没写的抓紧了，本期送个大家一副对联</p>
+<p>上联：微博知乎占头条谁与争锋</p>
+<p>下联：桌面移动待前端一统江湖</p>
+<p>横批：瞬息万变</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="二十个令程序员泪流满面的瞬间"><a href="#二十个令程序员泪流满面的瞬间" class="headerlink" title="二十个令程序员泪流满面的瞬间"></a><a href="http://mp.weixin.qq.com/s?__biz=MzI2MzEzNzQ3MQ==&amp;mid=2650307110&amp;idx=1&amp;sn=e7a247e1dd3b86d3441806ad24cb094c&amp;chksm=f24cabf6c53b22e086a09b8481b10879f073e56073290e4f75dddb55cc74ff2b0d76ea15dad0&amp;mpshare=1&amp;scene=1&amp;srcid=0119Hrto64icL7EJf7WWxzwI#rd" target="_blank" rel="external">二十个令程序员泪流满面的瞬间</a></h3><p>只有程序员能看懂的gif图，感同身受，泪流满面啊，%&gt;_&lt;%</p>
+<h3 id="2017年的前端该学些什么-md"><a href="#2017年的前端该学些什么-md" class="headerlink" title="2017年的前端该学些什么.md"></a><a href="https://github.com/fezaoduke/TranslationInstitute/blob/master/2017%E5%B9%B4%E7%9A%84%E5%89%8D%E7%AB%AF%E8%AF%A5%E5%AD%A6%E4%BA%9B%E4%BB%80%E4%B9%88.md" target="_blank" rel="external">2017年的前端该学些什么.md</a></h3><p>17年你打算学点啥？给自己设定好规划了没？还在迷茫的同学看看这篇文章吧，2017一起加油</p>
+<h3 id="搜罗一切webpack的好文章好工具"><a href="#搜罗一切webpack的好文章好工具" class="headerlink" title="搜罗一切webpack的好文章好工具"></a><a href="https://github.com/webpack-china/awesome-webpack-cn" target="_blank" rel="external">搜罗一切webpack的好文章好工具</a></h3><p>webpakc2发布了，又到了伤筋动骨，加班熬夜的时候了，关于webpack的一切文章都在这里</p>
 <a id="more"></a>
-<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="揭秘babel的魔法之class魔法处理"><a href="#揭秘babel的魔法之class魔法处理" class="headerlink" title="揭秘babel的魔法之class魔法处理"></a><a href="https://mp.weixin.qq.com/s?__biz=MzIzNjE5NzAyMA==&amp;mid=2649879842&amp;idx=1&amp;sn=0e7eb27fd9bb7f5ba9bbd2b3640ba663&amp;chksm=f0ded0d1c7a959c785fd8c8b384e348506ea4dd40ca72a8fac00aa4f34ab07aacab6aa92514b&amp;mpshare=1&amp;scene=1&amp;srcid=01132iAX9Sp6Gpll9otS2un8&amp;key=59506e83f2f7e1fd47b66ec743010bafb62e75b40f02a088b7a58ef822f0fcfe14c244308ee819c24dd7303946792d0ace78d7c18cb31a020ca5b42528939fa5ce021ed6ae7a77d738521132ff2afee9&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a></h3><p>揭秘Babel的同时，在复习一遍原型链基础支持～</p>
-<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="如何让你的-CSS-更具有可维护性？——大神有绝招-amp"><a href="#如何让你的-CSS-更具有可维护性？——大神有绝招-amp" class="headerlink" title="如何让你的 CSS 更具有可维护性？——大神有绝招&amp;)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964179&amp;idx=1&amp;sn=f7088de66f09efd35057541695582d52&amp;chksm=843aecb5b34d65a3ff8d67142403f3463e08f57041f4212e991248f49770b59943d5c65545bc&amp;mpshare=1&amp;scene=1&amp;srcid=0111H4YARr96el0lj1WY0J09&amp;key=f27a3d85b887ad782291dcbcbc6989e0bb3335f0f66ac9cc6b6994c455227fac808715c21fb47af4ad18b5ff25efbb9aca75f3d0bbf57baefb60f1d36971b42fa9d323e2b3d80208070837dfd770fa49&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">如何让你的 CSS 更具有可维护性？——大神有绝招</a>&amp;)</h3><p>这篇文章教你一种方法，能够写出更具有可维护性的CSS，它就是”BEM”。</p>
-<h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="回顾-2016-年-Node-js-十大文章-amp"><a href="#回顾-2016-年-Node-js-十大文章-amp" class="headerlink" title="回顾 2016 年 Node.js 十大文章&amp;)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964196&amp;idx=1&amp;sn=d52e8258b54e0d807e14efa5a2791f84&amp;chksm=843aec82b34d65944704e1f7fc04747934bad078ad91906781f21edeb204a9a55f4d9f129369&amp;mpshare=1&amp;scene=1&amp;srcid=0111eOoheFnpABemlLvmHvL9&amp;key=b43a3af60b96e11e86b22b45b526335d70f3fbb0d1f05d664eb97888d1744e7026b64c4bdae93ab2ceb9092123f81dfcaecf157e9a43e4e2bed516a6b9db9e4e0fe03330913f5cfcf971d9ac46dfaf8e&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">回顾 2016 年 Node.js 十大文章</a>&amp;)</h3><p>对于Node.js开发者来说，2016是振奋人心的一年。</p>
-]]></content>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="掌握这5大核心概念，你就理解了React"><a href="#掌握这5大核心概念，你就理解了React" class="headerlink" title="掌握这5大核心概念，你就理解了React"></a><a href="https://zhuanlan.zhihu.com/p/24833815" target="_blank" rel="external">掌握这5大核心概念，你就理解了React</a></h3><p>react就这5个东西，还没入门的同学，或者深陷其中的同学快来围观，react不难，难得是用react做东西</p>
+<h3 id="一个react-redux工程实例"><a href="#一个react-redux工程实例" class="headerlink" title="一个react+redux工程实例"></a><a href="http://www.jianshu.com/p/8e28be0e7ab1?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends" target="_blank" rel="external">一个react+redux工程实例</a></h3><h3 id="揭秘babel的魔法之class继承的处理2"><a href="#揭秘babel的魔法之class继承的处理2" class="headerlink" title="揭秘babel的魔法之class继承的处理2"></a><a href="http://www.jianshu.com/p/95901615f322" target="_blank" rel="external">揭秘babel的魔法之class继承的处理2</a></h3><h3 id="全栈JS工程师的崛起"><a href="#全栈JS工程师的崛起" class="headerlink" title="全栈JS工程师的崛起"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651225356&amp;idx=1&amp;sn=4740cca7ab89b4449bfe5438e1427729&amp;chksm=bd49a4888a3e2d9e8c625d116fcc42db25c11421ba79d47dff272f0db8f6e5427d1bdbf3fe1b&amp;mpshare=1&amp;scene=1&amp;srcid=0120NQv87HQjc6Q50a1LLF0w#rd" target="_blank" rel="external">全栈JS工程师的崛起</a></h3><p>先精后广，一专多长，不想成为全栈的工程师，不是好工程师，一起加油</p>
+<h3 id="250行实现一个简单的MVVM"><a href="#250行实现一个简单的MVVM" class="headerlink" title="250行实现一个简单的MVVM"></a><a href="https://zhuanlan.zhihu.com/p/24475845" target="_blank" rel="external">250行实现一个简单的MVVM</a></h3><p>一直想动手写一个mvvm框架，就从这篇文章开始吧</p>
+<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="Google发布新的图像压缩技术，最高可节省75％带宽"><a href="#Google发布新的图像压缩技术，最高可节省75％带宽" class="headerlink" title="Google发布新的图像压缩技术，最高可节省75％带宽"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA5Nzc4OTA1Mw==&amp;mid=2659598877&amp;idx=1&amp;sn=704e7d5a05adaff567c9adf015753124&amp;chksm=8be9970fbc9e1e191b0f3cf92a9dd6e76ad4a8d0fff38a30ed772033eb0ac10f6356d2a4f528&amp;mpshare=1&amp;scene=1&amp;srcid=0118TvMOVHhoZN10kF4DDpc6#rd" target="_blank" rel="external">Google发布新的图像压缩技术，最高可节省75％带宽</a></h3><h3 id="Bluebird-是如何做到比原生实现更快的？"><a href="#Bluebird-是如何做到比原生实现更快的？" class="headerlink" title="Bluebird 是如何做到比原生实现更快的？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964223&amp;idx=1&amp;sn=f2c37c05fb6ad370a67c59ca745bd7bf&amp;chksm=843aec99b34d658f043acdea3a3c5b948d664cff48947f4616ccebac4548c5b57978c0d3be38&amp;mpshare=1&amp;scene=1&amp;srcid=0117zptRUZNoEger5avSAAem#rd" target="_blank" rel="external">Bluebird 是如何做到比原生实现更快的？</a></h3><h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="你可能不知道的-Mac-技巧-文本操作"><a href="#你可能不知道的-Mac-技巧-文本操作" class="headerlink" title="你可能不知道的 Mac 技巧 - 文本操作"></a><a href="https://zhuanlan.zhihu.com/p/24921055" target="_blank" rel="external">你可能不知道的 Mac 技巧 - 文本操作</a></h3>]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;1.8-1.13，新的一期，继续积累！&lt;/p&gt;
-&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;《JS-闯关记》之原型及原型链&quot;&gt;&lt;a href=&quot;#《JS-闯关记》之原型及原型链&quot; class=&quot;headerlink&quot; title=&quot;《JS 闯关记》之原型及原型链&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;amp;mid=2650101216&amp;amp;idx=1&amp;amp;sn=dcc39636ebff46aca84df68533fb0742&amp;amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;amp;scene=0&quot;&gt;《JS 闯关记》之原型及原型链&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的&lt;strong&gt;proto&lt;/strong&gt; 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、&lt;strong&gt;proto&lt;/strong&gt; 这五个概念入手。&lt;/p&gt;
-&lt;h3 id=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;a href=&quot;#H5项目常见问题及注意事项&quot; class=&quot;headerlink&quot; title=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.open-open.com/lib/view/open1449325854077.html&quot;&gt;H5项目常见问题及注意事项&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;再也不用为PM嘴中的“H5”发愁了。&lt;/p&gt;
+      &lt;p&gt;1.16-1.21，马上要放假了，提前祝大家春节快乐，年终总结还没写的抓紧了，本期送个大家一副对联&lt;/p&gt;
+&lt;p&gt;上联：微博知乎占头条谁与争锋&lt;/p&gt;
+&lt;p&gt;下联：桌面移动待前端一统江湖&lt;/p&gt;
+&lt;p&gt;横批：瞬息万变&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;二十个令程序员泪流满面的瞬间&quot;&gt;&lt;a href=&quot;#二十个令程序员泪流满面的瞬间&quot; class=&quot;headerlink&quot; title=&quot;二十个令程序员泪流满面的瞬间&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzI2MzEzNzQ3MQ==&amp;amp;mid=2650307110&amp;amp;idx=1&amp;amp;sn=e7a247e1dd3b86d3441806ad24cb094c&amp;amp;chksm=f24cabf6c53b22e086a09b8481b10879f073e56073290e4f75dddb55cc74ff2b0d76ea15dad0&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=0119Hrto64icL7EJf7WWxzwI#rd&quot;&gt;二十个令程序员泪流满面的瞬间&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;只有程序员能看懂的gif图，感同身受，泪流满面啊，%&amp;gt;_&amp;lt;%&lt;/p&gt;
+&lt;h3 id=&quot;2017年的前端该学些什么-md&quot;&gt;&lt;a href=&quot;#2017年的前端该学些什么-md&quot; class=&quot;headerlink&quot; title=&quot;2017年的前端该学些什么.md&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://github.com/fezaoduke/TranslationInstitute/blob/master/2017%E5%B9%B4%E7%9A%84%E5%89%8D%E7%AB%AF%E8%AF%A5%E5%AD%A6%E4%BA%9B%E4%BB%80%E4%B9%88.md&quot;&gt;2017年的前端该学些什么.md&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;17年你打算学点啥？给自己设定好规划了没？还在迷茫的同学看看这篇文章吧，2017一起加油&lt;/p&gt;
+&lt;h3 id=&quot;搜罗一切webpack的好文章好工具&quot;&gt;&lt;a href=&quot;#搜罗一切webpack的好文章好工具&quot; class=&quot;headerlink&quot; title=&quot;搜罗一切webpack的好文章好工具&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://github.com/webpack-china/awesome-webpack-cn&quot;&gt;搜罗一切webpack的好文章好工具&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;webpakc2发布了，又到了伤筋动骨，加班熬夜的时候了，关于webpack的一切文章都在这里&lt;/p&gt;
     
     </summary>
     
@@ -754,276 +820,33 @@ if (target.prototype) {
   </entry>
   
   <entry>
-    <title>揭秘babel的魔法之class继承的处理</title>
-    <link href="https://exp-team.github.io/blog/2017/01/12/js/babel-class2/"/>
-    <id>https://exp-team.github.io/blog/2017/01/12/js/babel-class2/</id>
-    <published>2017-01-11T16:00:00.000Z</published>
-    <updated>2017-01-16T07:13:59.000Z</updated>
+    <title>expfe技术周刊第10100期</title>
+    <link href="https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/"/>
+    <id>https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/</id>
+    <published>2017-01-12T16:00:00.000Z</published>
+    <updated>2017-01-13T12:23:08.000Z</updated>
     
-    <content type="html"><![CDATA[<p>如果你已经看过第一篇<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a>，这篇将会是一个延伸；<br>如果你还没看过，并且也不想<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">现在就去读一下</a>，单独看这篇也没有关系，并不存在理解上的障碍。</p>
-<p>上一篇针对Babel对ES6里面基础“class”的编译进行了分析。这一篇将会对class的继承，包括extends和super进行讲解。</p>
-<p>什么？你还不了解ES6如何实现继承？没关系，下文内容也有详细示例。</p>
-<p>再啰嗦一句，这一系列的文章并不是科普ECMAScript新规范。她的意义在于分析Babel对ES6的编译，从而希望读者对JS语言基础，程序设计理念等有更深刻的认识。</p>
-<h2 id="Class的继承"><a href="#Class的继承" class="headerlink" title="Class的继承"></a>Class的继承</h2><p>在这篇文章中，我会讲解Babel如何处理ES6 Class里面的继承功能，同样，这其实是一系列语法糖的实现。<br>我们先来温习一下实现方式：</p>
-<h3 id="ES6-实现继承"><a href="#ES6-实现继承" class="headerlink" title="ES6 实现继承"></a>ES6 实现继承</h3><p>首先，我们定义一个父类：</p>
-<pre><code>class Person {
-    constructor(){
-        this.type = &apos;person&apos;
-    }
-}
-</code></pre><p>这个类包含了一个实例属性。</p>
-<p>然后，实现一个Student类，这个“学生”类继承“人”类：</p>
-<pre><code>class Student extends Person {
-    constructor(){
-        super()
-    }
-}
-</code></pre><p>从简出发，我们定义的Person类只包含了type为person的这一个属性，不含有方法。所以我们extends+super()之后，Student类<br>也继承了同样的属性。<br>如下：</p>
-<pre><code>var student1 = new Student();
-student1.type // &quot;person&quot;
-</code></pre><p>我们进一步可以验证原型链上的关系：</p>
-<pre><code>student1 instanceof Student // true
-student1 instanceof Person // true
-student1.hasOwnProperty(&apos;type&apos;) // true
-</code></pre><p>一切看上去cool极了，我们实现了ES6里面的继承。并且用instanceof验证了ES6中一系列的实质就是“魔法糖”的本质。<br>那么，经过Babel编译，我们的代码是什么样呢？</p>
-<h3 id="Babel-transformation"><a href="#Babel-transformation" class="headerlink" title="Babel transformation"></a>Babel transformation</h3><p>我们一步一步来看，</p>
-<p>Step1: Person定义</p>
-<pre><code>class Person {
-    constructor(){
-        this.type = &apos;person&apos;
-    }
-}
-</code></pre><p>被编译为：</p>
-<pre><code>var Person = function Person() {
-    _classCallCheck(this, Person);
-    this.type = &apos;person&apos;;
-};
-</code></pre><p>如果你看过这一篇的<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">前传</a>，<br>你应该就熟悉这一系列的变换，也可能会记得_classCallCheck函数到底是什么鬼。这里因为篇幅和去冗余的原因，就不再展开。</p>
-<p>Step2：Student探秘<br>我们这次尝试观察Student子类：</p>
-<pre><code>class Student extends Person {
-    constructor(){
-        super()
-    }
-}
-</code></pre><p>编译结果：</p>
-<pre><code>// 实现定义Student构造函数，它是一个自执行函数，接受父类构造函数为参数
-var Student = (function(_Person) {
-    // 实现对父类原型链属性的继承
-    _inherits(Student, _Person);
-
-    // 将会返回这个函数作为完整的Student构造函数
-    function Student() {
-        // 使用检测
-        _classCallCheck(this, Student);  
-        // _get的返回值可以先理解为父类构造函数       
-        _get(Object.getPrototypeOf(Student.prototype), &apos;constructor&apos;, this).call(this);
-    }
-
-    return Student;
-})(Person);
-
-// _x为Student.prototype.__proto__
-// _x2为&apos;constructor&apos;
-// _x3为this
-var _get = function get(_x, _x2, _x3) {
-    var _again = true;
-    _function: while (_again) {
-        var object = _x,
-            property = _x2,
-            receiver = _x3;
-        _again = false;
-        // Student.prototype.__proto__为null的处理
-        if (object === null) object = Function.prototype;
-        // 以下是为了完整复制父类原型链上的属性，包括属性特性的描述符
-        var desc = Object.getOwnPropertyDescriptor(object, property);
-        if (desc === undefined) {
-            var parent = Object.getPrototypeOf(object);
-            if (parent === null) {
-                return undefined;
-            } else {
-                _x = parent;
-                _x2 = property;
-                _x3 = receiver;
-                _again = true;
-                desc = parent = undefined;
-                continue _function;
-            }
-        } else if (&apos;value&apos; in desc) {
-            return desc.value;
-        } else {
-            var getter = desc.get;
-            if (getter === undefined) {
-                return undefined;
-            }
-            return getter.call(receiver);
-        }
-    }
-};
-
-function _inherits(subClass, superClass) {
-    // superClass需要为函数类型，否则会报错
-    if (typeof superClass !== &apos;function&apos; &amp;&amp; superClass !== null) {
-        throw new TypeError(&apos;Super expression must either be null or a function, not &apos; + typeof superClass);
-    }
-    // Object.create第二个参数是为了修复子类的constructor
-    subClass.prototype = Object.create(superClass &amp;&amp; superClass.prototype, {
-        constructor: {
-            value: subClass,
-            enumerable: false,
-            writable: true,
-            configurable: true
-        }
-    });
-    // Object.setPrototypeOf是否存在做了一个判断，否则使用__proto__
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-}
-</code></pre><p>虽然我加上了注释，但是这一坨代码仍然看上去恶心极了！没关系，下面我们进行拆解，你很快就能明白。</p>
-<p>Step3：抽丝剥茧<br>我们首先看Student的编译结果：</p>
-<pre><code>var Student = (function(_Person) {
-    _inherits(Student, _Person);
-
-    function Student() {
-        _classCallCheck(this, Student);            
-        _get(Object.getPrototypeOf(Student.prototype), &apos;constructor&apos;, this).call(this);
-    }
-
-    return Student;
-})(Person);
-</code></pre><p>这是一个自执行函数，它接受一个参数Person（就是他要继承的父类），返回一个构造函数Student。</p>
-<p>上面_inherits方法的本质其实就是让Student子类继承Person父类原型链上的方法。它实现原理可以归结为一句话：</p>
-<pre><code>Student.prototype = Object.create(Person.prototype);
-Object.setPrototypeOf(Student, Person)
-</code></pre><p>注意，Object.create接收第二个参数，这就实现了对Student的constructor修复。<br>如果你不了解Object.create，那么<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create" target="_blank" rel="external">请参考这里。</a></p>
-<p>以上通过_inherits实现了对父类原型链上属性的继承，那么对于父类的实例属性（就是constructor定义的属性）的继承，也可以归结为一句话：</p>
-<pre><code>Person.call(this);
-</code></pre><p>如果你还不理解使用call或者apply或者bind来改变JS中this的指向，那么请参考<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call" target="_blank" rel="external">这篇文章。</a></p>
-<p>这样，我们便透析了Babel编译这一切的秘密。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>如果你看完这一系列的文章可能会有体会：我想灌输的肯定不是ES6新特性的使用，关于这些东西有太多的文章、博客、书籍去讨论。</p>
-<p>我是在讲Babel对这些新特性的编译产出，那为什么我会在乎这些呢？<br>其实通过分析，我们悄然回顾了JS中很多重点以及难点，还包括程序设计上的一些小思想。<br>最近面试了很多前端“新同学”：有的人痴迷于框架，可以使用React或者Vue比照tutorial做出页面炫酷的交互，甚至自觉SPA也不在话下；<br>有的人ES6、ES7了解很多，generator，async都能说出一二，仿佛Promise处理异步已经成为了“时代弃儿”。<br>可是同样是这些人，对原型原型链、this、作用域、闭包都没有深刻地理解和掌握。<br>同样是这些页面，即便用callback处理异步回调，嵌套最多也不到两层。</p>
-<p>也许，同样一批人也会问：“我能用前端框架、ES6撸出好多页面，可是为什么感觉进步很慢处于瓶颈中、面试也总被挂呢？”</p>
+    <content type="html"><![CDATA[<p>1.8-1.13，新的一期，继续积累！</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="《JS-闯关记》之原型及原型链"><a href="#《JS-闯关记》之原型及原型链" class="headerlink" title="《JS 闯关记》之原型及原型链"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;mid=2650101216&amp;idx=1&amp;sn=dcc39636ebff46aca84df68533fb0742&amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;scene=0" target="_blank" rel="external">《JS 闯关记》之原型及原型链</a></h3><p>原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的<strong>proto</strong> 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、<strong>proto</strong> 这五个概念入手。</p>
+<h3 id="H5项目常见问题及注意事项"><a href="#H5项目常见问题及注意事项" class="headerlink" title="H5项目常见问题及注意事项"></a><a href="http://www.open-open.com/lib/view/open1449325854077.html" target="_blank" rel="external">H5项目常见问题及注意事项</a></h3><p>再也不用为PM嘴中的“H5”发愁了。</p>
+<a id="more"></a>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="揭秘babel的魔法之class魔法处理"><a href="#揭秘babel的魔法之class魔法处理" class="headerlink" title="揭秘babel的魔法之class魔法处理"></a><a href="https://mp.weixin.qq.com/s?__biz=MzIzNjE5NzAyMA==&amp;mid=2649879842&amp;idx=1&amp;sn=0e7eb27fd9bb7f5ba9bbd2b3640ba663&amp;chksm=f0ded0d1c7a959c785fd8c8b384e348506ea4dd40ca72a8fac00aa4f34ab07aacab6aa92514b&amp;mpshare=1&amp;scene=1&amp;srcid=01132iAX9Sp6Gpll9otS2un8&amp;key=59506e83f2f7e1fd47b66ec743010bafb62e75b40f02a088b7a58ef822f0fcfe14c244308ee819c24dd7303946792d0ace78d7c18cb31a020ca5b42528939fa5ce021ed6ae7a77d738521132ff2afee9&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a></h3><p>揭秘Babel的同时，在复习一遍原型链基础支持～</p>
+<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="如何让你的-CSS-更具有可维护性？——大神有绝招-amp"><a href="#如何让你的-CSS-更具有可维护性？——大神有绝招-amp" class="headerlink" title="如何让你的 CSS 更具有可维护性？——大神有绝招&amp;)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964179&amp;idx=1&amp;sn=f7088de66f09efd35057541695582d52&amp;chksm=843aecb5b34d65a3ff8d67142403f3463e08f57041f4212e991248f49770b59943d5c65545bc&amp;mpshare=1&amp;scene=1&amp;srcid=0111H4YARr96el0lj1WY0J09&amp;key=f27a3d85b887ad782291dcbcbc6989e0bb3335f0f66ac9cc6b6994c455227fac808715c21fb47af4ad18b5ff25efbb9aca75f3d0bbf57baefb60f1d36971b42fa9d323e2b3d80208070837dfd770fa49&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">如何让你的 CSS 更具有可维护性？——大神有绝招</a>&amp;)</h3><p>这篇文章教你一种方法，能够写出更具有可维护性的CSS，它就是”BEM”。</p>
+<h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="回顾-2016-年-Node-js-十大文章-amp"><a href="#回顾-2016-年-Node-js-十大文章-amp" class="headerlink" title="回顾 2016 年 Node.js 十大文章&amp;)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964196&amp;idx=1&amp;sn=d52e8258b54e0d807e14efa5a2791f84&amp;chksm=843aec82b34d65944704e1f7fc04747934bad078ad91906781f21edeb204a9a55f4d9f129369&amp;mpshare=1&amp;scene=1&amp;srcid=0111eOoheFnpABemlLvmHvL9&amp;key=b43a3af60b96e11e86b22b45b526335d70f3fbb0d1f05d664eb97888d1744e7026b64c4bdae93ab2ceb9092123f81dfcaecf157e9a43e4e2bed516a6b9db9e4e0fe03330913f5cfcf971d9ac46dfaf8e&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">回顾 2016 年 Node.js 十大文章</a>&amp;)</h3><p>对于Node.js开发者来说，2016是振奋人心的一年。</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;如果你已经看过第一篇&lt;a href=&quot;http://www.jianshu.com/p/d36fb31f9cff&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;揭秘babel的魔法之class魔法处理&lt;/a&gt;，这篇将会是一个延伸；&lt;br&gt;如果你还没看过，并
+      &lt;p&gt;1.8-1.13，新的一期，继续积累！&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;《JS-闯关记》之原型及原型链&quot;&gt;&lt;a href=&quot;#《JS-闯关记》之原型及原型链&quot; class=&quot;headerlink&quot; title=&quot;《JS 闯关记》之原型及原型链&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;amp;mid=2650101216&amp;amp;idx=1&amp;amp;sn=dcc39636ebff46aca84df68533fb0742&amp;amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;amp;scene=0&quot;&gt;《JS 闯关记》之原型及原型链&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的&lt;strong&gt;proto&lt;/strong&gt; 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、&lt;strong&gt;proto&lt;/strong&gt; 这五个概念入手。&lt;/p&gt;
+&lt;h3 id=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;a href=&quot;#H5项目常见问题及注意事项&quot; class=&quot;headerlink&quot; title=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.open-open.com/lib/view/open1449325854077.html&quot;&gt;H5项目常见问题及注意事项&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;再也不用为PM嘴中的“H5”发愁了。&lt;/p&gt;
     
     </summary>
     
-      <category term="js" scheme="https://exp-team.github.io/categories/js/"/>
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
     
     
-      <category term="js" scheme="https://exp-team.github.io/tags/js/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>深入新版BS4源码 探索flex和工程化sass奥秘</title>
-    <link href="https://exp-team.github.io/blog/2017/01/12/program/BS4/"/>
-    <id>https://exp-team.github.io/blog/2017/01/12/program/BS4/</id>
-    <published>2017-01-11T16:00:00.000Z</published>
-    <updated>2017-02-19T12:29:49.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布<a href="https://github.com/twbs/bootstrap/pull/21389" target="_blank" rel="external">放弃支持IE9，并默认使用flexbox弹性盒模型</a>。<br>这标志着前端开发全面步入“现代浏览器”的时代进一步来临；样式处理也再一次面向未来，拥抱更加灵活的弹性盒模型－Flex布局。</p>
-<p>这篇文章会带你深入Bootstrap最新版源码，窥探其架构组织奥秘，并解析最具亮点的栅格化系统。<br>你也会了解到sass的高阶用法和flex最新语法奥秘。</p>
-<h2 id="BS4的新特性"><a href="#BS4的新特性" class="headerlink" title="BS4的新特性"></a>BS4的新特性</h2><p>在开启我们的探索之前，有必要先梳理一下BS4添加的新特性：<br>1）从Less迁移到Sass：<br>现在，Bootstrap已加入Sass的大家庭中。得益于Libsass（Sass 解析器），Bootstrap的编译速度比以前更快；<br>2）改进网格系统：<br>新增一个网格层适配移动设备，并整顿语义混合。<br>3）默认弹性盒模型（flexbox）：<br>这是项划时代的变动，利用flexbox的优势快速布局。<br>4）废弃了wells、thumbnails和panels，使用cards代替。<br>5）新的自定义选项：<br>不再像上个版本一样，将渐变、淡入淡出、阴影等效果分放在单独的样式表中。而是将所有选项都移到一个Sass变量中。<br>想要给全局或考虑不到的角落定义一个默认效果？很简单，只要更新变量值，然后重新编译就可以了。<br>6）使用rem和em单位。<br>7）重构所有JavaScript插件：<br>Bootstrap 4用ES6重写了所有插件。现在提供UMD支持、泛型拆解方法、选项类型检查等特性。<br>8）改进工具提示和popovers自动定位：<br>这部分要感谢Tether（A positioning engine to make overlays, tooltips and dropdowns better）工具的帮助，<br>如果你还不知道Tether是什么，可以去他家<a href="https://github.com/HubSpot/tether" target="_blank" rel="external">Github地址</a>。</p>
-<h2 id="BS4栅格系统揭秘"><a href="#BS4栅格系统揭秘" class="headerlink" title="BS4栅格系统揭秘"></a>BS4栅格系统揭秘</h2><p>了解了以上新特性，我们主要研究BS从诞生以来最大的“卖点”－栅格系统。</p>
-<h2 id="一个栅格实例"><a href="#一个栅格实例" class="headerlink" title="一个栅格实例"></a>一个栅格实例</h2><p>我们选取代表性的BS4官网范例，可以<a href="http://v4.bootcss.com/examples/dashboard/#" target="_blank" rel="external">在线参考</a>, 或者参看以下截图，<br>在大屏幕下，我们看到：</p>
-<p>当屏幕宽度小于576px时候，我们有：</p>
-<p>对应代码：</p>
-<pre><code>&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
-    ...
-&lt;/div&gt;
-&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
-    ...
-&lt;/div&gt;
-&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
-    ...
-&lt;/div&gt;
-&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
-    ...
-&lt;/div&gt;
-</code></pre><p>.col-6 class样式在源码里面可以简单归纳（不完全）为：</p>
-<pre><code>.col-6 {
-    -webkit-box-flex: 0;
-    -webkit-flex: 0 0 50%;
-    -ms-flex: 0 0 50%;
-    flex: 0 0 50%;
-    max-width: 50%;
-}
-</code></pre><p>.col-sm-3 class在源码里面可以归纳为：</p>
-<pre><code>.col-sm-3{
-    -webkit-box-flex: 0;
-    -webkit-flex: 0 0 25%;
-        -ms-flex: 0 0 25%;
-            flex: 0 0 25%;
-    max-width: 25%;
-}
-</code></pre><h3 id="两种类的共存和交替作用"><a href="#两种类的共存和交替作用" class="headerlink" title="两种类的共存和交替作用"></a>两种类的共存和交替作用</h3><p>我们看到，代码里设置了这两个class进行样式声明，很明显他们的样式属性是有冲突的，那么他们是如何做到“和平共处”交替发挥作用的呢？</p>
-<p>1）在屏幕宽度大于576px时候，我们发现.col-sm-3并没有起作用，这时候起作用的是.col-6。<br>我们在源码里发现.col-sm-<em>的样式声明全部在@media (min-width: 576px) {…}的媒体查询中，<br>这就保证了在576px宽度以上的屏幕，只有在媒体查询之外的.col-</em>样式声明发挥了作用。</p>
-<p>2）在屏幕宽度小于576px时候，命中媒体查询，命中.col-sm-3的样式声明。他的优先级一定大于.col-6（媒体查询优先级高），这时候就保证了移动端的样式“占上风”。</p>
-<h3 id="flex讲解"><a href="#flex讲解" class="headerlink" title="flex讲解"></a>flex讲解</h3><p>我们从样式代码里看到类似flex: 0 0 25%的声明，为了理解它，我们从flex属性入手：<br>flex属性是flex-grow, flex-shrink 和 flex-basis的简写（类似backgroud是很多背景属性的简写一样），<br>它的默认值为0 1 auto。后两个属性可选。语法格式如下：</p>
-<pre><code>.item {
-    flex: none | [ &lt;&apos;flex-grow&apos;&gt; &lt;&apos;flex-shrink&apos;&gt;? || &lt;&apos;flex-basis&apos;&gt; ]
-}
-</code></pre><p>1）flex-grow：属性定义项目的放大比例，默认为0。我们看到BS代码里这个值一直为0，即如果存在剩余空间，也不放大。</p>
-<p>2）flex-shrink：属性定义了项目的缩小比例，默认为1，即如果空间不足，该项目将缩小。</p>
-<p>3）flex-basis：属性定义了在分配多余空间之前，项目占据的主轴空间（main size）。<br>浏览器根据这个属性，计算主轴是否有多余空间。它可以设为跟width或height属性一样的值（比如350px），则项目将占据固定空间。<br>当然BS4这里设置为比例值，这也是响应式自然而然实现的基础。</p>
-<h2 id="SASS在BS4工程化中的伟大作用"><a href="#SASS在BS4工程化中的伟大作用" class="headerlink" title="SASS在BS4工程化中的伟大作用"></a>SASS在BS4工程化中的伟大作用</h2><p>看到此，不难明白BS4栅格的实现，但是这并不是此文的最终目的。我们可以深入更多，比如，BS4的栅格系统里，一行一共是12栏。他的媒体查询断点又包括：xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px。<br>参考其源码dist/css目录下样式代码，我们会想组织生成如此大量的CSS样式，不用预处理器简直是反人类的。而BS4却是把sass用到了极致。</p>
-<h3 id="col-sm-是如何生成的"><a href="#col-sm-是如何生成的" class="headerlink" title=".col-sm-*是如何生成的"></a>.col-sm-*是如何生成的</h3><p>我们深入其scss目录下，scss/mixins/_grid.scss文件：</p>
-<pre><code>@if $enable-grid-classes {
-    @include make-grid-columns();
-}
-</code></pre><p>在enable-grid-classes变量为true的情况下（默认为true），调用make-grid-columns()</p>
-<p>make-grid-columns()这个mixin定义在scss/mixins/_grid-reamework.scss文件中（找的我好心累。。。）：</p>
-<pre><code>@mixin make-grid-columns($columns: $grid-columns, $gutters: $grid-gutter-widths, $breakpoints: $grid-breakpoints) {
-    ...
-}
-</code></pre><p>这个mixin接受三个参数：<br>1）$columns表示栅格数目默认为12<br>2）$gutters默认为30<br>3）$breakpoints表示断点设置，这是一个全局变量，为map类型。<br>这些你可以在scss/mixins/_breakpoints.scss文件中和scss/_variables.scss文件中找到。</p>
-<p>认识了这些参数，我们看.col-sm-<em>具体实现，下面代码我已经进行过大范围精简，只保留col-sm-</em>相关部分，并且加了注释：</p>
-<pre><code>@each $breakpoint in map-keys($breakpoints) {
-    // Returns a blank string if smallest breakpoint, otherwise returns the name with a dash infront.
-    $infix: breakpoint-infix($breakpoint, $breakpoints);
-    // Media of at least the minimum breakpoint width. No query for the smallest breakpoint.
-    // Makes the @content apply to the given breakpoint and wider.
-    @include media-breakpoint-up($breakpoint, $breakpoints) {
-        @for $i from 1 through $columns {
-            .col#{$infix}-#{$i} {
-                @include make-col($i, $columns);
-            }
-        }
-    }
-}
-</code></pre><p>我们一步一步来分析：<br>1）@each $breakpoint in map-keys($breakpoints)，对每一个断点进行遍历；<br>2）breakpoint-infix是一个函数，它定义在css/mixins/_breakpoints.scss文件当中， 返回一个带破折号的断点标识字符串，比如这里我们关系的就是“-sm”；<br>3）media-breakpoint-up是一个mixin：</p>
-<pre><code>@mixin media-breakpoint-up($name, $breakpoints: $grid-breakpoints) {
-    $min: breakpoint-min($name, $breakpoints);
-    @if $min {
-        @media (min-width: $min) {
-        @content;
-    }
-    } @else {
-        @content;
-    }
-}
-</code></pre><p>4）breakpoint-min又是一个函数，它返回了断点的具体数值。这里是用来拼媒体查询条件的。<br>5）最后最关键样式的生成又使用了另外一个定义在css/mixins/_grid.scss文件当中的mixin:</p>
-<pre><code>@mixin make-col($size, $columns: $grid-columns) {
-    flex: 0 0 percentage($size / $columns);
-    max-width: percentage($size / $columns);
-}
-</code></pre><p>到此为止，我们深入了Bootstrap V4的scss/目录下的源码，研究涉及了：<br>css/mixins/_grid-framework.scss文件;<br>css/mixins/_breakpoints.scss文件;<br>css/mixins/_grid.scss文件;<br>css/_variables.scss文件;<br>css/bootstrap-gris.scss文件;<br>……</p>
-<p>如果你理解了这些，那么再去读bootstrap新版源码就不会存在任何难度。相信你也能够在全局上，以“上帝视角”了解sass所起的作用，大型样式框架的架构组织。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过阅读源码的栅格系统部分，我们应该认识到sass对于这样大型样式框架系统的重要意义：<br>1）css模块化在管理组织上的灵活性；<br>2）复用的意义，我们使用了大量的mixin,function,全局变量；<br>3）像JS一样神奇的语法，包括条件、遍历等等等等。<br>我们也应该对flex这一神器有了更加深刻的认识。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布&lt;a href=&quot;https://github.com/twbs/bootstrap/pull/21389&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;放弃支持IE
-    
-    </summary>
-    
-      <category term="program" scheme="https://exp-team.github.io/categories/program/"/>
-    
-    
-      <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
     
   </entry>
   
@@ -1224,6 +1047,280 @@ var Person = (function () {
   </entry>
   
   <entry>
+    <title>深入新版BS4源码 探索flex和工程化sass奥秘</title>
+    <link href="https://exp-team.github.io/blog/2017/01/12/program/BS4/"/>
+    <id>https://exp-team.github.io/blog/2017/01/12/program/BS4/</id>
+    <published>2017-01-11T16:00:00.000Z</published>
+    <updated>2017-02-19T12:29:49.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布<a href="https://github.com/twbs/bootstrap/pull/21389" target="_blank" rel="external">放弃支持IE9，并默认使用flexbox弹性盒模型</a>。<br>这标志着前端开发全面步入“现代浏览器”的时代进一步来临；样式处理也再一次面向未来，拥抱更加灵活的弹性盒模型－Flex布局。</p>
+<p>这篇文章会带你深入Bootstrap最新版源码，窥探其架构组织奥秘，并解析最具亮点的栅格化系统。<br>你也会了解到sass的高阶用法和flex最新语法奥秘。</p>
+<h2 id="BS4的新特性"><a href="#BS4的新特性" class="headerlink" title="BS4的新特性"></a>BS4的新特性</h2><p>在开启我们的探索之前，有必要先梳理一下BS4添加的新特性：<br>1）从Less迁移到Sass：<br>现在，Bootstrap已加入Sass的大家庭中。得益于Libsass（Sass 解析器），Bootstrap的编译速度比以前更快；<br>2）改进网格系统：<br>新增一个网格层适配移动设备，并整顿语义混合。<br>3）默认弹性盒模型（flexbox）：<br>这是项划时代的变动，利用flexbox的优势快速布局。<br>4）废弃了wells、thumbnails和panels，使用cards代替。<br>5）新的自定义选项：<br>不再像上个版本一样，将渐变、淡入淡出、阴影等效果分放在单独的样式表中。而是将所有选项都移到一个Sass变量中。<br>想要给全局或考虑不到的角落定义一个默认效果？很简单，只要更新变量值，然后重新编译就可以了。<br>6）使用rem和em单位。<br>7）重构所有JavaScript插件：<br>Bootstrap 4用ES6重写了所有插件。现在提供UMD支持、泛型拆解方法、选项类型检查等特性。<br>8）改进工具提示和popovers自动定位：<br>这部分要感谢Tether（A positioning engine to make overlays, tooltips and dropdowns better）工具的帮助，<br>如果你还不知道Tether是什么，可以去他家<a href="https://github.com/HubSpot/tether" target="_blank" rel="external">Github地址</a>。</p>
+<h2 id="BS4栅格系统揭秘"><a href="#BS4栅格系统揭秘" class="headerlink" title="BS4栅格系统揭秘"></a>BS4栅格系统揭秘</h2><p>了解了以上新特性，我们主要研究BS从诞生以来最大的“卖点”－栅格系统。</p>
+<h2 id="一个栅格实例"><a href="#一个栅格实例" class="headerlink" title="一个栅格实例"></a>一个栅格实例</h2><p>我们选取代表性的BS4官网范例，可以<a href="http://v4.bootcss.com/examples/dashboard/#" target="_blank" rel="external">在线参考</a>, 或者参看以下截图，<br>在大屏幕下，我们看到：</p>
+<p>当屏幕宽度小于576px时候，我们有：</p>
+<p>对应代码：</p>
+<pre><code>&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
+    ...
+&lt;/div&gt;
+&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
+    ...
+&lt;/div&gt;
+&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
+    ...
+&lt;/div&gt;
+&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
+    ...
+&lt;/div&gt;
+</code></pre><p>.col-6 class样式在源码里面可以简单归纳（不完全）为：</p>
+<pre><code>.col-6 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 50%;
+    -ms-flex: 0 0 50%;
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+</code></pre><p>.col-sm-3 class在源码里面可以归纳为：</p>
+<pre><code>.col-sm-3{
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 25%;
+        -ms-flex: 0 0 25%;
+            flex: 0 0 25%;
+    max-width: 25%;
+}
+</code></pre><h3 id="两种类的共存和交替作用"><a href="#两种类的共存和交替作用" class="headerlink" title="两种类的共存和交替作用"></a>两种类的共存和交替作用</h3><p>我们看到，代码里设置了这两个class进行样式声明，很明显他们的样式属性是有冲突的，那么他们是如何做到“和平共处”交替发挥作用的呢？</p>
+<p>1）在屏幕宽度大于576px时候，我们发现.col-sm-3并没有起作用，这时候起作用的是.col-6。<br>我们在源码里发现.col-sm-<em>的样式声明全部在@media (min-width: 576px) {…}的媒体查询中，<br>这就保证了在576px宽度以上的屏幕，只有在媒体查询之外的.col-</em>样式声明发挥了作用。</p>
+<p>2）在屏幕宽度小于576px时候，命中媒体查询，命中.col-sm-3的样式声明。他的优先级一定大于.col-6（媒体查询优先级高），这时候就保证了移动端的样式“占上风”。</p>
+<h3 id="flex讲解"><a href="#flex讲解" class="headerlink" title="flex讲解"></a>flex讲解</h3><p>我们从样式代码里看到类似flex: 0 0 25%的声明，为了理解它，我们从flex属性入手：<br>flex属性是flex-grow, flex-shrink 和 flex-basis的简写（类似backgroud是很多背景属性的简写一样），<br>它的默认值为0 1 auto。后两个属性可选。语法格式如下：</p>
+<pre><code>.item {
+    flex: none | [ &lt;&apos;flex-grow&apos;&gt; &lt;&apos;flex-shrink&apos;&gt;? || &lt;&apos;flex-basis&apos;&gt; ]
+}
+</code></pre><p>1）flex-grow：属性定义项目的放大比例，默认为0。我们看到BS代码里这个值一直为0，即如果存在剩余空间，也不放大。</p>
+<p>2）flex-shrink：属性定义了项目的缩小比例，默认为1，即如果空间不足，该项目将缩小。</p>
+<p>3）flex-basis：属性定义了在分配多余空间之前，项目占据的主轴空间（main size）。<br>浏览器根据这个属性，计算主轴是否有多余空间。它可以设为跟width或height属性一样的值（比如350px），则项目将占据固定空间。<br>当然BS4这里设置为比例值，这也是响应式自然而然实现的基础。</p>
+<h2 id="SASS在BS4工程化中的伟大作用"><a href="#SASS在BS4工程化中的伟大作用" class="headerlink" title="SASS在BS4工程化中的伟大作用"></a>SASS在BS4工程化中的伟大作用</h2><p>看到此，不难明白BS4栅格的实现，但是这并不是此文的最终目的。我们可以深入更多，比如，BS4的栅格系统里，一行一共是12栏。他的媒体查询断点又包括：xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px。<br>参考其源码dist/css目录下样式代码，我们会想组织生成如此大量的CSS样式，不用预处理器简直是反人类的。而BS4却是把sass用到了极致。</p>
+<h3 id="col-sm-是如何生成的"><a href="#col-sm-是如何生成的" class="headerlink" title=".col-sm-*是如何生成的"></a>.col-sm-*是如何生成的</h3><p>我们深入其scss目录下，scss/mixins/_grid.scss文件：</p>
+<pre><code>@if $enable-grid-classes {
+    @include make-grid-columns();
+}
+</code></pre><p>在enable-grid-classes变量为true的情况下（默认为true），调用make-grid-columns()</p>
+<p>make-grid-columns()这个mixin定义在scss/mixins/_grid-reamework.scss文件中（找的我好心累。。。）：</p>
+<pre><code>@mixin make-grid-columns($columns: $grid-columns, $gutters: $grid-gutter-widths, $breakpoints: $grid-breakpoints) {
+    ...
+}
+</code></pre><p>这个mixin接受三个参数：<br>1）$columns表示栅格数目默认为12<br>2）$gutters默认为30<br>3）$breakpoints表示断点设置，这是一个全局变量，为map类型。<br>这些你可以在scss/mixins/_breakpoints.scss文件中和scss/_variables.scss文件中找到。</p>
+<p>认识了这些参数，我们看.col-sm-<em>具体实现，下面代码我已经进行过大范围精简，只保留col-sm-</em>相关部分，并且加了注释：</p>
+<pre><code>@each $breakpoint in map-keys($breakpoints) {
+    // Returns a blank string if smallest breakpoint, otherwise returns the name with a dash infront.
+    $infix: breakpoint-infix($breakpoint, $breakpoints);
+    // Media of at least the minimum breakpoint width. No query for the smallest breakpoint.
+    // Makes the @content apply to the given breakpoint and wider.
+    @include media-breakpoint-up($breakpoint, $breakpoints) {
+        @for $i from 1 through $columns {
+            .col#{$infix}-#{$i} {
+                @include make-col($i, $columns);
+            }
+        }
+    }
+}
+</code></pre><p>我们一步一步来分析：<br>1）@each $breakpoint in map-keys($breakpoints)，对每一个断点进行遍历；<br>2）breakpoint-infix是一个函数，它定义在css/mixins/_breakpoints.scss文件当中， 返回一个带破折号的断点标识字符串，比如这里我们关系的就是“-sm”；<br>3）media-breakpoint-up是一个mixin：</p>
+<pre><code>@mixin media-breakpoint-up($name, $breakpoints: $grid-breakpoints) {
+    $min: breakpoint-min($name, $breakpoints);
+    @if $min {
+        @media (min-width: $min) {
+        @content;
+    }
+    } @else {
+        @content;
+    }
+}
+</code></pre><p>4）breakpoint-min又是一个函数，它返回了断点的具体数值。这里是用来拼媒体查询条件的。<br>5）最后最关键样式的生成又使用了另外一个定义在css/mixins/_grid.scss文件当中的mixin:</p>
+<pre><code>@mixin make-col($size, $columns: $grid-columns) {
+    flex: 0 0 percentage($size / $columns);
+    max-width: percentage($size / $columns);
+}
+</code></pre><p>到此为止，我们深入了Bootstrap V4的scss/目录下的源码，研究涉及了：<br>css/mixins/_grid-framework.scss文件;<br>css/mixins/_breakpoints.scss文件;<br>css/mixins/_grid.scss文件;<br>css/_variables.scss文件;<br>css/bootstrap-gris.scss文件;<br>……</p>
+<p>如果你理解了这些，那么再去读bootstrap新版源码就不会存在任何难度。相信你也能够在全局上，以“上帝视角”了解sass所起的作用，大型样式框架的架构组织。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过阅读源码的栅格系统部分，我们应该认识到sass对于这样大型样式框架系统的重要意义：<br>1）css模块化在管理组织上的灵活性；<br>2）复用的意义，我们使用了大量的mixin,function,全局变量；<br>3）像JS一样神奇的语法，包括条件、遍历等等等等。<br>我们也应该对flex这一神器有了更加深刻的认识。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布&lt;a href=&quot;https://github.com/twbs/bootstrap/pull/21389&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;放弃支持IE
+    
+    </summary>
+    
+      <category term="program" scheme="https://exp-team.github.io/categories/program/"/>
+    
+    
+      <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>揭秘babel的魔法之class继承的处理</title>
+    <link href="https://exp-team.github.io/blog/2017/01/12/js/babel-class2/"/>
+    <id>https://exp-team.github.io/blog/2017/01/12/js/babel-class2/</id>
+    <published>2017-01-11T16:00:00.000Z</published>
+    <updated>2017-01-16T07:13:59.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>如果你已经看过第一篇<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a>，这篇将会是一个延伸；<br>如果你还没看过，并且也不想<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">现在就去读一下</a>，单独看这篇也没有关系，并不存在理解上的障碍。</p>
+<p>上一篇针对Babel对ES6里面基础“class”的编译进行了分析。这一篇将会对class的继承，包括extends和super进行讲解。</p>
+<p>什么？你还不了解ES6如何实现继承？没关系，下文内容也有详细示例。</p>
+<p>再啰嗦一句，这一系列的文章并不是科普ECMAScript新规范。她的意义在于分析Babel对ES6的编译，从而希望读者对JS语言基础，程序设计理念等有更深刻的认识。</p>
+<h2 id="Class的继承"><a href="#Class的继承" class="headerlink" title="Class的继承"></a>Class的继承</h2><p>在这篇文章中，我会讲解Babel如何处理ES6 Class里面的继承功能，同样，这其实是一系列语法糖的实现。<br>我们先来温习一下实现方式：</p>
+<h3 id="ES6-实现继承"><a href="#ES6-实现继承" class="headerlink" title="ES6 实现继承"></a>ES6 实现继承</h3><p>首先，我们定义一个父类：</p>
+<pre><code>class Person {
+    constructor(){
+        this.type = &apos;person&apos;
+    }
+}
+</code></pre><p>这个类包含了一个实例属性。</p>
+<p>然后，实现一个Student类，这个“学生”类继承“人”类：</p>
+<pre><code>class Student extends Person {
+    constructor(){
+        super()
+    }
+}
+</code></pre><p>从简出发，我们定义的Person类只包含了type为person的这一个属性，不含有方法。所以我们extends+super()之后，Student类<br>也继承了同样的属性。<br>如下：</p>
+<pre><code>var student1 = new Student();
+student1.type // &quot;person&quot;
+</code></pre><p>我们进一步可以验证原型链上的关系：</p>
+<pre><code>student1 instanceof Student // true
+student1 instanceof Person // true
+student1.hasOwnProperty(&apos;type&apos;) // true
+</code></pre><p>一切看上去cool极了，我们实现了ES6里面的继承。并且用instanceof验证了ES6中一系列的实质就是“魔法糖”的本质。<br>那么，经过Babel编译，我们的代码是什么样呢？</p>
+<h3 id="Babel-transformation"><a href="#Babel-transformation" class="headerlink" title="Babel transformation"></a>Babel transformation</h3><p>我们一步一步来看，</p>
+<p>Step1: Person定义</p>
+<pre><code>class Person {
+    constructor(){
+        this.type = &apos;person&apos;
+    }
+}
+</code></pre><p>被编译为：</p>
+<pre><code>var Person = function Person() {
+    _classCallCheck(this, Person);
+    this.type = &apos;person&apos;;
+};
+</code></pre><p>如果你看过这一篇的<a href="http://www.jianshu.com/p/d36fb31f9cff" target="_blank" rel="external">前传</a>，<br>你应该就熟悉这一系列的变换，也可能会记得_classCallCheck函数到底是什么鬼。这里因为篇幅和去冗余的原因，就不再展开。</p>
+<p>Step2：Student探秘<br>我们这次尝试观察Student子类：</p>
+<pre><code>class Student extends Person {
+    constructor(){
+        super()
+    }
+}
+</code></pre><p>编译结果：</p>
+<pre><code>// 实现定义Student构造函数，它是一个自执行函数，接受父类构造函数为参数
+var Student = (function(_Person) {
+    // 实现对父类原型链属性的继承
+    _inherits(Student, _Person);
+
+    // 将会返回这个函数作为完整的Student构造函数
+    function Student() {
+        // 使用检测
+        _classCallCheck(this, Student);  
+        // _get的返回值可以先理解为父类构造函数       
+        _get(Object.getPrototypeOf(Student.prototype), &apos;constructor&apos;, this).call(this);
+    }
+
+    return Student;
+})(Person);
+
+// _x为Student.prototype.__proto__
+// _x2为&apos;constructor&apos;
+// _x3为this
+var _get = function get(_x, _x2, _x3) {
+    var _again = true;
+    _function: while (_again) {
+        var object = _x,
+            property = _x2,
+            receiver = _x3;
+        _again = false;
+        // Student.prototype.__proto__为null的处理
+        if (object === null) object = Function.prototype;
+        // 以下是为了完整复制父类原型链上的属性，包括属性特性的描述符
+        var desc = Object.getOwnPropertyDescriptor(object, property);
+        if (desc === undefined) {
+            var parent = Object.getPrototypeOf(object);
+            if (parent === null) {
+                return undefined;
+            } else {
+                _x = parent;
+                _x2 = property;
+                _x3 = receiver;
+                _again = true;
+                desc = parent = undefined;
+                continue _function;
+            }
+        } else if (&apos;value&apos; in desc) {
+            return desc.value;
+        } else {
+            var getter = desc.get;
+            if (getter === undefined) {
+                return undefined;
+            }
+            return getter.call(receiver);
+        }
+    }
+};
+
+function _inherits(subClass, superClass) {
+    // superClass需要为函数类型，否则会报错
+    if (typeof superClass !== &apos;function&apos; &amp;&amp; superClass !== null) {
+        throw new TypeError(&apos;Super expression must either be null or a function, not &apos; + typeof superClass);
+    }
+    // Object.create第二个参数是为了修复子类的constructor
+    subClass.prototype = Object.create(superClass &amp;&amp; superClass.prototype, {
+        constructor: {
+            value: subClass,
+            enumerable: false,
+            writable: true,
+            configurable: true
+        }
+    });
+    // Object.setPrototypeOf是否存在做了一个判断，否则使用__proto__
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+</code></pre><p>虽然我加上了注释，但是这一坨代码仍然看上去恶心极了！没关系，下面我们进行拆解，你很快就能明白。</p>
+<p>Step3：抽丝剥茧<br>我们首先看Student的编译结果：</p>
+<pre><code>var Student = (function(_Person) {
+    _inherits(Student, _Person);
+
+    function Student() {
+        _classCallCheck(this, Student);            
+        _get(Object.getPrototypeOf(Student.prototype), &apos;constructor&apos;, this).call(this);
+    }
+
+    return Student;
+})(Person);
+</code></pre><p>这是一个自执行函数，它接受一个参数Person（就是他要继承的父类），返回一个构造函数Student。</p>
+<p>上面_inherits方法的本质其实就是让Student子类继承Person父类原型链上的方法。它实现原理可以归结为一句话：</p>
+<pre><code>Student.prototype = Object.create(Person.prototype);
+Object.setPrototypeOf(Student, Person)
+</code></pre><p>注意，Object.create接收第二个参数，这就实现了对Student的constructor修复。<br>如果你不了解Object.create，那么<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create" target="_blank" rel="external">请参考这里。</a></p>
+<p>以上通过_inherits实现了对父类原型链上属性的继承，那么对于父类的实例属性（就是constructor定义的属性）的继承，也可以归结为一句话：</p>
+<pre><code>Person.call(this);
+</code></pre><p>如果你还不理解使用call或者apply或者bind来改变JS中this的指向，那么请参考<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call" target="_blank" rel="external">这篇文章。</a></p>
+<p>这样，我们便透析了Babel编译这一切的秘密。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>如果你看完这一系列的文章可能会有体会：我想灌输的肯定不是ES6新特性的使用，关于这些东西有太多的文章、博客、书籍去讨论。</p>
+<p>我是在讲Babel对这些新特性的编译产出，那为什么我会在乎这些呢？<br>其实通过分析，我们悄然回顾了JS中很多重点以及难点，还包括程序设计上的一些小思想。<br>最近面试了很多前端“新同学”：有的人痴迷于框架，可以使用React或者Vue比照tutorial做出页面炫酷的交互，甚至自觉SPA也不在话下；<br>有的人ES6、ES7了解很多，generator，async都能说出一二，仿佛Promise处理异步已经成为了“时代弃儿”。<br>可是同样是这些人，对原型原型链、this、作用域、闭包都没有深刻地理解和掌握。<br>同样是这些页面，即便用callback处理异步回调，嵌套最多也不到两层。</p>
+<p>也许，同样一批人也会问：“我能用前端框架、ES6撸出好多页面，可是为什么感觉进步很慢处于瓶颈中、面试也总被挂呢？”</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;如果你已经看过第一篇&lt;a href=&quot;http://www.jianshu.com/p/d36fb31f9cff&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;揭秘babel的魔法之class魔法处理&lt;/a&gt;，这篇将会是一个延伸；&lt;br&gt;如果你还没看过，并
+    
+    </summary>
+    
+      <category term="js" scheme="https://exp-team.github.io/categories/js/"/>
+    
+    
+      <category term="js" scheme="https://exp-team.github.io/tags/js/"/>
+    
+  </entry>
+  
+  <entry>
     <title>expfe技术周刊第10011期</title>
     <link href="https://exp-team.github.io/blog/2017/01/07/weekly/weekly-10011/"/>
     <id>https://exp-team.github.io/blog/2017/01/07/weekly/weekly-10011/</id>
@@ -1419,243 +1516,6 @@ var Person = (function () {
     
     
       <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>一个简单的react+redux工程实例</title>
-    <link href="https://exp-team.github.io/blog/2016/11/26/program/react-redux-1/"/>
-    <id>https://exp-team.github.io/blog/2016/11/26/program/react-redux-1/</id>
-    <published>2016-11-25T16:00:00.000Z</published>
-    <updated>2017-01-17T05:04:05.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>最近一直在学习研究react.js。前前后后做了几次分享。并在我参与的私信项目也使用了这套技术栈 ，目前也已经上线。</p>
-<p>学习过程期间，感觉react+redux初级DEMO不多，社区上多是用烂了的todolist教程，未免乏味。<br>这篇文章主要实现一个简单的例子，难度不大，但是贯穿了react+redux基本思想。</p>
-<p>他将会是一个连续教程，这只是第一篇，不涉及redux中间件，redux处理异步等内容，也不涉及react性能优化，不可变数据immutable.js等内容。读者可以根据自己的层次来选读。但这些不涉及到的内容，都会随着这个demo复杂度一步一步提升，在后续章节有分析和使用。<br>另外，他并不适合初学者阅读，如果你还不太清楚react.js、ES6、redux相关知识，建议先做了解。</p>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>百度经验个人中心（WAP端）是经验流量较多的页面群，其中的个人定制页面是重要的页面之一，请用手机<a href="http://jingyan.baidu.com/user/nuc/feed" target="_blank" rel="external">点击这里</a>查看效果，页面的截图如下：</p>
-<p><img src="/bimg/c1.png" alt=""></p>
-<p>页面功能一目了然。主要分为两大块：<br>1）可以在『选择分类』区块中选择自己喜欢的经验分类条目来订阅。在该区块中，我们可以点击『换一换』按钮来切换分类条目。<br>2）已选结果会再『已选分类』区块里面展示。在『已选分类』区块里，我们可以点击相关经验分类条目来取消订阅。</p>
-<p><img src="/bimg/c5.png" alt=""></p>
-<p>在现在线上版本中，我们采用了传统的操作DOM方式（zepto类库）来实现这一系列交互。使用react，又是一种全新的思想。孰优孰劣，可以在结尾处大家自己总结。<br>好了，废话不多说，我们马上进入正题。</p>
-<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>整体目录如截图，为了和我们线上代码保持一致，我采用了fisp来做工程化组织。现在社区上大多都是采用webpack，其实这些工具用哪个都一样，解决的问题也都类似，这里不再展开。即使你不懂FIS，也不妨碍继续阅读。</p>
-<p><img src="/bimg/c2.png" alt=""></p>
-<h3 id="app-app文件夹下"><a href="#app-app文件夹下" class="headerlink" title="app/ app文件夹下"></a>app/ app文件夹下</h3><p>action.es定义了页面交互中dispatch的所有actions；</p>
-<p><img src="/bimg/c6.png" alt=""></p>
-<p>app.jsx是页面入口脚本；</p>
-<p><img src="/bimg/c8.png" alt=""></p>
-<p>component.jsx定义了页面的组件；</p>
-<p><img src="/bimg/c7.png" alt=""></p>
-<p>reducer.jsx接收action，该文件定义了所有用到的reducer。</p>
-<h3 id="lib-lib-nomod-文件夹下"><a href="#lib-lib-nomod-文件夹下" class="headerlink" title="lib + lib-nomod 文件夹下"></a>lib + lib-nomod 文件夹下</h3><p>这两个文件夹是我们要用的框架源码，比如react.js+redux.js等等；<br>该项目用到的是react15.3.1版本未压缩版，这个版本比较稳定。<br>采用未压缩版的原因是想使用react addons 的perf，因为在后续章节中，会有性能优化部分的分析；<br>我们知道，react和redux其实独立存在，我们使用流行的react-redux.js库来实现两者的连接。</p>
-<h3 id="其他相关文件"><a href="#其他相关文件" class="headerlink" title="其他相关文件"></a>其他相关文件</h3><p>其他还有 fis-conf.js文件：这是用来做fis配置的，比如打包规则，发布规则，编译配置等；<br>同时，我们配置了babel来编译es6和jsx等，还配置了autoprefixer；<br>server.conf是fis的附属文件，用来做数据mock；<br>build.sh和BCLOUD是上线脚本相关，这里我们并不上线，只是学习react的用法。</p>
-<h2 id="页面数据"><a href="#页面数据" class="headerlink" title="页面数据"></a>页面数据</h2><p>我们部门后端是PHP，采用Smarty模板。这个页面会在请求时同步给出一些数据，比如用户信息等。项目里，我们的同步数据如截图：</p>
-<p><img src="/bimg/c3.png" alt=""></p>
-<p>我们关心selectList和likedList：<br>1）likedList给出当前用户已经选则的订阅分类条目；<br>2）selectList给出所有可选的分类条目，一共从1-127，127个可选条目，数据格式如上。<br>我们的脚本里使用F.context(‘likedList’)，和F.context(‘selectList’)取出相应同步数据，用于页面初始化展示。<br>F.context()没有什么可神奇的，其实就是一个全局的数据中心，实现就是在window.F下存取数据。</p>
-<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><p>说了这么多，终于可以进入具体代码层面了。如果上边的内容你似懂非懂，也没有关系。因为涉及了一些项目组织上的内容。下边的内容，就是具体的代码分析。</p>
-<h3 id="数据设计"><a href="#数据设计" class="headerlink" title="数据设计"></a>数据设计</h3><p>react+redux开发前端的思想是页面由数据驱动。<br>上边已经分析到我们的页面主要由两种数据：<br>1）一个是F.context(‘selectList’)，我们姑且叫做选择池数据；<br>2）另一个是F.context(‘likedList’)，我们叫做已选数据。<br>这两处数据初始由reducer拿到，设置为容器组件的初始状态，并由容器组件传递给相应展示组件。</p>
-<h3 id="组件设计"><a href="#组件设计" class="headerlink" title="组件设计"></a>组件设计</h3><p>组件设计如下截图：</p>
-<p><img src="/bimg/c4.jpg" alt=""></p>
-<p>按照react-redux思想，组件分为<br>1）容器组件，负责接收数据；<br>2）展示（木偶）组件负责向上接收数据，根据数据展现组件UI。</p>
-<p>其实很明显，我们主要就是两个展示组件，叫做：<br>1）SelectedBlock，负责展示用户已选已订阅内容<br>2）SelectListBlock，展示页面选择池可供选择的内容<br>他们一起被套在叫做DemoApp的父组件里面。</p>
-<p>有了以上划分，我们可以想到：<br>SelectedBlock组件需要关心已选数据F.context(‘likedList’)；<br>SelectListBlock则选择池数据和已选数据都需要关心。<br>你可能会问『SelectListBlock关心选择池数据不就够了吗？』<br>但是，产品经理要求在选择池里，当渲染用户已选条目时，需要样式置灰，并且在点击已选分类条目时不在触发action。所以选择池SelectListBlock组件也要依赖已选数据，进而做出相应的变化。</p>
-<p>这两项数据由react-redux派分给容器组件，并由容器组件按需分给展示组件；</p>
-<p>有了以上基础，我们看最外层的DemoApp组件全部代码：</p>
-<pre><code>class DemoApp extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-    render() {
-        const { dispatch } = this.props;
-        return (
-            &lt;div&gt;
-                &lt;SelectedBlock 
-                    likedList={this.props.likedList} 
-                    onDeleteLikeItem={(item)=&gt;{dispatch(action.deleteLikeItem(item))}}&gt;
-                &lt;/SelectedBlock&gt;
-
-                &lt;SelectListBlock 
-                    selectList={this.props.selectList} 
-                    likedList={this.props.likedList} 
-                    onAddLikeItem={(index, item) =&gt;{dispatch(action.addLikeItem(index, item))}}&gt;
-                &lt;/SelectListBlock&gt;
-            &lt;/div&gt;
-        )
-    }
-}
-</code></pre><p>我们看他的render()部分，很明显，他平行嵌套了<br>1）SelectedBlock组件，并把likedList数据作为属性向其传递；<br>2）同时，包含了SelectListBlock，并把selectList，likedList数据作为属性向其传递。</p>
-<p>那么SelectedBlock设计如下：</p>
-<pre><code>class SelectedBlock extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-    deleteItem(event, index) {
-        this.props.onDeleteLikeItem(index);
-    }
-    render() {
-        let likedList = this.props.likedList;
-        let likedListArray = [];
-        let likedListKey = Object.keys(likedList);
-        likedListKey.forEach(function(index){
-            likedListArray.push(likedList[index]);
-        })
-        return (
-            &lt;div&gt;
-                &lt;h2&gt;已选分类(&lt;em id=&quot;f-num&quot;&gt;{likedListArray.length}&lt;/em&gt;)&lt;/h2&gt;
-                &lt;div className=&quot;selected-list&quot; style={{overflow: 'auto'}}&gt;
-                    &lt;ul className=&quot;feed-list&quot;&gt;
-                        {
-                            likedListArray.length &gt; 0 ?
-                            likedListArray.map((item, index) =&gt; {
-                                return (
-                                    &lt;li style={{position: 'relative'}}&gt;
-                                        &lt;span&gt;{item}&lt;/span&gt;
-                                        &lt;a style={deleteIconStyle} 
-                                            onClick={event=&gt;{this.deleteItem(event, likedListKey[index])}}&gt;
-                                        &lt;/a&gt;
-                                    &lt;/li&gt;
-                                )
-                            })
-                            :
-                            &lt;li className=&quot;empty-list&quot;&gt;还没有任何订阅&lt;br /&gt;请从下方选择订阅&lt;/li&gt;
-                        }
-                    &lt;/ul&gt;
-                &lt;/div&gt;
-            &lt;/div&gt;
-        )
-    }
-}
-</code></pre><p>我们把likedList转换成likedListArray数组，在render()里面，直接使用map循环输出；<br>当用户删除某一条目时，触发deleteItem(event, index)方法，该方法向上传递。并在DemoApp父组件中，触发相应action。这个删除过程并不是一个组件内行为，因为这个action会使得已选数据发生变化，进而影响SelectListBlock组件。所以一系列逻辑需要在组件外，即reducer中处理，处理完后重置已选数据，进而页面更新。</p>
-<p>SelectListBlock组件也很好理解：</p>
-<pre><code>class SelectListBlock extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            flag: 0
-        }
-    }
-    onChangeGroup(event) {
-        event.stopPropagation();
-        let flagNow = this.state.flag;
-        if (flagNow == 117) {
-            this.setState({
-                flag: 0
-            });
-        }
-        else {
-            this.setState({
-                flag: flagNow + 9
-            });
-        }
-    }
-    onSelectItem(index, item) {
-        var likedList = this.props.likedList;
-        var likedListKey = Object.keys(likedList);
-        if ( likedListKey.indexOf(index.toString()) &gt;= 0 ) {
-            return;
-        }
-        this.props.onAddLikeItem(index, item);
-    }
-    render() {
-        let selectListArray = [];
-        for (var i in this.props.selectList) {
-            selectListArray.push(this.props.selectList[i])
-        }
-        let likedList = this.props.likedList;
-        let likedListKey = Object.keys(likedList);
-        return (
-            &lt;div&gt;
-                &lt;h2 className=&quot;clr&quot;&gt;
-                    &lt;span onClick={event=&gt;{this.onChangeGroup(event)}}&gt;换一换&lt;/span&gt;
-                选择分类&lt;/h2&gt;
-                &lt;ul className=&quot;feed-list clr&quot;&gt;
-                    {
-                        selectListArray.slice(this.state.flag, this.state.flag+9).map((item, index)=&gt;{
-                            return (
-                                &lt;li onClick={event=&gt;{this.onSelectItem((index + this.state.flag), item)}} 
-                                    key={index + this.state.flag}&gt;
-                                    {(likedListKey.indexOf((index + this.state.flag).toString()) &gt;= 0 ?
-                                        &lt;span className=&apos;disable&apos;&gt;{item}&lt;/span&gt;
-                                        :
-                                        &lt;span&gt;{item}&lt;/span&gt;
-                                    )}
-                                &lt;/li&gt;
-                            )
-                        })
-                    }
-                &lt;/ul&gt;
-            &lt;/div&gt;
-        )
-    }
-}
-</code></pre><p>我们首先把后端打过来的127条可供选择的数据转换为selectListArray数组。这127个分类内容都对应一个index（1-127）。之后我们获得用户已经选择喜欢条目的index，将这些index组成likedListKey数组，用于存储当前用户已选条目。在render()时候，因为页面一次只展示9项待选项，所以我们把selectListArray用slice方法按顺序切割出来9项输出。<br>点击『换一换』按钮时，触发onChangeGroup（）方法，这个方法是个组件内方法，他负责将slice参数+9，当到127（一共127项分类）时，还原回0。</p>
-<p>我们知道，点击『换一换』触发的onChangeGroup方法改变flag时，因为flag为该组件内部state，他的变化，将会引起该组件重新render()，所以数据池就会毫无压力的切换了。</p>
-<p>同时，我们给数据池里每一项分类都绑定onSelectItem方法，该方法会向上传递给父组件，由父组件发出相应action。因为这个动作将会改变已选数据，从而影响平行的SelectedBlock组件。因此需要在reducer中处理。</p>
-<h3 id="action设计"><a href="#action设计" class="headerlink" title="action设计"></a>action设计</h3><p>有了以上组件的设计，很明显我们需要定义两个action：<br>1）第一个是添加某一条目到已选分类</p>
-<pre><code>export const ADD_LIKE_ITEM = &apos;ADD_LIKE_ITEM&apos;;
-</code></pre><p>对应action creator:</p>
-<pre><code>export function addLikeItem (index, item) {
-    return {
-        type: ADD_LIKE_ITEM,
-        obj: {
-            index: index,
-            item: item
-        }
-    }
-}
-</code></pre><p>返回action对象，包括type命名为ADD_LIKE_ITEM和负载数据：条目名item及其index。</p>
-<p>2）另一个是在已选分类删除某一条目：</p>
-<pre><code>export const DELETE_LIKE_ITEM = &apos;DELETE_LIKE_ITEM&apos;;
-</code></pre><p>对应action creator:</p>
-<pre><code>export function deleteLikeItem (index) {
-    return {
-        type: DELETE_LIKE_ITEM,
-        index
-    }
-}
-</code></pre><p>返回action对象，包括type和负载数据。<br>到此为止，action脚本只需要定义action，不需要进一步处理，对所有action的处理都会由reducer接受。</p>
-<h3 id="reducer设计"><a href="#reducer设计" class="headerlink" title="reducer设计"></a>reducer设计</h3><p>再次强调reducer是一个纯函数，他接受两个参数，一个是state，一个是action；并对相应的action，返回一个新的state，从而促使页面里订阅相关state的组件再次render（）；<br>我们把同步模板数据initialLikeBlockState设为初始state：</p>
-<pre><code>var initialLikeBlockState = F.context(&apos;likedList&apos;);
-function likeBlockReducer (state = initialLikeBlockState, action) {
-    switch (action.type) {
-        case actionType.ADD_LIKE_ITEM: {
-            var addIndex = action.obj.index;
-            var newLikedList = Object.assign({}, state, {
-                [addIndex]: action.obj.item
-            })
-            return newLikedList;
-        }
-        case actionType.DELETE_LIKE_ITEM: {
-            var newLikedList =  {};
-            for (var key in state) {  
-                var val = state[key];  
-                newLikedList[key] = val;  
-            }  
-            var index = action.index;
-            delete newLikedList[index];
-            return newLikedList;
-        }
-        default: {
-            return state;
-        }
-    }
-}
-</code></pre><p>当匹配ADD_LIKE_ITEM action时，我们把当前的state和action带来的数据（item，index）进行merge，从而return 一个新的已选数据状态，即添加了新分类item的state；<br>当匹配DELETE_LIKE_ITEM action时，我们把action负载带来要删除item的index删除掉。返回删除该条目之后的新state。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>截至目前，我们介绍了基本设计和开发思路。教程里面已经基本包含了全部代码。</p>
-<h3 id="对比线上已有代码"><a href="#对比线上已有代码" class="headerlink" title="对比线上已有代码"></a>对比线上已有代码</h3><p>1）和线上的zepto实现对比完全是两种思路，经过比较，用react设计的代码代码量上有明显的优势。<br>2）开发思路上，是个萝卜青菜各有所爱的问题。但是对于写惯了$()的我来说，这种全新的开发方式还是带来了很大的惊喜。<br>3）线上实现这一套逻辑，可能对于一个简单的UI交互，我们都需要选取很多dom元素，进行处理。整体上看，比较复杂且凌乱，不是很容易进行维护。</p>
-<h3 id="接下来…"><a href="#接下来…" class="headerlink" title="接下来…"></a>接下来…</h3><p>当然，这只是第一步。后边还有更多的路要走。比如：<br>1）我们在选择或删除一个条目时，如何给后端发异步请求并没有涉及。因此，redux异步流程并没有展现。后续章节会进一步讲解。<br>2）我们的数据都是后端模板通过同步的方式传递过来的，数据量也不大，结构也不复杂，因此这一章为了简单并未使用immutable.js。当然，后续章节会进一步讲解。<br>3）这里我并没有介绍使用redux dev tool，这真的是一个很漂亮的利器。<br>尤其在数据复杂时候，对于调试能帮上很大作用。后面我会单独介绍一下关于这个工具的使用。<br>4）最后，这么简单的交互还并不会涉及页面性能的问题。在后续章节，我会构造出极端CASE进行一些边缘测试，并使用一些方法结合chrome dev tool进行性能优化，请进一步关注。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;最近一直在学习研究react.js。前前后后做了几次分享。并在我参与的私信项目也使用了这套技术栈 ，目前也已经上线。&lt;/p&gt;
-&lt;p&gt;学习过程期间，感觉react+redux初级DEMO不多，社区上多是用烂了的todolist教程，未免乏味。&lt;br&gt;这篇文章主要实现一个简单的
-    
-    </summary>
-    
-      <category term="program" scheme="https://exp-team.github.io/categories/program/"/>
-    
-    
-      <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
     
   </entry>
   
