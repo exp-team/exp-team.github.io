@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://exp-team.github.io/"/>
-  <updated>2017-03-09T06:43:42.000Z</updated>
+  <updated>2017-03-09T12:25:32.000Z</updated>
   <id>https://exp-team.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://exp-team.github.io/blog/2017/03/09/js/reduce/"/>
     <id>https://exp-team.github.io/blog/2017/03/09/js/reduce/</id>
     <published>2017-03-08T16:00:00.000Z</published>
-    <updated>2017-03-09T06:43:42.000Z</updated>
+    <updated>2017-03-09T12:25:32.000Z</updated>
     
     <content type="html"><![CDATA[<p>之前的<a href="http://www.jianshu.com/p/6958f99db769" target="_blank" rel="external">一篇文章：从一道面试题，到“我可能看了假源码”</a>讨论了bind方法的各种进阶Pollyfill，今天再分享一个有意思的题目。</p>
 <p>从解这道题目出发，我会谈到数组的Reduce方法，ES6特性和Redux数据流框架中Reducer的命名等等。一道典型的题目，却如唐代诗人章碣《对月》诗中所云：“别有洞天三十六，水晶台殿冷层层。”</p>
@@ -30,7 +30,7 @@ var testArr2 = [0, [1, [2, [3, [4, [5]]]]]];
 flatten(testArr1) // [0, 1, 2, 3, 4, 5]
 flatten(testArr2) // [0, 1, 2, 3, 4, 5]
 </code></pre><h2 id="解法先睹为快"><a href="#解法先睹为快" class="headerlink" title="解法先睹为快"></a>解法先睹为快</h2><p>先看一眼比较优雅的ES6解法：</p>
-<pre><code>const flatten = arr =&gt; arr.reduce((pre, val) =&gt; acc.concat(Array.isArray(pre) ? flatten(val) : val), []);
+<pre><code>const flatten = arr =&gt; arr.reduce((pre, val) =&gt; pre.concat(Array.isArray(val) ? flatten(val) : val), []);
 </code></pre><p>如果你看不明白，不要放弃。我会用ES5的思路“翻译”一下，相信你很快就能看懂。</p>
 <p>如果你一眼能看明白，也建议继续往下读。因为会有“不一样”的知识点。</p>
 <h2 id="深入解读"><a href="#深入解读" class="headerlink" title="深入解读"></a>深入解读</h2><p>第一个想到的念头肯定是递归，递归自然就想到递归的“尽头”，那就要判断数组某项元素是否还是数组类型。<br>好吧，我们开始动手实现一个方案，其实是上面解法的ES5版本：</p>
@@ -74,7 +74,7 @@ array // 调用reduce的数组
 </code></pre><p>这里并未提供reduce的第二个参数initialValue，所以从数组第一项开始进行回调函数的执行。并且每次回调函数执行完之后的结果，作为下一次的previous执行回调。</p>
 <p>所以，上述代码便是一个累加器的实现。</p>
 <h2 id="ES6写法"><a href="#ES6写法" class="headerlink" title="ES6写法"></a>ES6写法</h2><p>现在理解了Reduce函数，再结合ES6特性，使解法更加优雅：</p>
-<pre><code>const flatten = arr =&gt; arr.reduce((pre, val) =&gt; acc.concat(Array.isArray(pre) ? flatten(val) : val), []);
+<pre><code>const flatten = arr =&gt; arr.reduce((pre, val) =&gt; pre.concat(Array.isArray(val) ? flatten(val) : val), []);
 </code></pre><p>这样写是不是太“函数式”了，但是思路跟之前解法完全一样。我只不过充分使用了箭头函数带来的便利。并且使用了更便捷的isArray对数组类型进行判断。这是开篇提到的解法，也是MDN最新版的实现。</p>
 <h2 id="如何实现一个reduce的pollyfill"><a href="#如何实现一个reduce的pollyfill" class="headerlink" title="如何实现一个reduce的pollyfill"></a>如何实现一个reduce的pollyfill</h2><p>现在明白了reduce的秘密，接下来我们需要充分发挥对JS的理解，来手动实现一个reduce函数。毕竟，reduce是ES5带来的数组新特性，在不使用ES5-shim的情况下，需要手动兼容。另外，其实reduce方法可以实现的逻辑，大多都能够使用循环来实现。但是了解这样一个优雅的方法，不管是在程序的可读性上，还是在设计理解层面上，还是很有必要的。</p>
 <p>同样，在MDN上也有实现，但是我觉得下面的代码实现更加优雅和清晰：</p>
