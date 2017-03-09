@@ -21,7 +21,7 @@ author: 侯策
 ## 解法先睹为快
 先看一眼比较优雅的ES6解法：
 
-    const flatten = arr => arr.reduce((pre, val) => acc.concat(Array.isArray(pre) ? flatten(val) : val), []);
+    const flatten = arr => arr.reduce((pre, val) => pre.concat(Array.isArray(val) ? flatten(val) : val), []);
 
 如果你看不明白，不要放弃。我会用ES5的思路“翻译”一下，相信你很快就能看懂。
 
@@ -105,7 +105,7 @@ reduce在英文中译为“减少; 缩小; 使还原; 使变弱”，MDN对方�
 ## ES6写法
 现在理解了Reduce函数，再结合ES6特性，使解法更加优雅：
 
-    const flatten = arr => arr.reduce((pre, val) => acc.concat(Array.isArray(pre) ? flatten(val) : val), []);
+    const flatten = arr => arr.reduce((pre, val) => pre.concat(Array.isArray(val) ? flatten(val) : val), []);
 
 这样写是不是太“函数式”了，但是思路跟之前解法完全一样。我只不过充分使用了箭头函数带来的便利。并且使用了更便捷的isArray对数组类型进行判断。这是开篇提到的解法，也是MDN最新版的实现。
 
