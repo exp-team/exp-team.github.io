@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://exp-team.github.io/"/>
-  <updated>2017-03-09T12:25:32.000Z</updated>
+  <updated>2017-03-11T16:06:14.000Z</updated>
   <id>https://exp-team.github.io/</id>
   
   <author>
@@ -14,6 +14,152 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>手把手教你撸一个跑男动画 顺便抽丝剥茧CSS3动画奥秘</title>
+    <link href="https://exp-team.github.io/blog/2017/03/14/web/animation-runningman/"/>
+    <id>https://exp-team.github.io/blog/2017/03/14/web/animation-runningman/</id>
+    <published>2017-03-13T16:00:00.000Z</published>
+    <updated>2017-03-11T16:06:14.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>作为一名真正的前端开发者，我们不能只关注前端的逻辑部分，毕竟“水银泄地”般的页面实现和“炫酷逼真”的动画效果是我们区别于其他程序员所特有的优势。尽量百分之百的还原视觉稿，连接UE设计灵感和用户视觉享受，正所谓“晋帝时祭北郊，更祝版，工人削之，笔入木三分。”借古书法形容我们的代码，当真是恰当准确又自恋无比。</p>
+<p>之前的一些文章大多都是分享JS相关，今天轻松一下，我来谈谈前端页面的动画部分。最要通过剖析一个上线的“跑男”动画实例，来把CSS3中动画相关的知识点一网打尽。如果读者有自己的感想或者不一样的见解，欢迎一起讨论。</p>
+<h2 id="项目简介"><a href="#项目简介" class="headerlink" title="项目简介"></a>项目简介</h2><p>这是一个运营活动页面——春季马拉松大比拼：用户以闯关形式参加进行角色扮演。在满足一定条件下，自己扮演的马拉松选手会绕着跑道前进，向终点发起冲击。</p>
+<p>部分页面动画效果如下：</p>
+<p><img src="/bimg/run3.gif" alt="部分动画场景截图"></p>
+<p>当然，这个动画并不完美。考虑到时间性价比，我只用了两帧重复循环。但也达到了运营和产品小妹的满意。如果在没有上线压力的情况下，我们完全可以把他打磨的更流畅顺滑。</p>
+<p>首先，我们来看一下它的具体实现方式吧。如果您觉得很简单，也可以往下读，相信你也会有不一样的收获。</p>
+<h2 id="动画方案"><a href="#动画方案" class="headerlink" title="动画方案"></a>动画方案</h2><p>这一系列的动画设计，出于性能和简单的考虑，我采用了纯CSS3来实现。CSS3实现动画，主要有两种方式：transition属性和animation属性。前者用张鑫旭大大的话来说就是用来“平滑的改变CSS的值”。一般对于需要特定帧处理的动画，这显然是苍白无力的。我就不过多介绍。重点介绍一下animation属性。</p>
+<h3 id="animation"><a href="#animation" class="headerlink" title="animation"></a>animation</h3><p>animation属性其实是一个简写属性，就像我们更加熟悉的“background”属性一样。它用于设置六个动画属性：</p>
+<p>1）animation-name<br>2）animation-duration<br>3）animation-timing-function<br>4）animation-delay<br>5）animation-iteration-count<br>6）animation-direction</p>
+<p>最重要的就是animation-name，它规定需要绑定到选择器的keyframe名称，它要和keyframes对应。keyframes，就是我们用来定义几个关键节点帧。</p>
+<p>具体我就不再进行科普了。如果初学者不了解，社区上关于这些的资料可是一大把。</p>
+<h3 id="跑男开跑"><a href="#跑男开跑" class="headerlink" title="跑男开跑"></a>跑男开跑</h3><p>回到我们具体的业务场景，我们进行分析。跑男的动画其实可以拆分为两种，一个是交替摆腿，另一个是位置移动。这两个动作要严丝合缝的结合。能把这个想清楚，那就实现了一大半。</p>
+<p>那么如何让这两种动画一起施加在“静止的”跑男身上呢？</p>
+<p>我采用了增加一个div标签的方式：</p>
+<pre><code>&lt;div class=&quot;man-wrapper&quot;&gt;
+    &lt;div class=&quot;man&quot; id=&quot;man&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre><p>‘man-wrapper’这个div与’man’这个div大小完全一致。父节点处理位移，子节点负责交替摆腿：</p>
+<pre><code>.man-wrapper {
+    display: inline-block;
+    width: 46px;
+    height: 75px;
+    position: absolute;
+}
+.man {
+    display: inline-block;
+    width: 46px;
+    height: 75px;
+    background: url(img/sprite.png);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+</code></pre><p>当需要触发位移，开启跑步状态时，父节点添”start-run”类：</p>
+<pre><code>$(&apos;.man-wrapper&apos;).addClass(&apos;start-run&apos;);
+</code></pre><p>子节点添加：</p>
+<pre><code>$(&apos;#man&apos;).addClass(&apos;running&apos;);
+</code></pre><h3 id="动画实现"><a href="#动画实现" class="headerlink" title="动画实现"></a>动画实现</h3><p>关于“start-run”的动画设计，在跑道上直道部分相对简单，我们思路是使用transform-&gt;translate3d。但是视觉稿上存在不少于5处不规则弯道，在不改变原图的基础上，我们可以使用transform-&gt;rotate3d。具体设计看下图：</p>
+<p><img src="/bimg/run.png" alt="动画部分分解"></p>
+<p>1-2和4-5，只需要改变transform-&gt;translate3d；<br>2-4部分，一共三个阶段是为了弯道准备的。当然，如果时间充足，我们完全可以拆分的更加细致。<br>其中3是弯道中心的45度转身：translate3d(0,0,1,45deg);<br>其中4是已经完全转身：translate3d(0,0,1,90deg);</p>
+<p>具体代码：</p>
+<pre><code>.start-run {
+    animation: start-run 5000ms; 
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
+}
+@keyframes start-run {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    35% {
+        transform: translate3d(0, 155px, 0) rotate3d(0, 0, 1, 0deg);
+    }
+    50% {
+        transform: translate3d(20px, 224px, 0) rotate3d(0, 0, 1, -45deg);
+    }
+    70% {
+        transform: translate3d(80px, 242px, 0) rotate3d(0, 0, 1, -90deg);
+    }
+    100% {
+        transform: translate3d(200px, 243px, 0) rotate3d(0, 0, 1, -90deg);
+    }
+}
+</code></pre><p>为什么是35%，50%，70%呢？这个是我调试出来比较能达到相对顺畅的值。如果更严谨的化，完全可以列一个圆形坐标计算一下。当然这样子时间成本会比较大。<br>还有一点值得一提的是animation-timing-function: linear; 一般马拉松中段，都近似于匀速跑吧～</p>
+<p>解决完了位移的问题，我们来看摆腿动作。这个其实就是两张图片在交替播放。其实就是一个gif图原理。我使用了background-position来切换精灵图片的方式：</p>
+<pre><code>.running {
+    animation: running-man 1200ms steps(2) infinite;
+}
+@keyframes running-man {
+    0% {
+        background-position: 0 0;
+    }
+    50% {
+        background-position: 92px 0;
+    }
+}
+</code></pre><p>千万不要扫一眼代码完事儿，这里还有一些细节要注意。首先是“infinite”的使用，这个应该没什么意外吧。另外，你可曾注意了steps?</p>
+<h3 id="steps-函数实现阶跃动画"><a href="#steps-函数实现阶跃动画" class="headerlink" title="steps()函数实现阶跃动画"></a>steps()函数实现阶跃动画</h3><p>我们知道animation定义的关键帧之间试“平滑过渡”的。这个平滑过渡怎么理解呢？我精心做了一个“反例”示图来说明：</p>
+<p><img src="/bimg/run1.gif" alt="动画部分分解反面示例"></p>
+<p>所以，在切换雪碧图背景的情况下，steps()就要派上用场了。顺便说一句，最近面试一些人，讲熟悉CSS3动画，但是大部分都还不知道这个steps阶跃函数。如果你还不清楚，可以参考<a href="http://www.cnblogs.com/BATAKK/p/5301819.html" target="_blank" rel="external">这里。</a></p>
+<p>借助steps()函数，我们实现了交替跑动的分解动画：</p>
+<p><img src="/bimg/run2.gif" alt="动画部分分解"></p>
+<h2 id="还不完美"><a href="#还不完美" class="headerlink" title="还不完美"></a>还不完美</h2><p>做到这里，其实还没有完全结束。有一些值得我们思考的问题。</p>
+<p>1）真的有必要多一个标签，来结合生成动画吗？<br>其实不是的，animation很神奇很强大的一点在于它可以接受多个动画属性序列。比如上边那种情况我们可以这样实现：</p>
+<pre><code>.running {
+    animation: start-run 5000ms forwards linear, running-man 1200ms steps(2) infinite
+}
+</code></pre><p>2) 如果刻意追求更佳完美的动画，我们还需要哪些储备？<br>不得不要说，就是数学和物理知识了。比如，二次方曲线、三次方曲线、一直到五次方曲线，正弦余弦、圆弧、抛物线、反弹曲线、弹簧曲线等等。如果你对研究这些有兴趣，我安利一个<a href="https://greensock.com/" target="_blank" rel="external">高性能动画实现</a>以及<a href="https://greensock.com/ease-visualizer" target="_blank" rel="external">可视化1</a>，<a href="http://jeremyckahn.github.io/stylie/" target="_blank" rel="external">可视化2</a></p>
+<p>除了数学公式以外，也需要我们掌握良好的样式预处理器函数使用习惯。毕竟，那么多帧我们不可能自己手动实现。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>流畅高效的动画，绝非一朝一夕就能完成，需要各方面甚至跨领域的积累。如果你对此很感兴趣，欢迎讨论。我也在工作过程中，积累了很多动画实现效果，愿意同大家一起分享，互通资源。</p>
+<p>PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;作为一名真正的前端开发者，我们不能只关注前端的逻辑部分，毕竟“水银泄地”般的页面实现和“炫酷逼真”的动画效果是我们区别于其他程序员所特有的优势。尽量百分之百的还原视觉稿，连接UE设计灵感和用户视觉享受，正所谓“晋帝时祭北郊，更祝版，工人削之，笔入木三分。”借古书法形容我们的
+    
+    </summary>
+    
+      <category term="web" scheme="https://exp-team.github.io/categories/web/"/>
+    
+    
+      <category term="web" scheme="https://exp-team.github.io/tags/web/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第11000期</title>
+    <link href="https://exp-team.github.io/blog/2017/03/10/weekly/weekly-11000/"/>
+    <id>https://exp-team.github.io/blog/2017/03/10/weekly/weekly-11000/</id>
+    <published>2017-03-09T16:00:00.000Z</published>
+    <updated>2017-03-11T16:06:13.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>3.6-3.10，你的前端工作经验值钱吗？</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="为什么你的前端工作经验不值钱？"><a href="#为什么你的前端工作经验不值钱？" class="headerlink" title="为什么你的前端工作经验不值钱？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzI3NzIzMDY0NA==&amp;mid=2247484101&amp;idx=1&amp;sn=6b095010810a9dfa0c134fa9d116c1ce&amp;chksm=eb68279edc1fae8847b479592461a9f62136ac2c5b5047baaf82d0f2c63a3f67bbb643a3a887&amp;mpshare=1&amp;scene=1&amp;srcid=030683oKsqW95apeyMRaqppM" target="_blank" rel="external">为什么你的前端工作经验不值钱？</a></h3><p>之前看过一本书叫做《技巧》，里面提到有些人不是有10年工作经验，而是把1年的工作经验用了10年，永远不要停止学习，永远不要待在舒适区</p>
+<h3 id="前端开发者应知必会：浏览器是如何渲染网页的"><a href="#前端开发者应知必会：浏览器是如何渲染网页的" class="headerlink" title="前端开发者应知必会：浏览器是如何渲染网页的"></a><a href="https://zhuanlan.zhihu.com/p/25554352" target="_blank" rel="external">前端开发者应知必会：浏览器是如何渲染网页的</a></h3><p>每次看都会有收获，温故而知新</p>
+<h3 id="如何用-fis3-来开发-React"><a href="#如何用-fis3-来开发-React" class="headerlink" title="如何用 fis3 来开发 React?"></a><a href="http://fex.baidu.com/blog/2016/04/develop-react-with-fis3/" target="_blank" rel="external">如何用 fis3 来开发 React?</a></h3><p>最近的一个项目中用上了react，觉得这个有点意思，那么fis3下开发react也是蛮爽的</p>
+<a id="more"></a>
+<h2 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h2><h3 id="HTML不能这么写、你造吗？"><a href="#HTML不能这么写、你造吗？" class="headerlink" title="HTML不能这么写、你造吗？"></a><a href="https://zhuanlan.zhihu.com/p/25410484?utm_source=wechat_session&amp;utm_medium=social" target="_blank" rel="external">HTML不能这么写、你造吗？</a></h3><p>html5中元素不再只有块级和行内，嵌套规则也变得需要表格来维护了</p>
+<h3 id="五分钟-get-你也许不知道的前端新特性"><a href="#五分钟-get-你也许不知道的前端新特性" class="headerlink" title="五分钟 get 你也许不知道的前端新特性"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964364&amp;idx=1&amp;sn=6ac57a2111cbc3bc042d85650278c83c&amp;chksm=843aedeab34d64fc93d629315b02995a3aabb891f83116afa26b9a6e5d85630ed3aed6072309&amp;mpshare=1&amp;scene=1&amp;srcid=0309RHflqTapJLuCvi9PTOiE" target="_blank" rel="external">五分钟 get 你也许不知道的前端新特性</a></h3><h3 id="不止-React-Native、Ionic、Weex，连-Objective-C-的开发者都收到警告邮件了"><a href="#不止-React-Native、Ionic、Weex，连-Objective-C-的开发者都收到警告邮件了" class="headerlink" title="不止 React Native、Ionic、Weex，连 Objective-C 的开发者都收到警告邮件了"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5Mjg4NDMwMA==&amp;mid=2652974732&amp;idx=1&amp;sn=3462a3ca8a2f10e645be76f922c7e8c2&amp;chksm=bd4afdaf8a3d74b96bb748af53ad721e826251228efc45b23fabc14f5dfe20f3d1e252f633bf&amp;mpshare=1&amp;scene=1&amp;srcid=0308Shw8MOXxeRrjzdcV4G3o" target="_blank" rel="external">不止 React Native、Ionic、Weex，连 Objective-C 的开发者都收到警告邮件了</a></h3><h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="作为一个面试官，我是怎么来面试测试人员的"><a href="#作为一个面试官，我是怎么来面试测试人员的" class="headerlink" title="作为一个面试官，我是怎么来面试测试人员的"></a><a href="https://zhuanlan.zhihu.com/p/25516083?utm_medium=social&amp;utm_source=wechat_session&amp;from=singlemessage" target="_blank" rel="external">作为一个面试官，我是怎么来面试测试人员的</a></h3><p>最近也面试了不少人，一直都在</p>
+<h3 id="人到中年，我就问你怕不怕？"><a href="#人到中年，我就问你怕不怕？" class="headerlink" title="人到中年，我就问你怕不怕？"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5ODQ2MDIyMA==&amp;mid=2650713067&amp;idx=1&amp;sn=81459616b22059bc743a3be5911156f4&amp;chksm=bec065b889b7ecae7cf84110f5f03935e59dd4cd815cb4918489bfd3092367e444b70a9b4fd5&amp;mpshare=1&amp;scene=1&amp;srcid=0307rNX7bl8qGHZbRBF9kKby" target="_blank" rel="external">人到中年，我就问你怕不怕？</a></h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;3.6-3.10，你的前端工作经验值钱吗？&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;为什么你的前端工作经验不值钱？&quot;&gt;&lt;a href=&quot;#为什么你的前端工作经验不值钱？&quot; class=&quot;headerlink&quot; title=&quot;为什么你的前端工作经验不值钱？&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzI3NzIzMDY0NA==&amp;amp;mid=2247484101&amp;amp;idx=1&amp;amp;sn=6b095010810a9dfa0c134fa9d116c1ce&amp;amp;chksm=eb68279edc1fae8847b479592461a9f62136ac2c5b5047baaf82d0f2c63a3f67bbb643a3a887&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=030683oKsqW95apeyMRaqppM&quot;&gt;为什么你的前端工作经验不值钱？&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;之前看过一本书叫做《技巧》，里面提到有些人不是有10年工作经验，而是把1年的工作经验用了10年，永远不要停止学习，永远不要待在舒适区&lt;/p&gt;
+&lt;h3 id=&quot;前端开发者应知必会：浏览器是如何渲染网页的&quot;&gt;&lt;a href=&quot;#前端开发者应知必会：浏览器是如何渲染网页的&quot; class=&quot;headerlink&quot; title=&quot;前端开发者应知必会：浏览器是如何渲染网页的&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/25554352&quot;&gt;前端开发者应知必会：浏览器是如何渲染网页的&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;每次看都会有收获，温故而知新&lt;/p&gt;
+&lt;h3 id=&quot;如何用-fis3-来开发-React&quot;&gt;&lt;a href=&quot;#如何用-fis3-来开发-React&quot; class=&quot;headerlink&quot; title=&quot;如何用 fis3 来开发 React?&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://fex.baidu.com/blog/2016/04/develop-react-with-fis3/&quot;&gt;如何用 fis3 来开发 React?&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;最近的一个项目中用上了react，觉得这个有点意思，那么fis3下开发react也是蛮爽的&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
   
   <entry>
     <title>面试题目别有洞天 -&gt; 从es6优雅解法，到降级polyfill，再到redux reducer迷之命名</title>
@@ -627,6 +773,45 @@ if (target.prototype) {
   </entry>
   
   <entry>
+    <title>expfe技术周刊第10101期</title>
+    <link href="https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/"/>
+    <id>https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/</id>
+    <published>2017-01-20T16:00:00.000Z</published>
+    <updated>2017-02-19T12:29:49.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>1.16-1.21，马上要放假了，提前祝大家春节快乐，年终总结还没写的抓紧了，本期送个大家一副对联</p>
+<p>上联：微博知乎占头条谁与争锋</p>
+<p>下联：桌面移动待前端一统江湖</p>
+<p>横批：瞬息万变</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="二十个令程序员泪流满面的瞬间"><a href="#二十个令程序员泪流满面的瞬间" class="headerlink" title="二十个令程序员泪流满面的瞬间"></a><a href="http://mp.weixin.qq.com/s?__biz=MzI2MzEzNzQ3MQ==&amp;mid=2650307110&amp;idx=1&amp;sn=e7a247e1dd3b86d3441806ad24cb094c&amp;chksm=f24cabf6c53b22e086a09b8481b10879f073e56073290e4f75dddb55cc74ff2b0d76ea15dad0&amp;mpshare=1&amp;scene=1&amp;srcid=0119Hrto64icL7EJf7WWxzwI#rd" target="_blank" rel="external">二十个令程序员泪流满面的瞬间</a></h3><p>只有程序员能看懂的gif图，感同身受，泪流满面啊，%&gt;_&lt;%</p>
+<h3 id="2017年的前端该学些什么-md"><a href="#2017年的前端该学些什么-md" class="headerlink" title="2017年的前端该学些什么.md"></a><a href="https://github.com/fezaoduke/TranslationInstitute/blob/master/2017%E5%B9%B4%E7%9A%84%E5%89%8D%E7%AB%AF%E8%AF%A5%E5%AD%A6%E4%BA%9B%E4%BB%80%E4%B9%88.md" target="_blank" rel="external">2017年的前端该学些什么.md</a></h3><p>17年你打算学点啥？给自己设定好规划了没？还在迷茫的同学看看这篇文章吧，2017一起加油</p>
+<h3 id="搜罗一切webpack的好文章好工具"><a href="#搜罗一切webpack的好文章好工具" class="headerlink" title="搜罗一切webpack的好文章好工具"></a><a href="https://github.com/webpack-china/awesome-webpack-cn" target="_blank" rel="external">搜罗一切webpack的好文章好工具</a></h3><p>webpakc2发布了，又到了伤筋动骨，加班熬夜的时候了，关于webpack的一切文章都在这里</p>
+<a id="more"></a>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="掌握这5大核心概念，你就理解了React"><a href="#掌握这5大核心概念，你就理解了React" class="headerlink" title="掌握这5大核心概念，你就理解了React"></a><a href="https://zhuanlan.zhihu.com/p/24833815" target="_blank" rel="external">掌握这5大核心概念，你就理解了React</a></h3><p>react就这5个东西，还没入门的同学，或者深陷其中的同学快来围观，react不难，难得是用react做东西</p>
+<h3 id="一个react-redux工程实例"><a href="#一个react-redux工程实例" class="headerlink" title="一个react+redux工程实例"></a><a href="http://www.jianshu.com/p/8e28be0e7ab1?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends" target="_blank" rel="external">一个react+redux工程实例</a></h3><h3 id="揭秘babel的魔法之class继承的处理2"><a href="#揭秘babel的魔法之class继承的处理2" class="headerlink" title="揭秘babel的魔法之class继承的处理2"></a><a href="http://www.jianshu.com/p/95901615f322" target="_blank" rel="external">揭秘babel的魔法之class继承的处理2</a></h3><h3 id="全栈JS工程师的崛起"><a href="#全栈JS工程师的崛起" class="headerlink" title="全栈JS工程师的崛起"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651225356&amp;idx=1&amp;sn=4740cca7ab89b4449bfe5438e1427729&amp;chksm=bd49a4888a3e2d9e8c625d116fcc42db25c11421ba79d47dff272f0db8f6e5427d1bdbf3fe1b&amp;mpshare=1&amp;scene=1&amp;srcid=0120NQv87HQjc6Q50a1LLF0w#rd" target="_blank" rel="external">全栈JS工程师的崛起</a></h3><p>先精后广，一专多长，不想成为全栈的工程师，不是好工程师，一起加油</p>
+<h3 id="250行实现一个简单的MVVM"><a href="#250行实现一个简单的MVVM" class="headerlink" title="250行实现一个简单的MVVM"></a><a href="https://zhuanlan.zhihu.com/p/24475845" target="_blank" rel="external">250行实现一个简单的MVVM</a></h3><p>一直想动手写一个mvvm框架，就从这篇文章开始吧</p>
+<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="Google发布新的图像压缩技术，最高可节省75％带宽"><a href="#Google发布新的图像压缩技术，最高可节省75％带宽" class="headerlink" title="Google发布新的图像压缩技术，最高可节省75％带宽"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA5Nzc4OTA1Mw==&amp;mid=2659598877&amp;idx=1&amp;sn=704e7d5a05adaff567c9adf015753124&amp;chksm=8be9970fbc9e1e191b0f3cf92a9dd6e76ad4a8d0fff38a30ed772033eb0ac10f6356d2a4f528&amp;mpshare=1&amp;scene=1&amp;srcid=0118TvMOVHhoZN10kF4DDpc6#rd" target="_blank" rel="external">Google发布新的图像压缩技术，最高可节省75％带宽</a></h3><h3 id="Bluebird-是如何做到比原生实现更快的？"><a href="#Bluebird-是如何做到比原生实现更快的？" class="headerlink" title="Bluebird 是如何做到比原生实现更快的？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964223&amp;idx=1&amp;sn=f2c37c05fb6ad370a67c59ca745bd7bf&amp;chksm=843aec99b34d658f043acdea3a3c5b948d664cff48947f4616ccebac4548c5b57978c0d3be38&amp;mpshare=1&amp;scene=1&amp;srcid=0117zptRUZNoEger5avSAAem#rd" target="_blank" rel="external">Bluebird 是如何做到比原生实现更快的？</a></h3><h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="你可能不知道的-Mac-技巧-文本操作"><a href="#你可能不知道的-Mac-技巧-文本操作" class="headerlink" title="你可能不知道的 Mac 技巧 - 文本操作"></a><a href="https://zhuanlan.zhihu.com/p/24921055" target="_blank" rel="external">你可能不知道的 Mac 技巧 - 文本操作</a></h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;1.16-1.21，马上要放假了，提前祝大家春节快乐，年终总结还没写的抓紧了，本期送个大家一副对联&lt;/p&gt;
+&lt;p&gt;上联：微博知乎占头条谁与争锋&lt;/p&gt;
+&lt;p&gt;下联：桌面移动待前端一统江湖&lt;/p&gt;
+&lt;p&gt;横批：瞬息万变&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;二十个令程序员泪流满面的瞬间&quot;&gt;&lt;a href=&quot;#二十个令程序员泪流满面的瞬间&quot; class=&quot;headerlink&quot; title=&quot;二十个令程序员泪流满面的瞬间&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzI2MzEzNzQ3MQ==&amp;amp;mid=2650307110&amp;amp;idx=1&amp;amp;sn=e7a247e1dd3b86d3441806ad24cb094c&amp;amp;chksm=f24cabf6c53b22e086a09b8481b10879f073e56073290e4f75dddb55cc74ff2b0d76ea15dad0&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=0119Hrto64icL7EJf7WWxzwI#rd&quot;&gt;二十个令程序员泪流满面的瞬间&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;只有程序员能看懂的gif图，感同身受，泪流满面啊，%&amp;gt;_&amp;lt;%&lt;/p&gt;
+&lt;h3 id=&quot;2017年的前端该学些什么-md&quot;&gt;&lt;a href=&quot;#2017年的前端该学些什么-md&quot; class=&quot;headerlink&quot; title=&quot;2017年的前端该学些什么.md&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://github.com/fezaoduke/TranslationInstitute/blob/master/2017%E5%B9%B4%E7%9A%84%E5%89%8D%E7%AB%AF%E8%AF%A5%E5%AD%A6%E4%BA%9B%E4%BB%80%E4%B9%88.md&quot;&gt;2017年的前端该学些什么.md&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;17年你打算学点啥？给自己设定好规划了没？还在迷茫的同学看看这篇文章吧，2017一起加油&lt;/p&gt;
+&lt;h3 id=&quot;搜罗一切webpack的好文章好工具&quot;&gt;&lt;a href=&quot;#搜罗一切webpack的好文章好工具&quot; class=&quot;headerlink&quot; title=&quot;搜罗一切webpack的好文章好工具&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://github.com/webpack-china/awesome-webpack-cn&quot;&gt;搜罗一切webpack的好文章好工具&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;webpakc2发布了，又到了伤筋动骨，加班熬夜的时候了，关于webpack的一切文章都在这里&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
+    
+  </entry>
+  
+  <entry>
     <title>伍酱的2016</title>
     <link href="https://exp-team.github.io/blog/2017/01/21/other/wujiang-2016/"/>
     <id>https://exp-team.github.io/blog/2017/01/21/other/wujiang-2016/</id>
@@ -709,34 +894,26 @@ if (target.prototype) {
   </entry>
   
   <entry>
-    <title>expfe技术周刊第10101期</title>
-    <link href="https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/"/>
-    <id>https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/</id>
-    <published>2017-01-20T16:00:00.000Z</published>
-    <updated>2017-02-19T12:29:49.000Z</updated>
+    <title>expfe技术周刊第10100期</title>
+    <link href="https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/"/>
+    <id>https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/</id>
+    <published>2017-01-12T16:00:00.000Z</published>
+    <updated>2017-01-13T12:23:08.000Z</updated>
     
-    <content type="html"><![CDATA[<p>1.16-1.21，马上要放假了，提前祝大家春节快乐，年终总结还没写的抓紧了，本期送个大家一副对联</p>
-<p>上联：微博知乎占头条谁与争锋</p>
-<p>下联：桌面移动待前端一统江湖</p>
-<p>横批：瞬息万变</p>
-<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="二十个令程序员泪流满面的瞬间"><a href="#二十个令程序员泪流满面的瞬间" class="headerlink" title="二十个令程序员泪流满面的瞬间"></a><a href="http://mp.weixin.qq.com/s?__biz=MzI2MzEzNzQ3MQ==&amp;mid=2650307110&amp;idx=1&amp;sn=e7a247e1dd3b86d3441806ad24cb094c&amp;chksm=f24cabf6c53b22e086a09b8481b10879f073e56073290e4f75dddb55cc74ff2b0d76ea15dad0&amp;mpshare=1&amp;scene=1&amp;srcid=0119Hrto64icL7EJf7WWxzwI#rd" target="_blank" rel="external">二十个令程序员泪流满面的瞬间</a></h3><p>只有程序员能看懂的gif图，感同身受，泪流满面啊，%&gt;_&lt;%</p>
-<h3 id="2017年的前端该学些什么-md"><a href="#2017年的前端该学些什么-md" class="headerlink" title="2017年的前端该学些什么.md"></a><a href="https://github.com/fezaoduke/TranslationInstitute/blob/master/2017%E5%B9%B4%E7%9A%84%E5%89%8D%E7%AB%AF%E8%AF%A5%E5%AD%A6%E4%BA%9B%E4%BB%80%E4%B9%88.md" target="_blank" rel="external">2017年的前端该学些什么.md</a></h3><p>17年你打算学点啥？给自己设定好规划了没？还在迷茫的同学看看这篇文章吧，2017一起加油</p>
-<h3 id="搜罗一切webpack的好文章好工具"><a href="#搜罗一切webpack的好文章好工具" class="headerlink" title="搜罗一切webpack的好文章好工具"></a><a href="https://github.com/webpack-china/awesome-webpack-cn" target="_blank" rel="external">搜罗一切webpack的好文章好工具</a></h3><p>webpakc2发布了，又到了伤筋动骨，加班熬夜的时候了，关于webpack的一切文章都在这里</p>
+    <content type="html"><![CDATA[<p>1.8-1.13，新的一期，继续积累！</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="《JS-闯关记》之原型及原型链"><a href="#《JS-闯关记》之原型及原型链" class="headerlink" title="《JS 闯关记》之原型及原型链"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;mid=2650101216&amp;idx=1&amp;sn=dcc39636ebff46aca84df68533fb0742&amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;scene=0" target="_blank" rel="external">《JS 闯关记》之原型及原型链</a></h3><p>原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的<strong>proto</strong> 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、<strong>proto</strong> 这五个概念入手。</p>
+<h3 id="H5项目常见问题及注意事项"><a href="#H5项目常见问题及注意事项" class="headerlink" title="H5项目常见问题及注意事项"></a><a href="http://www.open-open.com/lib/view/open1449325854077.html" target="_blank" rel="external">H5项目常见问题及注意事项</a></h3><p>再也不用为PM嘴中的“H5”发愁了。</p>
 <a id="more"></a>
-<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="掌握这5大核心概念，你就理解了React"><a href="#掌握这5大核心概念，你就理解了React" class="headerlink" title="掌握这5大核心概念，你就理解了React"></a><a href="https://zhuanlan.zhihu.com/p/24833815" target="_blank" rel="external">掌握这5大核心概念，你就理解了React</a></h3><p>react就这5个东西，还没入门的同学，或者深陷其中的同学快来围观，react不难，难得是用react做东西</p>
-<h3 id="一个react-redux工程实例"><a href="#一个react-redux工程实例" class="headerlink" title="一个react+redux工程实例"></a><a href="http://www.jianshu.com/p/8e28be0e7ab1?utm_campaign=hugo&amp;utm_medium=reader_share&amp;utm_content=note&amp;utm_source=weixin-friends" target="_blank" rel="external">一个react+redux工程实例</a></h3><h3 id="揭秘babel的魔法之class继承的处理2"><a href="#揭秘babel的魔法之class继承的处理2" class="headerlink" title="揭秘babel的魔法之class继承的处理2"></a><a href="http://www.jianshu.com/p/95901615f322" target="_blank" rel="external">揭秘babel的魔法之class继承的处理2</a></h3><h3 id="全栈JS工程师的崛起"><a href="#全栈JS工程师的崛起" class="headerlink" title="全栈JS工程师的崛起"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651225356&amp;idx=1&amp;sn=4740cca7ab89b4449bfe5438e1427729&amp;chksm=bd49a4888a3e2d9e8c625d116fcc42db25c11421ba79d47dff272f0db8f6e5427d1bdbf3fe1b&amp;mpshare=1&amp;scene=1&amp;srcid=0120NQv87HQjc6Q50a1LLF0w#rd" target="_blank" rel="external">全栈JS工程师的崛起</a></h3><p>先精后广，一专多长，不想成为全栈的工程师，不是好工程师，一起加油</p>
-<h3 id="250行实现一个简单的MVVM"><a href="#250行实现一个简单的MVVM" class="headerlink" title="250行实现一个简单的MVVM"></a><a href="https://zhuanlan.zhihu.com/p/24475845" target="_blank" rel="external">250行实现一个简单的MVVM</a></h3><p>一直想动手写一个mvvm框架，就从这篇文章开始吧</p>
-<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="Google发布新的图像压缩技术，最高可节省75％带宽"><a href="#Google发布新的图像压缩技术，最高可节省75％带宽" class="headerlink" title="Google发布新的图像压缩技术，最高可节省75％带宽"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA5Nzc4OTA1Mw==&amp;mid=2659598877&amp;idx=1&amp;sn=704e7d5a05adaff567c9adf015753124&amp;chksm=8be9970fbc9e1e191b0f3cf92a9dd6e76ad4a8d0fff38a30ed772033eb0ac10f6356d2a4f528&amp;mpshare=1&amp;scene=1&amp;srcid=0118TvMOVHhoZN10kF4DDpc6#rd" target="_blank" rel="external">Google发布新的图像压缩技术，最高可节省75％带宽</a></h3><h3 id="Bluebird-是如何做到比原生实现更快的？"><a href="#Bluebird-是如何做到比原生实现更快的？" class="headerlink" title="Bluebird 是如何做到比原生实现更快的？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964223&amp;idx=1&amp;sn=f2c37c05fb6ad370a67c59ca745bd7bf&amp;chksm=843aec99b34d658f043acdea3a3c5b948d664cff48947f4616ccebac4548c5b57978c0d3be38&amp;mpshare=1&amp;scene=1&amp;srcid=0117zptRUZNoEger5avSAAem#rd" target="_blank" rel="external">Bluebird 是如何做到比原生实现更快的？</a></h3><h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="你可能不知道的-Mac-技巧-文本操作"><a href="#你可能不知道的-Mac-技巧-文本操作" class="headerlink" title="你可能不知道的 Mac 技巧 - 文本操作"></a><a href="https://zhuanlan.zhihu.com/p/24921055" target="_blank" rel="external">你可能不知道的 Mac 技巧 - 文本操作</a></h3>]]></content>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="揭秘babel的魔法之class魔法处理"><a href="#揭秘babel的魔法之class魔法处理" class="headerlink" title="揭秘babel的魔法之class魔法处理"></a><a href="https://mp.weixin.qq.com/s?__biz=MzIzNjE5NzAyMA==&amp;mid=2649879842&amp;idx=1&amp;sn=0e7eb27fd9bb7f5ba9bbd2b3640ba663&amp;chksm=f0ded0d1c7a959c785fd8c8b384e348506ea4dd40ca72a8fac00aa4f34ab07aacab6aa92514b&amp;mpshare=1&amp;scene=1&amp;srcid=01132iAX9Sp6Gpll9otS2un8&amp;key=59506e83f2f7e1fd47b66ec743010bafb62e75b40f02a088b7a58ef822f0fcfe14c244308ee819c24dd7303946792d0ace78d7c18cb31a020ca5b42528939fa5ce021ed6ae7a77d738521132ff2afee9&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a></h3><p>揭秘Babel的同时，在复习一遍原型链基础支持～</p>
+<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="如何让你的-CSS-更具有可维护性？——大神有绝招-amp"><a href="#如何让你的-CSS-更具有可维护性？——大神有绝招-amp" class="headerlink" title="如何让你的 CSS 更具有可维护性？——大神有绝招&amp;)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964179&amp;idx=1&amp;sn=f7088de66f09efd35057541695582d52&amp;chksm=843aecb5b34d65a3ff8d67142403f3463e08f57041f4212e991248f49770b59943d5c65545bc&amp;mpshare=1&amp;scene=1&amp;srcid=0111H4YARr96el0lj1WY0J09&amp;key=f27a3d85b887ad782291dcbcbc6989e0bb3335f0f66ac9cc6b6994c455227fac808715c21fb47af4ad18b5ff25efbb9aca75f3d0bbf57baefb60f1d36971b42fa9d323e2b3d80208070837dfd770fa49&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">如何让你的 CSS 更具有可维护性？——大神有绝招</a>&amp;)</h3><p>这篇文章教你一种方法，能够写出更具有可维护性的CSS，它就是”BEM”。</p>
+<h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="回顾-2016-年-Node-js-十大文章-amp"><a href="#回顾-2016-年-Node-js-十大文章-amp" class="headerlink" title="回顾 2016 年 Node.js 十大文章&amp;)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964196&amp;idx=1&amp;sn=d52e8258b54e0d807e14efa5a2791f84&amp;chksm=843aec82b34d65944704e1f7fc04747934bad078ad91906781f21edeb204a9a55f4d9f129369&amp;mpshare=1&amp;scene=1&amp;srcid=0111eOoheFnpABemlLvmHvL9&amp;key=b43a3af60b96e11e86b22b45b526335d70f3fbb0d1f05d664eb97888d1744e7026b64c4bdae93ab2ceb9092123f81dfcaecf157e9a43e4e2bed516a6b9db9e4e0fe03330913f5cfcf971d9ac46dfaf8e&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">回顾 2016 年 Node.js 十大文章</a>&amp;)</h3><p>对于Node.js开发者来说，2016是振奋人心的一年。</p>
+]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;1.16-1.21，马上要放假了，提前祝大家春节快乐，年终总结还没写的抓紧了，本期送个大家一副对联&lt;/p&gt;
-&lt;p&gt;上联：微博知乎占头条谁与争锋&lt;/p&gt;
-&lt;p&gt;下联：桌面移动待前端一统江湖&lt;/p&gt;
-&lt;p&gt;横批：瞬息万变&lt;/p&gt;
-&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;二十个令程序员泪流满面的瞬间&quot;&gt;&lt;a href=&quot;#二十个令程序员泪流满面的瞬间&quot; class=&quot;headerlink&quot; title=&quot;二十个令程序员泪流满面的瞬间&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzI2MzEzNzQ3MQ==&amp;amp;mid=2650307110&amp;amp;idx=1&amp;amp;sn=e7a247e1dd3b86d3441806ad24cb094c&amp;amp;chksm=f24cabf6c53b22e086a09b8481b10879f073e56073290e4f75dddb55cc74ff2b0d76ea15dad0&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=0119Hrto64icL7EJf7WWxzwI#rd&quot;&gt;二十个令程序员泪流满面的瞬间&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;只有程序员能看懂的gif图，感同身受，泪流满面啊，%&amp;gt;_&amp;lt;%&lt;/p&gt;
-&lt;h3 id=&quot;2017年的前端该学些什么-md&quot;&gt;&lt;a href=&quot;#2017年的前端该学些什么-md&quot; class=&quot;headerlink&quot; title=&quot;2017年的前端该学些什么.md&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://github.com/fezaoduke/TranslationInstitute/blob/master/2017%E5%B9%B4%E7%9A%84%E5%89%8D%E7%AB%AF%E8%AF%A5%E5%AD%A6%E4%BA%9B%E4%BB%80%E4%B9%88.md&quot;&gt;2017年的前端该学些什么.md&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;17年你打算学点啥？给自己设定好规划了没？还在迷茫的同学看看这篇文章吧，2017一起加油&lt;/p&gt;
-&lt;h3 id=&quot;搜罗一切webpack的好文章好工具&quot;&gt;&lt;a href=&quot;#搜罗一切webpack的好文章好工具&quot; class=&quot;headerlink&quot; title=&quot;搜罗一切webpack的好文章好工具&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://github.com/webpack-china/awesome-webpack-cn&quot;&gt;搜罗一切webpack的好文章好工具&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;webpakc2发布了，又到了伤筋动骨，加班熬夜的时候了，关于webpack的一切文章都在这里&lt;/p&gt;
+      &lt;p&gt;1.8-1.13，新的一期，继续积累！&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;《JS-闯关记》之原型及原型链&quot;&gt;&lt;a href=&quot;#《JS-闯关记》之原型及原型链&quot; class=&quot;headerlink&quot; title=&quot;《JS 闯关记》之原型及原型链&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;amp;mid=2650101216&amp;amp;idx=1&amp;amp;sn=dcc39636ebff46aca84df68533fb0742&amp;amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;amp;scene=0&quot;&gt;《JS 闯关记》之原型及原型链&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的&lt;strong&gt;proto&lt;/strong&gt; 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、&lt;strong&gt;proto&lt;/strong&gt; 这五个概念入手。&lt;/p&gt;
+&lt;h3 id=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;a href=&quot;#H5项目常见问题及注意事项&quot; class=&quot;headerlink&quot; title=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.open-open.com/lib/view/open1449325854077.html&quot;&gt;H5项目常见问题及注意事项&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;再也不用为PM嘴中的“H5”发愁了。&lt;/p&gt;
     
     </summary>
     
@@ -816,37 +993,6 @@ if (target.prototype) {
       <category term="tool" scheme="https://exp-team.github.io/tags/tool/"/>
     
       <category term="pac" scheme="https://exp-team.github.io/tags/pac/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>expfe技术周刊第10100期</title>
-    <link href="https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/"/>
-    <id>https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/</id>
-    <published>2017-01-12T16:00:00.000Z</published>
-    <updated>2017-01-13T12:23:08.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>1.8-1.13，新的一期，继续积累！</p>
-<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="《JS-闯关记》之原型及原型链"><a href="#《JS-闯关记》之原型及原型链" class="headerlink" title="《JS 闯关记》之原型及原型链"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;mid=2650101216&amp;idx=1&amp;sn=dcc39636ebff46aca84df68533fb0742&amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;scene=0" target="_blank" rel="external">《JS 闯关记》之原型及原型链</a></h3><p>原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的<strong>proto</strong> 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、<strong>proto</strong> 这五个概念入手。</p>
-<h3 id="H5项目常见问题及注意事项"><a href="#H5项目常见问题及注意事项" class="headerlink" title="H5项目常见问题及注意事项"></a><a href="http://www.open-open.com/lib/view/open1449325854077.html" target="_blank" rel="external">H5项目常见问题及注意事项</a></h3><p>再也不用为PM嘴中的“H5”发愁了。</p>
-<a id="more"></a>
-<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="揭秘babel的魔法之class魔法处理"><a href="#揭秘babel的魔法之class魔法处理" class="headerlink" title="揭秘babel的魔法之class魔法处理"></a><a href="https://mp.weixin.qq.com/s?__biz=MzIzNjE5NzAyMA==&amp;mid=2649879842&amp;idx=1&amp;sn=0e7eb27fd9bb7f5ba9bbd2b3640ba663&amp;chksm=f0ded0d1c7a959c785fd8c8b384e348506ea4dd40ca72a8fac00aa4f34ab07aacab6aa92514b&amp;mpshare=1&amp;scene=1&amp;srcid=01132iAX9Sp6Gpll9otS2un8&amp;key=59506e83f2f7e1fd47b66ec743010bafb62e75b40f02a088b7a58ef822f0fcfe14c244308ee819c24dd7303946792d0ace78d7c18cb31a020ca5b42528939fa5ce021ed6ae7a77d738521132ff2afee9&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a></h3><p>揭秘Babel的同时，在复习一遍原型链基础支持～</p>
-<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="如何让你的-CSS-更具有可维护性？——大神有绝招-amp"><a href="#如何让你的-CSS-更具有可维护性？——大神有绝招-amp" class="headerlink" title="如何让你的 CSS 更具有可维护性？——大神有绝招&amp;)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964179&amp;idx=1&amp;sn=f7088de66f09efd35057541695582d52&amp;chksm=843aecb5b34d65a3ff8d67142403f3463e08f57041f4212e991248f49770b59943d5c65545bc&amp;mpshare=1&amp;scene=1&amp;srcid=0111H4YARr96el0lj1WY0J09&amp;key=f27a3d85b887ad782291dcbcbc6989e0bb3335f0f66ac9cc6b6994c455227fac808715c21fb47af4ad18b5ff25efbb9aca75f3d0bbf57baefb60f1d36971b42fa9d323e2b3d80208070837dfd770fa49&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">如何让你的 CSS 更具有可维护性？——大神有绝招</a>&amp;)</h3><p>这篇文章教你一种方法，能够写出更具有可维护性的CSS，它就是”BEM”。</p>
-<h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="回顾-2016-年-Node-js-十大文章-amp"><a href="#回顾-2016-年-Node-js-十大文章-amp" class="headerlink" title="回顾 2016 年 Node.js 十大文章&amp;)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964196&amp;idx=1&amp;sn=d52e8258b54e0d807e14efa5a2791f84&amp;chksm=843aec82b34d65944704e1f7fc04747934bad078ad91906781f21edeb204a9a55f4d9f129369&amp;mpshare=1&amp;scene=1&amp;srcid=0111eOoheFnpABemlLvmHvL9&amp;key=b43a3af60b96e11e86b22b45b526335d70f3fbb0d1f05d664eb97888d1744e7026b64c4bdae93ab2ceb9092123f81dfcaecf157e9a43e4e2bed516a6b9db9e4e0fe03330913f5cfcf971d9ac46dfaf8e&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">回顾 2016 年 Node.js 十大文章</a>&amp;)</h3><p>对于Node.js开发者来说，2016是振奋人心的一年。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;1.8-1.13，新的一期，继续积累！&lt;/p&gt;
-&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;《JS-闯关记》之原型及原型链&quot;&gt;&lt;a href=&quot;#《JS-闯关记》之原型及原型链&quot; class=&quot;headerlink&quot; title=&quot;《JS 闯关记》之原型及原型链&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;amp;mid=2650101216&amp;amp;idx=1&amp;amp;sn=dcc39636ebff46aca84df68533fb0742&amp;amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;amp;scene=0&quot;&gt;《JS 闯关记》之原型及原型链&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的&lt;strong&gt;proto&lt;/strong&gt; 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、&lt;strong&gt;proto&lt;/strong&gt; 这五个概念入手。&lt;/p&gt;
-&lt;h3 id=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;a href=&quot;#H5项目常见问题及注意事项&quot; class=&quot;headerlink&quot; title=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.open-open.com/lib/view/open1449325854077.html&quot;&gt;H5项目常见问题及注意事项&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;再也不用为PM嘴中的“H5”发愁了。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
-    
-    
-      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
     
   </entry>
   
@@ -1447,68 +1593,6 @@ Object.setPrototypeOf(Student, Person)
 &lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;资深Web技术专家曹刘阳：2016年前端技术观察&quot;&gt;&lt;a href=&quot;#资深Web技术专家曹刘阳：2016年前端技术观察&quot; class=&quot;headerlink&quot; title=&quot;资深Web技术专家曹刘阳：2016年前端技术观察&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://geek.csdn.net/news/detail/128912&quot;&gt;资深Web技术专家曹刘阳：2016年前端技术观察&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;合抱之木生于毫末，九层之台起于垒土，万丈高楼平地起。万里长城非一日而成，冰冻三尺非一日之寒。旧雨三年精化碧，孤灯午夜眼常青。不积跬步无以至千里，不积小流无以成江河。决定你速度的是智商，决定你高度的是基础。偷的懒迟早要补上，切记赶早不赶晚。&lt;/p&gt;
 &lt;h3 id=&quot;开源大神-James-Kyle-写给-JavaScript-的一封信&quot;&gt;&lt;a href=&quot;#开源大神-James-Kyle-写给-JavaScript-的一封信&quot; class=&quot;headerlink&quot; title=&quot;开源大神 James Kyle 写给 JavaScript 的一封信&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;amp;mid=2650963957&amp;amp;idx=1&amp;amp;sn=d39eda3548256310ddcc249ce29af42a&amp;amp;chksm=843a1393b34d9a85d08139aa53d6d885efbf117a3e6320a52433f5784d606bd20d14101f6928&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1213wlqwX0Q6DkZD9Wqn8Wb4#rd&quot;&gt;开源大神 James Kyle 写给 JavaScript 的一封信&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;请尊重开源的人，他们是最无私的，向开源致敬。&lt;/p&gt;
 &lt;h3 id=&quot;五个典型的-JavaScript-面试题&quot;&gt;&lt;a href=&quot;#五个典型的-JavaScript-面试题&quot; class=&quot;headerlink&quot; title=&quot;五个典型的 JavaScript 面试题&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;amp;mid=2650963939&amp;amp;idx=1&amp;amp;sn=ffa0ce59fc3a5691ee5be7520d1692d2&amp;amp;chksm=843a1385b34d9a932f11138f3332231b26c71067b2ebc59e31f27faedb7a40c9b960bb4330a2&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1212E8wJvLX84dWuLLgI0PLy#rd&quot;&gt;五个典型的 JavaScript 面试题&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;你一定知道我们最近在招人吧，如果你对这五个题都能看懂，那么快快发你的简历发给我吧。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
-    
-    
-      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>expfe技术周刊第1111期</title>
-    <link href="https://exp-team.github.io/blog/2016/12/10/weekly/weekly-1111/"/>
-    <id>https://exp-team.github.io/blog/2016/12/10/weekly/weekly-1111/</id>
-    <published>2016-12-09T16:00:00.000Z</published>
-    <updated>2017-01-13T08:09:51.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>12.4-12.10，这一期的数字听应景，水满则溢，月盈则亏，或升华，或迷失，进步永无止境。</p>
-<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="Firebug-宣布停止开发更新"><a href="#Firebug-宣布停止开发更新" class="headerlink" title="Firebug 宣布停止开发更新"></a><a href="http://mp.weixin.qq.com/s?__biz=MzAxODE2MjM1MA==&amp;mid=2651551544&amp;idx=1&amp;sn=5df9d76d2aab4bf82cc685f17af6aec9&amp;chksm=8025a0f9b75229ef349dd3507f16e7faf74cca0639af7a2b67bd894611f45abd28fd57810be2&amp;mpshare=1&amp;scene=1&amp;srcid=1207aEhoIUyh4RiyNQACrmj3#rd" target="_blank" rel="external">Firebug 宣布停止开发更新</a></h3><p>一石激起千层浪，这真是一个重磅消息，曾几何时，是你挽救了无数页面仔宝贵的青春，是你让前端调试工具迈进了一个新时代，急流勇退，智者也，缅怀，致敬。</p>
-<h3 id="阅读-NodeJS-文档，我学到了这-19-件事情"><a href="#阅读-NodeJS-文档，我学到了这-19-件事情" class="headerlink" title="阅读 NodeJS 文档，我学到了这 19 件事情"></a><a href="https://zhuanlan.zhihu.com/p/24210807" target="_blank" rel="external">阅读 NodeJS 文档，我学到了这 19 件事情</a></h3><p>最近学了点node的东西，用node做了几个小工具，突然发现，一下子打开了一扇新大门，原来有了权力确实感觉不一样，有权限的人想要更大的权限，向着未来出发，即便你写了很久的nodejs，也未必知道这19件事。</p>
-<h3 id="前端-MVC-已死吗？"><a href="#前端-MVC-已死吗？" class="headerlink" title="前端 MVC 已死吗？"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963905&amp;idx=1&amp;sn=70019642c4cbaaca657706ad20585934&amp;chksm=843a13a7b34d9ab1abb85b611daae44af0d0616bde0e686029c04c25840df62bd2d18c134937&amp;mpshare=1&amp;scene=1&amp;srcid=1209dJSy76l94Ea4lMrGzJk4#rd" target="_blank" rel="external">前端 MVC 已死吗？</a></h3><p>还未学过，就以死去吗？我并不这么认为，无数陈旧项目还在使用者mvc，无数历史项目都是mvc撑起来的，即便技术已不在流行，但还是值得学习的，道理不会变的，我们的目的只有一个，提升效率，有些东西死了，他还活着，永远。</p>
-<a id="more"></a>
-<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="理解-Babel-插件"><a href="#理解-Babel-插件" class="headerlink" title="理解 Babel 插件"></a><a href="http://taobaofed.org/blog/2016/09/29/babel-plugins/" target="_blank" rel="external">理解 Babel 插件</a></h3><h3 id="React-实践心得：key-属性的原理和用法"><a href="#React-实践心得：key-属性的原理和用法" class="headerlink" title="React 实践心得：key 属性的原理和用法"></a><a href="http://taobaofed.org/blog/2016/08/24/react-key/" target="_blank" rel="external">React 实践心得：key 属性的原理和用法</a></h3><h3 id="深入了解-JavaScript-中的-for-循环"><a href="#深入了解-JavaScript-中的-for-循环" class="headerlink" title="深入了解 JavaScript 中的 for 循环"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224371&amp;idx=1&amp;sn=54771d5420daf8f5554605c16023dc64&amp;chksm=bd49a0b78a3e29a10b45dae92a5668c5895bdb35d03b78f491cdbc68b8ba87ea511c8dc33cb5&amp;mpshare=1&amp;scene=1&amp;srcid=1207VugbcGhtGVIUNRVLR0FM#rd" target="_blank" rel="external">深入了解 JavaScript 中的 for 循环</a></h3><p>很久没有一篇文章能够打动我的心了，而这就是难得的一篇，即便你是个geek，也未必知道的如此透彻。</p>
-<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="使用CSS3-REM-和-VW-打造等比例响应式页面的便捷工作流"><a href="#使用CSS3-REM-和-VW-打造等比例响应式页面的便捷工作流" class="headerlink" title="使用CSS3 REM 和 VW 打造等比例响应式页面的便捷工作流"></a><a href="https://zhuanlan.zhihu.com/p/23968868" target="_blank" rel="external">使用CSS3 REM 和 VW 打造等比例响应式页面的便捷工作流</a></h3><h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="淘宝首页性能优化实践"><a href="#淘宝首页性能优化实践" class="headerlink" title="淘宝首页性能优化实践"></a><a href="http://taobaofed.org/blog/2016/04/05/optimize-in-tbhome/" target="_blank" rel="external">淘宝首页性能优化实践</a></h3><h3 id="“一天精通-Chrome-开发”"><a href="#“一天精通-Chrome-开发”" class="headerlink" title="“一天精通 Chrome 开发”"></a><a href="https://zhuanlan.zhihu.com/p/24225644" target="_blank" rel="external">“一天精通 Chrome 开发”</a></h3><h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="技术的成长曲线"><a href="#技术的成长曲线" class="headerlink" title="技术的成长曲线"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NTg1MjM0Mg==&amp;mid=2657261460&amp;idx=1&amp;sn=9c4decdffe54e0705ee0b468bebd59f8&amp;chksm=84479e4db330175b0f9ed87040768ed20e929fad6097b8a16b5fb431ea33c9cf5b51e9cf8234&amp;mpshare=1&amp;scene=1&amp;srcid=1129s7MEHAkjL0S5hg8KAlG6#rd" target="_blank" rel="external">技术的成长曲线</a></h3><p>技术成长，永无止境，你我共勉，加油。</p>
-<h3 id="程序员练级指北"><a href="#程序员练级指北" class="headerlink" title="程序员练级指北"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224332&amp;idx=1&amp;sn=99bcc28e0e4d65e62d9aa86bdae55f4d&amp;chksm=bd49a0888a3e299ea4b6b4f0fe4370ea3cd54e8db46b56448b282d5e405fa2f50f0c595199e3&amp;mpshare=1&amp;scene=1&amp;srcid=1206a2tYXT8PHyyGHy1FE3We#rd" target="_blank" rel="external">程序员练级指北</a></h3><p>欲穷千里目，更上一层楼，这也是我创建expfe周刊的目的，1+1&gt;2，进步我们要一起。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;12.4-12.10，这一期的数字听应景，水满则溢，月盈则亏，或升华，或迷失，进步永无止境。&lt;/p&gt;
-&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;Firebug-宣布停止开发更新&quot;&gt;&lt;a href=&quot;#Firebug-宣布停止开发更新&quot; class=&quot;headerlink&quot; title=&quot;Firebug 宣布停止开发更新&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzAxODE2MjM1MA==&amp;amp;mid=2651551544&amp;amp;idx=1&amp;amp;sn=5df9d76d2aab4bf82cc685f17af6aec9&amp;amp;chksm=8025a0f9b75229ef349dd3507f16e7faf74cca0639af7a2b67bd894611f45abd28fd57810be2&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1207aEhoIUyh4RiyNQACrmj3#rd&quot;&gt;Firebug 宣布停止开发更新&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;一石激起千层浪，这真是一个重磅消息，曾几何时，是你挽救了无数页面仔宝贵的青春，是你让前端调试工具迈进了一个新时代，急流勇退，智者也，缅怀，致敬。&lt;/p&gt;
-&lt;h3 id=&quot;阅读-NodeJS-文档，我学到了这-19-件事情&quot;&gt;&lt;a href=&quot;#阅读-NodeJS-文档，我学到了这-19-件事情&quot; class=&quot;headerlink&quot; title=&quot;阅读 NodeJS 文档，我学到了这 19 件事情&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/24210807&quot;&gt;阅读 NodeJS 文档，我学到了这 19 件事情&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;最近学了点node的东西，用node做了几个小工具，突然发现，一下子打开了一扇新大门，原来有了权力确实感觉不一样，有权限的人想要更大的权限，向着未来出发，即便你写了很久的nodejs，也未必知道这19件事。&lt;/p&gt;
-&lt;h3 id=&quot;前端-MVC-已死吗？&quot;&gt;&lt;a href=&quot;#前端-MVC-已死吗？&quot; class=&quot;headerlink&quot; title=&quot;前端 MVC 已死吗？&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;amp;mid=2650963905&amp;amp;idx=1&amp;amp;sn=70019642c4cbaaca657706ad20585934&amp;amp;chksm=843a13a7b34d9ab1abb85b611daae44af0d0616bde0e686029c04c25840df62bd2d18c134937&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1209dJSy76l94Ea4lMrGzJk4#rd&quot;&gt;前端 MVC 已死吗？&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;还未学过，就以死去吗？我并不这么认为，无数陈旧项目还在使用者mvc，无数历史项目都是mvc撑起来的，即便技术已不在流行，但还是值得学习的，道理不会变的，我们的目的只有一个，提升效率，有些东西死了，他还活着，永远。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
-    
-    
-      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>expfe技术周刊第1110期</title>
-    <link href="https://exp-team.github.io/blog/2016/12/04/weekly/weekly-1110/"/>
-    <id>https://exp-team.github.io/blog/2016/12/04/weekly/weekly-1110/</id>
-    <published>2016-12-03T16:00:00.000Z</published>
-    <updated>2017-01-13T08:09:51.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>11.28-12.04，“时光飞逝，来不及说再见”。</p>
-<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="ES6-的模块系统"><a href="#ES6-的模块系统" class="headerlink" title="ES6 的模块系统"></a><a href="https://segmentfault.com/a/1190000003410285" target="_blank" rel="external">ES6 的模块系统</a></h3><p>在任何发型项目中，模块化都是非常常见，也是非常有必要的，es6为JavaScript带来了模块特性，对比JavaScript模块系统的现状，es的模块系统在规范上与其他的模块系统衔接得非常好，以至于大家对他的学习成本很低，这篇文章不但在语法上讲得非常详细透彻，在原理上也分析得浅显易懂，没有很多晦涩的语法个名词，对于理解ES6模块化非常有帮助。</p>
-<h3 id="CSS-方法论的选择"><a href="#CSS-方法论的选择" class="headerlink" title="CSS 方法论的选择"></a><a href="http://zcfy.cc/article/when-to-use-which-css-methodology-1828.html" target="_blank" rel="external">CSS 方法论的选择</a></h3><p>相信各路前端大神对css方法论的选择都有自己的想法，对于我个人而言，没有最好的，只有最适合自己的，去争论其中的好坏并没有什么意义，还不如脚踏实地的做好自己技术选型。</p>
-<h3 id="美团点评酒旅前端的技术体系"><a href="#美团点评酒旅前端的技术体系" class="headerlink" title="美团点评酒旅前端的技术体系"></a><a href="https://zhuanlan.zhihu.com/p/23976121" target="_blank" rel="external">美团点评酒旅前端的技术体系</a></h3><p>当我们沉浸在自己所在团队的技术体系下的同时也要多看看外面的世界，对比自己所在的技术体系，或许有相似之处，也有很多值得我们学习和思考的point~<br><a id="more"></a></p>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="天猫即将不支持IE8"><a href="#天猫即将不支持IE8" class="headerlink" title="天猫即将不支持IE8"></a><a href="https://zhuanlan.zhihu.com/p/24091492" target="_blank" rel="external">天猫即将不支持IE8</a></h3>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;11.28-12.04，“时光飞逝，来不及说再见”。&lt;/p&gt;
-&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;ES6-的模块系统&quot;&gt;&lt;a href=&quot;#ES6-的模块系统&quot; class=&quot;headerlink&quot; title=&quot;ES6 的模块系统&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://segmentfault.com/a/1190000003410285&quot;&gt;ES6 的模块系统&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;在任何发型项目中，模块化都是非常常见，也是非常有必要的，es6为JavaScript带来了模块特性，对比JavaScript模块系统的现状，es的模块系统在规范上与其他的模块系统衔接得非常好，以至于大家对他的学习成本很低，这篇文章不但在语法上讲得非常详细透彻，在原理上也分析得浅显易懂，没有很多晦涩的语法个名词，对于理解ES6模块化非常有帮助。&lt;/p&gt;
-&lt;h3 id=&quot;CSS-方法论的选择&quot;&gt;&lt;a href=&quot;#CSS-方法论的选择&quot; class=&quot;headerlink&quot; title=&quot;CSS 方法论的选择&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://zcfy.cc/article/when-to-use-which-css-methodology-1828.html&quot;&gt;CSS 方法论的选择&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;相信各路前端大神对css方法论的选择都有自己的想法，对于我个人而言，没有最好的，只有最适合自己的，去争论其中的好坏并没有什么意义，还不如脚踏实地的做好自己技术选型。&lt;/p&gt;
-&lt;h3 id=&quot;美团点评酒旅前端的技术体系&quot;&gt;&lt;a href=&quot;#美团点评酒旅前端的技术体系&quot; class=&quot;headerlink&quot; title=&quot;美团点评酒旅前端的技术体系&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/23976121&quot;&gt;美团点评酒旅前端的技术体系&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;当我们沉浸在自己所在团队的技术体系下的同时也要多看看外面的世界，对比自己所在的技术体系，或许有相似之处，也有很多值得我们学习和思考的point~&lt;br&gt;
     
     </summary>
     

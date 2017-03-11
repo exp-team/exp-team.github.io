@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://exp-team.github.io/blog/2017/03/14/web/animation-runningman/</loc>
+    
+    <lastmod>2017-03-11T16:06:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/10/weekly/weekly-11000/</loc>
+    
+    <lastmod>2017-03-11T16:06:13.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://exp-team.github.io/blog/2017/03/09/js/reduce/</loc>
     
     <lastmod>2017-03-09T12:25:32.000Z</lastmod>
@@ -51,6 +65,13 @@
   </url>
   
   <url>
+    <loc>https://exp-team.github.io/blog/2017/01/12/program/BS4/</loc>
+    
+    <lastmod>2017-02-19T12:29:49.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://exp-team.github.io/blog/2017/01/21/other/wujiang-2016/</loc>
     
     <lastmod>2017-02-19T12:29:49.000Z</lastmod>
@@ -59,13 +80,6 @@
   
   <url>
     <loc>https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/</loc>
-    
-    <lastmod>2017-02-19T12:29:49.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/01/12/program/BS4/</loc>
     
     <lastmod>2017-02-19T12:29:49.000Z</lastmod>
     
@@ -114,21 +128,7 @@
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/10/13/weekly/weekly-1000/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/27/weekly/weekly-100/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/12/31/weekly/weekly-10010/</loc>
+    <loc>https://exp-team.github.io/blog/2016/11/06/weekly/weekly-1011/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
@@ -163,14 +163,14 @@
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/07/28/hexo/hello-world/</loc>
+    <loc>https://exp-team.github.io/blog/2016/08/20/tool/chrome-install/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/11/06/weekly/weekly-1011/</loc>
+    <loc>https://exp-team.github.io/blog/2016/07/28/hexo/hello-world/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
@@ -227,13 +227,6 @@
   
   <url>
     <loc>https://exp-team.github.io/blog/2016/08/21/js/event/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/20/tool/chrome-install/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
@@ -318,6 +311,27 @@
   
   <url>
     <loc>https://exp-team.github.io/blog/2016/12/17/weekly/weekly-10000/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/10/13/weekly/weekly-1000/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/27/weekly/weekly-100/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/12/31/weekly/weekly-10010/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
