@@ -80,6 +80,91 @@ animation属性其实是一个简写属性，就像我们更加熟悉的“backg
 ### 动画实现
 关于“start-run”的动画设计，在跑道上直道部分相对简单，我们思路是使用transform->translate3d。但是视觉稿上存在不少于5处不规则弯道，在不改变原图的基础上，我们可以使用transform->rotate3d。具体设计看下图：
 
-![动画部分分解](/bimg/run.gif)
+![动画部分分解](/bimg/run.png)
+
+1-2和4-5，只需要改变transform->translate3d；
+2-4部分，一共三个阶段是为了弯道准备的。当然，如果时间充足，我们完全可以拆分的更加细致。
+其中3是弯道中心的45度转身：translate3d(0,0,1,45deg);
+其中4是已经完全转身：translate3d(0,0,1,90deg);
+
+具体代码：
+
+    .start-run {
+        animation: start-run 5000ms; 
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+    @keyframes start-run {
+        0% {
+            transform: translate3d(0, 0, 0);
+        }
+        35% {
+            transform: translate3d(0, 155px, 0) rotate3d(0, 0, 1, 0deg);
+        }
+        50% {
+            transform: translate3d(20px, 224px, 0) rotate3d(0, 0, 1, -45deg);
+        }
+        70% {
+            transform: translate3d(80px, 242px, 0) rotate3d(0, 0, 1, -90deg);
+        }
+        100% {
+            transform: translate3d(200px, 243px, 0) rotate3d(0, 0, 1, -90deg);
+        }
+    }
+
+为什么是35%，50%，70%呢？这个是我调试出来比较能达到相对顺畅的值。如果更严谨的化，完全可以列一个圆形坐标计算一下。当然这样子时间成本会比较大。
+还有一点值得一提的是animation-timing-function: linear; 一般马拉松中段，都近似于匀速跑吧～
+
+解决完了位移的问题，我们来看摆腿动作。这个其实就是两张图片在交替播放。其实就是一个gif图原理。我使用了background-position来切换精灵图片的方式：
+
+    .running {
+        animation: running-man 1200ms steps(2) infinite;
+    }
+    @keyframes running-man {
+        0% {
+            background-position: 0 0;
+        }
+        50% {
+            background-position: 92px 0;
+        }
+    }
+
+千万不要扫一眼代码完事儿，这里还有一些细节要注意。首先是“infinite”的使用，这个应该没什么意外吧。另外，你可曾注意了steps?
+
+
+### steps()函数实现阶跃动画
+我们知道animation定义的关键帧之间试“平滑过渡”的。这个平滑过渡怎么理解呢？我精心做了一个“反例”示图来说明：
+
+![动画部分分解](/bimg/run1.gif)
+
+所以，在切换雪碧图背景的情况下，steps()就要派上用场了。顺便说一句，最近面试一些人，讲熟悉CSS3动画，但是大部分都还不知道这个steps阶跃函数。如果你还不清楚，可以参考[这里。](http://www.cnblogs.com/BATAKK/p/5301819.html)
+
+
+## 还不完美
+做到这里，其实还没有完全结束。有一些值得我们思考的问题。
+
+1）真的有必要多一个标签，来结合生成动画吗？
+其实不是的，animation很神奇很强大的一点在于它可以接受多个动画属性序列。比如上边那种情况我们可以这样实现：
+
+    .running {
+        animation: start-run 5000ms forwards linear, running-man 1200ms steps(2) infinite
+    }
+
+2) 如果刻意追求更佳完美的动画，我们还需要哪些储备？
+不得不要说，就是数学和物理知识了。比如，二次方曲线、三次方曲线、一直到五次方曲线，正弦余弦、圆弧、抛物线、反弹曲线、弹簧曲线等等。如果你对研究这些有兴趣，我安利一个[高性能动画实现](https://greensock.com/)以及[可视化1](https://greensock.com/ease-visualizer)，[可视化2](http://jeremyckahn.github.io/stylie/)
+
+除了数学公式以外，也需要我们掌握良好的样式预处理器函数使用习惯。毕竟，那么多帧我们不可能自己手动实现。
+
+
+## 总结
+流畅高效的动画，绝非一朝一夕就能完成，需要各方面甚至跨领域的积累。如果你对此很感兴趣，欢迎讨论。我也在工作过程中，积累了很多动画实现效果，愿意同大家一起分享，互通资源。
+
+PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。
+
+
+
+
+
+
 
 
