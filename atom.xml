@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://exp-team.github.io/"/>
-  <updated>2017-03-11T16:06:14.000Z</updated>
+  <updated>2017-03-13T08:06:32.000Z</updated>
   <id>https://exp-team.github.io/</id>
   
   <author>
@@ -16,31 +16,202 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>由nodeJS源码激发的灵感：“打造属于自己的事件发布订阅系统”</title>
+    <link href="https://exp-team.github.io/blog/2017/03/17/js/node_event/"/>
+    <id>https://exp-team.github.io/blog/2017/03/17/js/node_event/</id>
+    <published>2017-03-16T16:00:00.000Z</published>
+    <updated>2017-03-13T08:06:32.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>毫无疑问，nodeJS改变了整个前端开发生态。不管你是写nodeJS已经轻车熟路的老司机，还是初入前端的小菜鸟，都不妨碍对这篇文章的阅读和理解。nodeJS<a href="https://github.com/nodejs/node" target="_blank" rel="external">官方介绍</a>中，第二句话就是：”Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient.”由此“事件驱动（event-driven）”对nodeJS设计理念的重要性可见一斑。没错，我们对于文件的读取，任务队列的执行情况都需要这样一个观察者模式来保障。</p>
+<p>同样，作为前端开发人员，我们对于所谓的“事件驱动”——事件发布订阅模式（Pub/Sub模式）一定再熟悉不过了。这种模式在js里面有与生俱来的基因优势。因为js本身就是事件驱动型语言：比如，我们页面上有一个button, 点击一下就会触发上面的click事件。<br>因为此时有特定程序正在监听这个事件，随之触发相关的处理程序。</p>
+<p>这个模式最大的一个好处在于，能够解耦，实现“高内聚、低耦合”的理念。那么这样的一个模式应该怎么实现呢？<br>本文通过解析nodeJS源码中events模块，提取其精华，一步步打造了一个基于ES6的eventEmitter系统。</p>
+<p>读者有任何想法，欢迎与我交流。同时希望各路大神给予斧正。</p>
+<h2 id="背景简介"><a href="#背景简介" class="headerlink" title="背景简介"></a>背景简介</h2><p>为了方便大家理解，我从一个很简单的<a href="http://jingyan.baidu.com/article/ab69b270a678272ca6189f6a.html" target="_blank" rel="external">页面实例</a>说起。<br>该页面中，从在两处不同的收藏组件。一处在页面顶部，一处在页面详情侧栏。第一次点击组件，发送异步请求，进行收藏，同时请求成功的回调函数里应该将页面中所有“收藏”按钮转换状态为“已收藏”。<br><img src="/bimg/fave.png" alt="场景截图"></p>
+<p>完成这样的设计很简单，我们大可在业务代码中进行混乱的操作处理。当然，更优雅的做法就是使用事件订阅发布系统。<br>如何设计一个事件订阅发布系统？我们先来看看nodeJS是怎么做的吧？</p>
+<h2 id="nodeJS方案"><a href="#nodeJS方案" class="headerlink" title="nodeJS方案"></a>nodeJS方案</h2><p>读者可以自己去nodeJS仓库查找源码，也可以参考我的<a href="">Github事件发布订阅研究项目</a>，里面不仅有自己实现的多套基于ES6的事件发布订阅系统，也附赠了nodeJS实现源码。</p>
+<p>在nodeJS中，引入eventEmitter的方法和使用方法如下：</p>
+<pre><code>// 引入 events 模块
+var events = require(&apos;events&apos;);
+// 创建 eventEmitter 对象
+var eventEmitter = new events.EventEmitter();
+</code></pre><p>我们要研究的，当然就是这个eventEmitter实例。</p>
+<p>一个eventEmitter实例，自身包含有四个属性：<br>1）_events：是一个object，他用来保存一个eventEmitter实例中所有的注册事件和事件所对应的处理函数。以键值对方式存储，key为事件名，value分为两种情况，当此事件只有一个注册函数时，value为这个注册函数；如果此事件有多个注册函数时，value值为一个数组，数组每一项存储了对应此事件的注册函数。<br>2）_eventsCount：整型，表示此eventEmitter实例中注册的事件个数。<br>3）_maxListeners：整型，表示此eventEmitter实例中最多所能承载的事件个数。<br>4）domain：在node v0.8+版本的时候，发布了一个模块domain。这个模块做的是t捕捉异步回调中出现的异常。这里与主题无关，不做展开。</p>
+<p>同样，eventEmitter实例的构造函数原型上，包含了一些更为重要的属性和方法，包括但不限于：<br>1）addListener(event, listener)：为指定事件添加一个注册函数（以下称监听器）到监听器数组的尾部。<br>2）once(event, listener)：为指定事件注册一个单次监听器，即监听器最多只会触发一次，触发后立刻解除该监听器。<br>3）removeListener(event, listener)：移除指定事件的某个监听器，监听器必须是该事件已经注册过的监听器。<br>4）removeAllListeners([event])：移除所有事件的所有监听器，如果指定事件，则移除指定事件的所有监听器。<br>5）setMaxListeners(n)：默认情况下，如果你添加的监听器超过10个就会输出警告信息。setMaxListeners 函数用于提高监听器的默认限制的数量。<br>6）listeners(event)：返回指定事件的监听器数组。<br>7）emit(event, [arg1], [arg2], […])：按参数的顺序执行每个监听器，如果事件有注册监听返回true，否则返回false。</p>
+<h2 id="nodeJS-eventEmitter设计之美"><a href="#nodeJS-eventEmitter设计之美" class="headerlink" title="nodeJS eventEmitter设计之美"></a>nodeJS eventEmitter设计之美</h2><p>上一段其实简要介绍了nodeJS中eventEmitter的使用方法，读者可以在社区上找到不少资料。下面，我们要做的就是深入nodeJS事件模块源码，了解他的设计之美。</p>
+<h3 id="如何创建空对象？"><a href="#如何创建空对象？" class="headerlink" title="如何创建空对象？"></a>如何创建空对象？</h3><p>我们已经了解到，_events是要来储存监听器的map。那么，他的初始值一定是一个空对象。我们可以：</p>
+<pre><code>this._events = {};
+</code></pre><p>非常简单直观。但是nodeJS源码中的实现方式：</p>
+<pre><code>function EventHandlers() {};
+EventHandlers.prototype = Object.create(null);
+this._events = new EventHandlers();
+</code></pre><p>这么做的原因是出于定能上的考虑，经过jsperf比较，在v8 v4.9版本中，后者性能有超出2倍的表现。</p>
+<h3 id="addListener实现"><a href="#addListener实现" class="headerlink" title="addListener实现"></a>addListener实现</h3><p><a href="">经过整理，适当删减后的源码</a>，并保留了我的注释。我们来一步一步解读一下。</p>
+<p>判断添加的监听器是否为函数类型，使用了typeof进行验证：</p>
+<pre><code>if (typeof listener !== &apos;function&apos;) {
+    throw new TypeError(&apos;&quot;listener&quot; argument must be a function&apos;);
+}
+</code></pre><p>case1:<br>判断_events是否已经存在，如果不存在，则说明是第一次为eventEmitter实例添加监听器，需要新创建_events：</p>
+<pre><code>if (!events) {
+    events = target._events = new EventHandlers();
+    target._eventsCount = 0;
+} 
+</code></pre><p>同时，添加指定的事件和此事件对应的监听器：</p>
+<pre><code>existing = events[type] = listener;
+++target._eventsCount;
+</code></pre><p>注意第一次创建时，为了节省内存，提高性能，events[type]值是一个监听器函数。如果再次为相同的events[type]添加监听器时（下面case2），events[type]对应的值需要变成一个数组。</p>
+<p>case2:<br>如果_events已存在，在为相关事件添加监听器时，需要判断events[type]是函数类型（第一次添加）还是已经成为了一个数组类型（非第一次添加）。<br>并且还要根据参数分为监听器数组头部插入和尾部插入两种情况，以保证监听器的顺序执行：</p>
+<pre><code>if (typeof existing === &apos;function&apos;) {
+    existing = events[type] = prepend ? [listener, existing] :
+                                      [existing, listener];
+} 
+else {
+    if (prepend) {
+        existing.unshift(listener);
+    } 
+    else {
+        existing.push(listener);
+    }
+}
+</code></pre><p>case3:<br>在阅读源码时，我发现了一个很“诡异”的逻辑：</p>
+<pre><code> if (events.newListener) {
+    target.emit(&apos;newListener&apos;, type,
+              listener.listener ? listener.listener : listener);
+    events = target._events;
+}
+existing = events[type];
+</code></pre><p>仔细分析，他的目的在于：nodeJS默认当所有的eventEmitter对象在添加新的监听函数时都会发出newListener事件。这其实也并不奇怪，我个人认为这么设计还是非常合理的。</p>
+<p>cae4:<br>之前介绍了我们可以设置最大监听事件个数，nodeJS源码中通过这样的代码来实现：</p>
+<pre><code>EventEmitter.prototype.setMaxListeners = function setMaxListeners(n) {
+    if (typeof n !== &apos;number&apos; || n &lt; 0 || isNaN(n)) {
+        throw new TypeError(&apos;&quot;n&quot; argument must be a positive number&apos;);
+    }
+    this._maxListeners = n;
+    return this;
+};
+</code></pre><p>当对这个值进行了设置之后，如果超过此阈值，将会进行报警：</p>
+<pre><code>if (!existing.warned) {
+    m = $getMaxListeners(target);
+    if (m &amp;&amp; m &gt; 0 &amp;&amp; existing.length &gt; m) {
+        existing.warned = true;
+        const w = new Error(&apos;Possible EventEmitter memory leak detected. &apos; +
+                            `${existing.length} ${String(type)} listeners ` +
+                            &apos;added. Use emitter.setMaxListeners() to &apos; +
+                            &apos;increase limit&apos;);
+        w.name = &apos;MaxListenersExceededWarning&apos;;
+        w.emitter = target;
+        w.type = type;
+        w.count = existing.length;
+        process.emitWarning(w);
+    }
+}
+</code></pre><h3 id="emitter发射器实现"><a href="#emitter发射器实现" class="headerlink" title="emitter发射器实现"></a>emitter发射器实现</h3><p>有了之前的注册监听器，那么我们再来看看监听器是如何被触发的。其实触发过程直观上并不难理解，核心思想就是将监听器数组中的每一项，即监听函数逐个执行就好了。<br><a href="">经过整理，适当删减后的源码</a>同样可以这里找到。源码中，包含了较多的错误信息处理内容，忽略不表。下面我挑出一些“出神入化”的细节来分析。</p>
+<p>首先，有了上面的分析，我们现在可以清晰的意识到某个事件的监听器可能是一个函数类型，表示该事件只有一个事件处理程序；也可能是个数组，表示该事件有多个事件处理程序，存储在监听器数组中。<br>同时，emit方法可以接受多个参数。第一个参数为事件类型：type</p>
+<pre><code>handler = events[type];
+var isFn = typeof handler === &apos;function&apos;;
+</code></pre><p>源码中对于参数个数有个判断，并进行了switch分支处理：</p>
+<pre><code>switch (len) {
+    case 1:
+        emitNone(handler, isFn, this);
+        break;
+    case 2:
+        emitOne(handler, isFn, this, arguments[1]);
+        break;
+    case 3:
+        emitTwo(handler, isFn, this, arguments[1], arguments[2]);
+        break;
+    case 4:
+        emitThree(handler, isFn, this, arguments[1], arguments[2], arguments[3]);
+        break;
+    // slower
+    default:
+        args = new Array(len - 1);
+        for (i = 1; i &lt; len; i++) {
+            args[i - 1] = arguments[i];
+        }
+        emitMany(handler, isFn, this, args);
+}
+</code></pre><p>我们就来看一默认模式调用的emitMany：</p>
+<pre><code>function emitMany(handler, isFn, self, args) {
+    if (isFn) {
+        handler.apply(self, args);
+    }
+    else {
+        var len = handler.length;
+        var listeners = arrayClone(handler, len);
+        for (var i = 0; i &lt; len; ++i) {
+            listeners[i].apply(self, args);
+        }
+    }
+}
+</code></pre><p>对于只有一个事件处理程序的情况（isFn为true），直接执行：handler.apply(self, args);<br>否则，便使用for循环，逐个调用：listeners[i].apply(self, args);</p>
+<p>非常有意思的一个细节在于：</p>
+<pre><code>var listeners = arrayClone(handler, len);
+</code></pre><p>读到这里，我不禁要感叹设计的严谨精妙之处，他的意义在于防止在一个事件监听器中监听同一个事件，接而导致死循环。如果您不理解，且看我这个例子：</p>
+<pre><code>let emitter = new eventEmitter;
+emitter.on(&apos;message1&apos;, function test () {
+    // some codes here
+    // ...
+    emitter.on(&apos;message1&apos;, test}
+});
+emit(&apos;message1&apos;);
+</code></pre><p>正常来讲，不经过任何处理，上述代码在事件处理程序内部又添加了对于同一事件的监听，这必然会带来死循环问题。源码中对于这个问题的解决方案是：在执行emit方法时，使用arrayClone方法，拷贝出另一个一模一样的数组，来执行它。这样一来，当我们在监听器内监听同一个事件时，的确给原监听器数组添加了新的函数，但并没有影响到当前这个被拷贝出来的副本数组，在循环中，我们执行的也是这个副本函数。</p>
+<h3 id="单次监听器once实现"><a href="#单次监听器once实现" class="headerlink" title="单次监听器once实现"></a>单次监听器once实现</h3><p>once(event, listener)是为指定事件注册一个单次监听器，即监听器最多只会触发一次，触发后立刻解除该监听器。实现方式主要是在进行监听器绑定时，对于监听函数进行一层包装。该包装方式在原有函数上添加一个flag标识位。代码里，我们可以抽丝剥茧（已进行删减）：</p>
+<pre><code> EventEmitter.prototype.once = function once(type, listener) {
+    this.on(type, _onceWrap(this, type, listener));
+    return this;
+};
+</code></pre><p>once方法调用on方法（即addListener方法，on为别名alias），第二个参数即监听程序进行_onceWrap化。</p>
+<pre><code>this.target.removeListener(this.type, this.wrapFn);
+if (!this.fired) {
+    this.fired = true;
+    this.listener.apply(this.target, arguments);
+}
+</code></pre><p>_onceWrap化的主要思想是给once第二个参数listener的执行：this.listener.apply(this.target, arguments);包上了一次判断并在执行前进行removeListener删除该监听程序。</p>
+<h2 id="自己造轮子"><a href="#自己造轮子" class="headerlink" title="自己造轮子"></a>自己造轮子</h2><p>此前我们感受了nodeJS中的eventEmitter实现方式，我也对于其中的核心方法，在源码层面进行了剖析。学习到了精华之后，我们要学以致用，自己实现一个基于ES6的事件发布订阅系统。</p>
+<p>因为nodeJS的实现其实很多api在前端浏览器环境开发中并用不到。所以我对暴露的方法进行了精简。目前只开放了：on,once,emit,off四个方法。最终实现除去注释部分，只用了不到40行代码。如果您有兴趣，可以去<a href="">代码仓库</a>访问，整个逻辑还是很简单的。里面同时附赠了我同事@颜海镜大大基于zepto实现版本。整个过程编写时间仓促，其中必然不乏疏漏之处，还请您斧正并与我讨论。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;毫无疑问，nodeJS改变了整个前端开发生态。不管你是写nodeJS已经轻车熟路的老司机，还是初入前端的小菜鸟，都不妨碍对这篇文章的阅读和理解。nodeJS&lt;a href=&quot;https://github.com/nodejs/node&quot; target=&quot;_blank&quot; re
+    
+    </summary>
+    
+      <category term="js" scheme="https://exp-team.github.io/categories/js/"/>
+    
+    
+      <category term="js" scheme="https://exp-team.github.io/tags/js/"/>
+    
+  </entry>
+  
+  <entry>
     <title>手把手教你撸一个跑男动画 顺便抽丝剥茧CSS3动画奥秘</title>
     <link href="https://exp-team.github.io/blog/2017/03/14/web/animation-runningman/"/>
     <id>https://exp-team.github.io/blog/2017/03/14/web/animation-runningman/</id>
     <published>2017-03-13T16:00:00.000Z</published>
-    <updated>2017-03-11T16:06:14.000Z</updated>
+    <updated>2017-03-14T06:48:05.000Z</updated>
     
-    <content type="html"><![CDATA[<p>作为一名真正的前端开发者，我们不能只关注前端的逻辑部分，毕竟“水银泄地”般的页面实现和“炫酷逼真”的动画效果是我们区别于其他程序员所特有的优势。尽量百分之百的还原视觉稿，连接UE设计灵感和用户视觉享受，正所谓“晋帝时祭北郊，更祝版，工人削之，笔入木三分。”借古书法形容我们的代码，当真是恰当准确又自恋无比。</p>
-<p>之前的一些文章大多都是分享JS相关，今天轻松一下，我来谈谈前端页面的动画部分。最要通过剖析一个上线的“跑男”动画实例，来把CSS3中动画相关的知识点一网打尽。如果读者有自己的感想或者不一样的见解，欢迎一起讨论。</p>
-<h2 id="项目简介"><a href="#项目简介" class="headerlink" title="项目简介"></a>项目简介</h2><p>这是一个运营活动页面——春季马拉松大比拼：用户以闯关形式参加进行角色扮演。在满足一定条件下，自己扮演的马拉松选手会绕着跑道前进，向终点发起冲击。</p>
+    <content type="html"><![CDATA[<p>作为一名真正的前端开发者，我们不能只关注前端逻辑部分。毕竟“水银泄地”般的页面设计和“炫酷逼真”的动画效果，是我们区别于其他程序员所特有的优势之一。尽量百分之百的还原视觉稿，为UE设计灵感和用户视觉享受架起一座桥梁：正所谓“晋帝时祭北郊，更祝版，工人削之，笔入木三分。”<br>借古书法形容我们的代码，当真是恰当准确又自恋无比。</p>
+<p>之前的一些文章大多都是分享JS相关内容。今天轻松一下，我来谈谈前端页面的动画部分。通过剖析一个上线的“跑男”动画实例，来把CSS3中动画相关的知识点抽丝剥茧，一网打尽。如果读者有自己的感想或者不一样的见解，欢迎一起讨论。</p>
+<p>整个项目的<a href="https://github.com/HOUCe/runningman-animation" target="_blank" rel="external">Github地址</a>可以参考<a href="https://github.com/HOUCe/runningman-animation" target="_blank" rel="external">这里</a>。对比线上效果，这个仓库进行了90%的删减，但是更加适合练手和理解。感兴趣的读者欢迎拉下来自己玩一玩。里面只有一关动画，您可以比葫芦画瓢进行调试练习。</p>
+<h2 id="项目简介"><a href="#项目简介" class="headerlink" title="项目简介"></a>项目简介</h2><p>这是一个运营活动页面——“春季马拉松大比拼”：用户以闯关形式参加，并进行角色扮演。在满足一定条件下，自己扮演的马拉松选手会绕着跑道（非正规跑道形状）前进，向终点发起冲击。</p>
 <p>部分页面动画效果如下：</p>
-<p><img src="/bimg/run3.gif" alt="部分动画场景截图"></p>
-<p>当然，这个动画并不完美。考虑到时间性价比，我只用了两帧重复循环。但也达到了运营和产品小妹的满意。如果在没有上线压力的情况下，我们完全可以把他打磨的更流畅顺滑。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-cabc0a036d80d926.gif?imageMogr2/auto-orient/strip" alt="部分动画效果截图"></p>
+<p>当然，这个动画并不完美。考虑到时间性价比，我只用了两帧重复循环模拟摆腿动作。但也达到了运营和产品小妹的需求。如果在没有上线压力的情况下，我们完全可以拆分更多帧，把他打磨的更流畅顺滑。</p>
 <p>首先，我们来看一下它的具体实现方式吧。如果您觉得很简单，也可以往下读，相信你也会有不一样的收获。</p>
-<h2 id="动画方案"><a href="#动画方案" class="headerlink" title="动画方案"></a>动画方案</h2><p>这一系列的动画设计，出于性能和简单的考虑，我采用了纯CSS3来实现。CSS3实现动画，主要有两种方式：transition属性和animation属性。前者用张鑫旭大大的话来说就是用来“平滑的改变CSS的值”。一般对于需要特定帧处理的动画，这显然是苍白无力的。我就不过多介绍。重点介绍一下animation属性。</p>
+<h2 id="动画方案"><a href="#动画方案" class="headerlink" title="动画方案"></a>动画方案</h2><p>这一系列的动画设计，出于性能和简单的考虑，我采用了纯CSS3来实现。CSS3实现动画，主要有两种方式：transition属性和animation属性。前者是用来“平滑的改变CSS的值”。一般对于需要特定帧处理的动画，这显然是苍白无力的。我就不过多介绍了。这里重点介绍一下animation属性。</p>
 <h3 id="animation"><a href="#animation" class="headerlink" title="animation"></a>animation</h3><p>animation属性其实是一个简写属性，就像我们更加熟悉的“background”属性一样。它用于设置六个动画属性：</p>
 <p>1）animation-name<br>2）animation-duration<br>3）animation-timing-function<br>4）animation-delay<br>5）animation-iteration-count<br>6）animation-direction</p>
-<p>最重要的就是animation-name，它规定需要绑定到选择器的keyframe名称，它要和keyframes对应。keyframes，就是我们用来定义几个关键节点帧。</p>
-<p>具体我就不再进行科普了。如果初学者不了解，社区上关于这些的资料可是一大把。</p>
-<h3 id="跑男开跑"><a href="#跑男开跑" class="headerlink" title="跑男开跑"></a>跑男开跑</h3><p>回到我们具体的业务场景，我们进行分析。跑男的动画其实可以拆分为两种，一个是交替摆腿，另一个是位置移动。这两个动作要严丝合缝的结合。能把这个想清楚，那就实现了一大半。</p>
-<p>那么如何让这两种动画一起施加在“静止的”跑男身上呢？</p>
-<p>我采用了增加一个div标签的方式：</p>
-<pre><code>&lt;div class=&quot;man-wrapper&quot;&gt;
+<p>最重要的就是animation-name，它规定需要绑定的keyframes名称。keyframes，我们用来定义几个关键节点帧。</p>
+<p>具体我不会进行科普。如果初学者不了解，社区上关于这些的资料可是一大把。</p>
+<h3 id="跑男开跑"><a href="#跑男开跑" class="headerlink" title="跑男开跑"></a>跑男开跑</h3><p>回到我们具体的业务场景，我们进行分析。跑男的动画其实可以拆分为两种：<br>1）一个是交替摆腿；<br>2）另一个是位置移动。<br>这两个动作要严丝合缝的结合。能把这个想清楚，那就基本思路理解了。</p>
+<p>接着，如何让这两种动画一起施加在“静止的”跑男身上呢？</p>
+<p>我采用了增加一个div标签包裹的方式：</p>
+<pre><code>&lt;div class=&quot;man-wrapper&quot; id=&quot;man-wrapper&quot;&gt;
     &lt;div class=&quot;man&quot; id=&quot;man&quot;&gt;&lt;/div&gt;
 &lt;/div&gt;
-</code></pre><p>‘man-wrapper’这个div与’man’这个div大小完全一致。父节点处理位移，子节点负责交替摆腿：</p>
+</code></pre><p>‘man-wrapper’这个div与’man’这个div尺寸大小完全一致，视觉上绝对重合。父节点处理位移，子节点负责交替摆腿：</p>
 <pre><code>.man-wrapper {
     display: inline-block;
     width: 46px;
@@ -60,9 +231,9 @@
 <pre><code>$(&apos;.man-wrapper&apos;).addClass(&apos;start-run&apos;);
 </code></pre><p>子节点添加：</p>
 <pre><code>$(&apos;#man&apos;).addClass(&apos;running&apos;);
-</code></pre><h3 id="动画实现"><a href="#动画实现" class="headerlink" title="动画实现"></a>动画实现</h3><p>关于“start-run”的动画设计，在跑道上直道部分相对简单，我们思路是使用transform-&gt;translate3d。但是视觉稿上存在不少于5处不规则弯道，在不改变原图的基础上，我们可以使用transform-&gt;rotate3d。具体设计看下图：</p>
-<p><img src="/bimg/run.png" alt="动画部分分解"></p>
-<p>1-2和4-5，只需要改变transform-&gt;translate3d；<br>2-4部分，一共三个阶段是为了弯道准备的。当然，如果时间充足，我们完全可以拆分的更加细致。<br>其中3是弯道中心的45度转身：translate3d(0,0,1,45deg);<br>其中4是已经完全转身：translate3d(0,0,1,90deg);</p>
+</code></pre><h3 id="动画实现"><a href="#动画实现" class="headerlink" title="动画实现"></a>动画实现</h3><p>关于“start-run”位移的动画设计，在跑道上直道部分相对简单，我们思路是使用transform：translate3d。但是视觉稿上存在不少于5处不规则弯道，在不改变原图的基础上，在不增加多余图片的原则下，我们可以使用transform：rotate3d，使跑男进行侧身。具体设计看下图：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-22e1cfcd31e6b7e2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="动画部分分解"></p>
+<p>1）1-2和4-5，只需要改变transform：translate3d；<br>2）2-4部分，即2，3，4这三个阶段是为了弯道准备的。当然，如果时间充足，我们完全可以拆分的更加细致，更加细分。<br>3）其中3是弯道中心的45度转身：rotate3d(0,0,1,45deg);<br>4）其中4是已经完全转身：rotate3d(0,0,1,90deg);</p>
 <p>具体代码：</p>
 <pre><code>.start-run {
     animation: start-run 5000ms; 
@@ -86,8 +257,9 @@
         transform: translate3d(200px, 243px, 0) rotate3d(0, 0, 1, -90deg);
     }
 }
-</code></pre><p>为什么是35%，50%，70%呢？这个是我调试出来比较能达到相对顺畅的值。如果更严谨的化，完全可以列一个圆形坐标计算一下。当然这样子时间成本会比较大。<br>还有一点值得一提的是animation-timing-function: linear; 一般马拉松中段，都近似于匀速跑吧～</p>
-<p>解决完了位移的问题，我们来看摆腿动作。这个其实就是两张图片在交替播放。其实就是一个gif图原理。我使用了background-position来切换精灵图片的方式：</p>
+</code></pre><p>为什么是35%，50%，70%呢？这个是我调试出来，相对能达到顺畅效果。如果追求更严谨的话，完全可以列一个极坐标计算一下位移和时间。当然这样子成本会比较大。</p>
+<p>还有一点值得一提的是animation-timing-function: linear; 一般马拉松中段，都近似于匀速跑吧～</p>
+<p>解决完了位移的问题，我们来看摆腿动作。这个其实就是两张图片在交替播放。其实就是gif图原理。我使用了background-position来切换精灵图片的方式处理：</p>
 <pre><code>.running {
     animation: running-man 1200ms steps(2) infinite;
 }
@@ -99,26 +271,28 @@
         background-position: 92px 0;
     }
 }
-</code></pre><p>千万不要扫一眼代码完事儿，这里还有一些细节要注意。首先是“infinite”的使用，这个应该没什么意外吧。另外，你可曾注意了steps?</p>
-<h3 id="steps-函数实现阶跃动画"><a href="#steps-函数实现阶跃动画" class="headerlink" title="steps()函数实现阶跃动画"></a>steps()函数实现阶跃动画</h3><p>我们知道animation定义的关键帧之间试“平滑过渡”的。这个平滑过渡怎么理解呢？我精心做了一个“反例”示图来说明：</p>
-<p><img src="/bimg/run1.gif" alt="动画部分分解反面示例"></p>
-<p>所以，在切换雪碧图背景的情况下，steps()就要派上用场了。顺便说一句，最近面试一些人，讲熟悉CSS3动画，但是大部分都还不知道这个steps阶跃函数。如果你还不清楚，可以参考<a href="http://www.cnblogs.com/BATAKK/p/5301819.html" target="_blank" rel="external">这里。</a></p>
+</code></pre><p>千万不要扫一眼代码完事儿，这里还有一些最重要的细节要注意。首先是“infinite”的使用，这个应该没什么意外吧。另外，你可曾注意了steps这个函数?</p>
+<h3 id="steps-函数实现阶跃动画"><a href="#steps-函数实现阶跃动画" class="headerlink" title="steps()函数实现阶跃动画"></a>steps()函数实现阶跃动画</h3><p>我们知道animation定义的关键帧之间是“平滑过渡”的。这个平滑过渡怎么理解呢？我精心做了一个“反例”示图来说明：<br>在使用keyframes改变雪碧图background-position时，</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-de26aeaa8879fa44.gif?imageMogr2/auto-orient/strip" alt="动画部分分解反面示例"></p>
+<p>这样的”平滑过度”显然不是我们想要的。</p>
+<p>所以，在切换雪碧图背景的方案下，steps()就要派上用场了。顺便说一句，最近面试一些人，提到熟悉CSS3动画，但是大部分都还不知道这个steps阶跃函数。如果你还不清楚，可以参考<a href="http://www.cnblogs.com/BATAKK/p/5301819.html" target="_blank" rel="external">这里。</a></p>
 <p>借助steps()函数，我们实现了交替跑动的分解动画：</p>
-<p><img src="/bimg/run2.gif" alt="动画部分分解"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-4cd1498e2f1c9504.gif?imageMogr2/auto-orient/strip" alt="动画部分分解"></p>
 <h2 id="还不完美"><a href="#还不完美" class="headerlink" title="还不完美"></a>还不完美</h2><p>做到这里，其实还没有完全结束。有一些值得我们思考的问题。</p>
-<p>1）真的有必要多一个标签，来结合生成动画吗？<br>其实不是的，animation很神奇很强大的一点在于它可以接受多个动画属性序列。比如上边那种情况我们可以这样实现：</p>
+<p>1）真的有必要多一个标签，来相互结合生成动画吗？<br>其实不是的，animation很神奇很强大的一点在于：它可以接受多个动画属性序列。比如上边那种情况我们完全可以这样实现：</p>
 <pre><code>.running {
     animation: start-run 5000ms forwards linear, running-man 1200ms steps(2) infinite
 }
-</code></pre><p>2) 如果刻意追求更佳完美的动画，我们还需要哪些储备？<br>不得不要说，就是数学和物理知识了。比如，二次方曲线、三次方曲线、一直到五次方曲线，正弦余弦、圆弧、抛物线、反弹曲线、弹簧曲线等等。如果你对研究这些有兴趣，我安利一个<a href="https://greensock.com/" target="_blank" rel="external">高性能动画实现</a>以及<a href="https://greensock.com/ease-visualizer" target="_blank" rel="external">可视化1</a>，<a href="http://jeremyckahn.github.io/stylie/" target="_blank" rel="external">可视化2</a></p>
-<p>除了数学公式以外，也需要我们掌握良好的样式预处理器函数使用习惯。毕竟，那么多帧我们不可能自己手动实现。</p>
+</code></pre><p>2) 如果刻意追求更佳完美的动画，我们还需要哪些储备？<br>不得不要说知识储备上，就是数学和物理知识了。比如，二次方曲线、三次方曲线、一直到五次方曲线，正弦余弦、圆弧、抛物线、反弹曲线、弹簧曲线等等。如果你对研究这些有兴趣，这里安利一些：<a href="https://greensock.com/" target="_blank" rel="external">高性能动画实现</a>以及<a href="https://greensock.com/ease-visualizer" target="_blank" rel="external">可视化1</a>，<a href="http://jeremyckahn.github.io/stylie/" target="_blank" rel="external">可视化2。</a></p>
+<p>除了数学公式以外，也需要我们掌握样式预处理器函数使用。毕竟，那么多帧我们不可能自己手动实现。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>流畅高效的动画，绝非一朝一夕就能完成，需要各方面甚至跨领域的积累。如果你对此很感兴趣，欢迎讨论。我也在工作过程中，积累了很多动画实现效果，愿意同大家一起分享，互通资源。</p>
+<p>最后，这篇文章中截图部分采用了我厂（狼厂）UE：许冬设计师的视觉稿，和PM：田小甜大小姐的交互设计。</p>
 <p>PS：百度知识搜索部大前端继续招兵买马，有意向者火速联系。。。</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;作为一名真正的前端开发者，我们不能只关注前端的逻辑部分，毕竟“水银泄地”般的页面实现和“炫酷逼真”的动画效果是我们区别于其他程序员所特有的优势。尽量百分之百的还原视觉稿，连接UE设计灵感和用户视觉享受，正所谓“晋帝时祭北郊，更祝版，工人削之，笔入木三分。”借古书法形容我们的
+      &lt;p&gt;作为一名真正的前端开发者，我们不能只关注前端逻辑部分。毕竟“水银泄地”般的页面设计和“炫酷逼真”的动画效果，是我们区别于其他程序员所特有的优势之一。尽量百分之百的还原视觉稿，为UE设计灵感和用户视觉享受架起一座桥梁：正所谓“晋帝时祭北郊，更祝版，工人削之，笔入木三分。”&lt;b
     
     </summary>
     
@@ -894,37 +1068,6 @@ if (target.prototype) {
   </entry>
   
   <entry>
-    <title>expfe技术周刊第10100期</title>
-    <link href="https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/"/>
-    <id>https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/</id>
-    <published>2017-01-12T16:00:00.000Z</published>
-    <updated>2017-01-13T12:23:08.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>1.8-1.13，新的一期，继续积累！</p>
-<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="《JS-闯关记》之原型及原型链"><a href="#《JS-闯关记》之原型及原型链" class="headerlink" title="《JS 闯关记》之原型及原型链"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;mid=2650101216&amp;idx=1&amp;sn=dcc39636ebff46aca84df68533fb0742&amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;scene=0" target="_blank" rel="external">《JS 闯关记》之原型及原型链</a></h3><p>原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的<strong>proto</strong> 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、<strong>proto</strong> 这五个概念入手。</p>
-<h3 id="H5项目常见问题及注意事项"><a href="#H5项目常见问题及注意事项" class="headerlink" title="H5项目常见问题及注意事项"></a><a href="http://www.open-open.com/lib/view/open1449325854077.html" target="_blank" rel="external">H5项目常见问题及注意事项</a></h3><p>再也不用为PM嘴中的“H5”发愁了。</p>
-<a id="more"></a>
-<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="揭秘babel的魔法之class魔法处理"><a href="#揭秘babel的魔法之class魔法处理" class="headerlink" title="揭秘babel的魔法之class魔法处理"></a><a href="https://mp.weixin.qq.com/s?__biz=MzIzNjE5NzAyMA==&amp;mid=2649879842&amp;idx=1&amp;sn=0e7eb27fd9bb7f5ba9bbd2b3640ba663&amp;chksm=f0ded0d1c7a959c785fd8c8b384e348506ea4dd40ca72a8fac00aa4f34ab07aacab6aa92514b&amp;mpshare=1&amp;scene=1&amp;srcid=01132iAX9Sp6Gpll9otS2un8&amp;key=59506e83f2f7e1fd47b66ec743010bafb62e75b40f02a088b7a58ef822f0fcfe14c244308ee819c24dd7303946792d0ace78d7c18cb31a020ca5b42528939fa5ce021ed6ae7a77d738521132ff2afee9&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a></h3><p>揭秘Babel的同时，在复习一遍原型链基础支持～</p>
-<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="如何让你的-CSS-更具有可维护性？——大神有绝招-amp"><a href="#如何让你的-CSS-更具有可维护性？——大神有绝招-amp" class="headerlink" title="如何让你的 CSS 更具有可维护性？——大神有绝招&amp;)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964179&amp;idx=1&amp;sn=f7088de66f09efd35057541695582d52&amp;chksm=843aecb5b34d65a3ff8d67142403f3463e08f57041f4212e991248f49770b59943d5c65545bc&amp;mpshare=1&amp;scene=1&amp;srcid=0111H4YARr96el0lj1WY0J09&amp;key=f27a3d85b887ad782291dcbcbc6989e0bb3335f0f66ac9cc6b6994c455227fac808715c21fb47af4ad18b5ff25efbb9aca75f3d0bbf57baefb60f1d36971b42fa9d323e2b3d80208070837dfd770fa49&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">如何让你的 CSS 更具有可维护性？——大神有绝招</a>&amp;)</h3><p>这篇文章教你一种方法，能够写出更具有可维护性的CSS，它就是”BEM”。</p>
-<h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="回顾-2016-年-Node-js-十大文章-amp"><a href="#回顾-2016-年-Node-js-十大文章-amp" class="headerlink" title="回顾 2016 年 Node.js 十大文章&amp;)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964196&amp;idx=1&amp;sn=d52e8258b54e0d807e14efa5a2791f84&amp;chksm=843aec82b34d65944704e1f7fc04747934bad078ad91906781f21edeb204a9a55f4d9f129369&amp;mpshare=1&amp;scene=1&amp;srcid=0111eOoheFnpABemlLvmHvL9&amp;key=b43a3af60b96e11e86b22b45b526335d70f3fbb0d1f05d664eb97888d1744e7026b64c4bdae93ab2ceb9092123f81dfcaecf157e9a43e4e2bed516a6b9db9e4e0fe03330913f5cfcf971d9ac46dfaf8e&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">回顾 2016 年 Node.js 十大文章</a>&amp;)</h3><p>对于Node.js开发者来说，2016是振奋人心的一年。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;1.8-1.13，新的一期，继续积累！&lt;/p&gt;
-&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;《JS-闯关记》之原型及原型链&quot;&gt;&lt;a href=&quot;#《JS-闯关记》之原型及原型链&quot; class=&quot;headerlink&quot; title=&quot;《JS 闯关记》之原型及原型链&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;amp;mid=2650101216&amp;amp;idx=1&amp;amp;sn=dcc39636ebff46aca84df68533fb0742&amp;amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;amp;scene=0&quot;&gt;《JS 闯关记》之原型及原型链&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的&lt;strong&gt;proto&lt;/strong&gt; 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、&lt;strong&gt;proto&lt;/strong&gt; 这五个概念入手。&lt;/p&gt;
-&lt;h3 id=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;a href=&quot;#H5项目常见问题及注意事项&quot; class=&quot;headerlink&quot; title=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.open-open.com/lib/view/open1449325854077.html&quot;&gt;H5项目常见问题及注意事项&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;再也不用为PM嘴中的“H5”发愁了。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
-    
-    
-      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
-    
-  </entry>
-  
-  <entry>
     <title>如何使用PAC文件“科学上网”</title>
     <link href="https://exp-team.github.io/blog/2017/01/13/tool/using-pac/"/>
     <id>https://exp-team.github.io/blog/2017/01/13/tool/using-pac/</id>
@@ -993,6 +1136,37 @@ if (target.prototype) {
       <category term="tool" scheme="https://exp-team.github.io/tags/tool/"/>
     
       <category term="pac" scheme="https://exp-team.github.io/tags/pac/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>expfe技术周刊第10100期</title>
+    <link href="https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/"/>
+    <id>https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/</id>
+    <published>2017-01-12T16:00:00.000Z</published>
+    <updated>2017-01-13T12:23:08.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>1.8-1.13，新的一期，继续积累！</p>
+<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="《JS-闯关记》之原型及原型链"><a href="#《JS-闯关记》之原型及原型链" class="headerlink" title="《JS 闯关记》之原型及原型链"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;mid=2650101216&amp;idx=1&amp;sn=dcc39636ebff46aca84df68533fb0742&amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;scene=0" target="_blank" rel="external">《JS 闯关记》之原型及原型链</a></h3><p>原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的<strong>proto</strong> 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、<strong>proto</strong> 这五个概念入手。</p>
+<h3 id="H5项目常见问题及注意事项"><a href="#H5项目常见问题及注意事项" class="headerlink" title="H5项目常见问题及注意事项"></a><a href="http://www.open-open.com/lib/view/open1449325854077.html" target="_blank" rel="external">H5项目常见问题及注意事项</a></h3><p>再也不用为PM嘴中的“H5”发愁了。</p>
+<a id="more"></a>
+<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="揭秘babel的魔法之class魔法处理"><a href="#揭秘babel的魔法之class魔法处理" class="headerlink" title="揭秘babel的魔法之class魔法处理"></a><a href="https://mp.weixin.qq.com/s?__biz=MzIzNjE5NzAyMA==&amp;mid=2649879842&amp;idx=1&amp;sn=0e7eb27fd9bb7f5ba9bbd2b3640ba663&amp;chksm=f0ded0d1c7a959c785fd8c8b384e348506ea4dd40ca72a8fac00aa4f34ab07aacab6aa92514b&amp;mpshare=1&amp;scene=1&amp;srcid=01132iAX9Sp6Gpll9otS2un8&amp;key=59506e83f2f7e1fd47b66ec743010bafb62e75b40f02a088b7a58ef822f0fcfe14c244308ee819c24dd7303946792d0ace78d7c18cb31a020ca5b42528939fa5ce021ed6ae7a77d738521132ff2afee9&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">揭秘babel的魔法之class魔法处理</a></h3><p>揭秘Babel的同时，在复习一遍原型链基础支持～</p>
+<h2 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h2><h3 id="如何让你的-CSS-更具有可维护性？——大神有绝招-amp"><a href="#如何让你的-CSS-更具有可维护性？——大神有绝招-amp" class="headerlink" title="如何让你的 CSS 更具有可维护性？——大神有绝招&amp;)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964179&amp;idx=1&amp;sn=f7088de66f09efd35057541695582d52&amp;chksm=843aecb5b34d65a3ff8d67142403f3463e08f57041f4212e991248f49770b59943d5c65545bc&amp;mpshare=1&amp;scene=1&amp;srcid=0111H4YARr96el0lj1WY0J09&amp;key=f27a3d85b887ad782291dcbcbc6989e0bb3335f0f66ac9cc6b6994c455227fac808715c21fb47af4ad18b5ff25efbb9aca75f3d0bbf57baefb60f1d36971b42fa9d323e2b3d80208070837dfd770fa49&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">如何让你的 CSS 更具有可维护性？——大神有绝招</a>&amp;)</h3><p>这篇文章教你一种方法，能够写出更具有可维护性的CSS，它就是”BEM”。</p>
+<h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><h3 id="回顾-2016-年-Node-js-十大文章-amp"><a href="#回顾-2016-年-Node-js-十大文章-amp" class="headerlink" title="回顾 2016 年 Node.js 十大文章&amp;)"></a><a href="https://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650964196&amp;idx=1&amp;sn=d52e8258b54e0d807e14efa5a2791f84&amp;chksm=843aec82b34d65944704e1f7fc04747934bad078ad91906781f21edeb204a9a55f4d9f129369&amp;mpshare=1&amp;scene=1&amp;srcid=0111eOoheFnpABemlLvmHvL9&amp;key=b43a3af60b96e11e86b22b45b526335d70f3fbb0d1f05d664eb97888d1744e7026b64c4bdae93ab2ceb9092123f81dfcaecf157e9a43e4e2bed516a6b9db9e4e0fe03330913f5cfcf971d9ac46dfaf8e&amp;ascene=0&amp;uin=NjI4NTQ2ODIx&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.10.4+build(14E46" target="_blank" rel="external">回顾 2016 年 Node.js 十大文章</a>&amp;)</h3><p>对于Node.js开发者来说，2016是振奋人心的一年。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;1.8-1.13，新的一期，继续积累！&lt;/p&gt;
+&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;《JS-闯关记》之原型及原型链&quot;&gt;&lt;a href=&quot;#《JS-闯关记》之原型及原型链&quot; class=&quot;headerlink&quot; title=&quot;《JS 闯关记》之原型及原型链&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzIyNjE0MzU1OQ%3D%3D&amp;amp;mid=2650101216&amp;amp;idx=1&amp;amp;sn=dcc39636ebff46aca84df68533fb0742&amp;amp;chksm=f07509c8c70280deb444e9ac5405982e0892f1331bdc02a48f4161dba0f27dcde8f4acf2cd07&amp;amp;scene=0&quot;&gt;《JS 闯关记》之原型及原型链&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;原型链是一种机制，指的是 JavaScript 每个对象都有一个内置的&lt;strong&gt;proto&lt;/strong&gt; 属性指向创建它的构造函数的 prototype（原型）属性。原型链的作用是为了实现对象的继承，要理解原型链，需要先从函数对象、constructor、new、prototype、&lt;strong&gt;proto&lt;/strong&gt; 这五个概念入手。&lt;/p&gt;
+&lt;h3 id=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;a href=&quot;#H5项目常见问题及注意事项&quot; class=&quot;headerlink&quot; title=&quot;H5项目常见问题及注意事项&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.open-open.com/lib/view/open1449325854077.html&quot;&gt;H5项目常见问题及注意事项&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;再也不用为PM嘴中的“H5”发愁了。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
+    
+    
+      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
     
   </entry>
   
@@ -1193,117 +1367,6 @@ var Person = (function () {
   </entry>
   
   <entry>
-    <title>深入新版BS4源码 探索flex和工程化sass奥秘</title>
-    <link href="https://exp-team.github.io/blog/2017/01/12/program/BS4/"/>
-    <id>https://exp-team.github.io/blog/2017/01/12/program/BS4/</id>
-    <published>2017-01-11T16:00:00.000Z</published>
-    <updated>2017-02-19T12:29:49.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布<a href="https://github.com/twbs/bootstrap/pull/21389" target="_blank" rel="external">放弃支持IE9，并默认使用flexbox弹性盒模型</a>。<br>这标志着前端开发全面步入“现代浏览器”的时代进一步来临；样式处理也再一次面向未来，拥抱更加灵活的弹性盒模型－Flex布局。</p>
-<p>这篇文章会带你深入Bootstrap最新版源码，窥探其架构组织奥秘，并解析最具亮点的栅格化系统。<br>你也会了解到sass的高阶用法和flex最新语法奥秘。</p>
-<h2 id="BS4的新特性"><a href="#BS4的新特性" class="headerlink" title="BS4的新特性"></a>BS4的新特性</h2><p>在开启我们的探索之前，有必要先梳理一下BS4添加的新特性：<br>1）从Less迁移到Sass：<br>现在，Bootstrap已加入Sass的大家庭中。得益于Libsass（Sass 解析器），Bootstrap的编译速度比以前更快；<br>2）改进网格系统：<br>新增一个网格层适配移动设备，并整顿语义混合。<br>3）默认弹性盒模型（flexbox）：<br>这是项划时代的变动，利用flexbox的优势快速布局。<br>4）废弃了wells、thumbnails和panels，使用cards代替。<br>5）新的自定义选项：<br>不再像上个版本一样，将渐变、淡入淡出、阴影等效果分放在单独的样式表中。而是将所有选项都移到一个Sass变量中。<br>想要给全局或考虑不到的角落定义一个默认效果？很简单，只要更新变量值，然后重新编译就可以了。<br>6）使用rem和em单位。<br>7）重构所有JavaScript插件：<br>Bootstrap 4用ES6重写了所有插件。现在提供UMD支持、泛型拆解方法、选项类型检查等特性。<br>8）改进工具提示和popovers自动定位：<br>这部分要感谢Tether（A positioning engine to make overlays, tooltips and dropdowns better）工具的帮助，<br>如果你还不知道Tether是什么，可以去他家<a href="https://github.com/HubSpot/tether" target="_blank" rel="external">Github地址</a>。</p>
-<h2 id="BS4栅格系统揭秘"><a href="#BS4栅格系统揭秘" class="headerlink" title="BS4栅格系统揭秘"></a>BS4栅格系统揭秘</h2><p>了解了以上新特性，我们主要研究BS从诞生以来最大的“卖点”－栅格系统。</p>
-<h2 id="一个栅格实例"><a href="#一个栅格实例" class="headerlink" title="一个栅格实例"></a>一个栅格实例</h2><p>我们选取代表性的BS4官网范例，可以<a href="http://v4.bootcss.com/examples/dashboard/#" target="_blank" rel="external">在线参考</a>, 或者参看以下截图，<br>在大屏幕下，我们看到：</p>
-<p>当屏幕宽度小于576px时候，我们有：</p>
-<p>对应代码：</p>
-<pre><code>&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
-    ...
-&lt;/div&gt;
-&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
-    ...
-&lt;/div&gt;
-&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
-    ...
-&lt;/div&gt;
-&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
-    ...
-&lt;/div&gt;
-</code></pre><p>.col-6 class样式在源码里面可以简单归纳（不完全）为：</p>
-<pre><code>.col-6 {
-    -webkit-box-flex: 0;
-    -webkit-flex: 0 0 50%;
-    -ms-flex: 0 0 50%;
-    flex: 0 0 50%;
-    max-width: 50%;
-}
-</code></pre><p>.col-sm-3 class在源码里面可以归纳为：</p>
-<pre><code>.col-sm-3{
-    -webkit-box-flex: 0;
-    -webkit-flex: 0 0 25%;
-        -ms-flex: 0 0 25%;
-            flex: 0 0 25%;
-    max-width: 25%;
-}
-</code></pre><h3 id="两种类的共存和交替作用"><a href="#两种类的共存和交替作用" class="headerlink" title="两种类的共存和交替作用"></a>两种类的共存和交替作用</h3><p>我们看到，代码里设置了这两个class进行样式声明，很明显他们的样式属性是有冲突的，那么他们是如何做到“和平共处”交替发挥作用的呢？</p>
-<p>1）在屏幕宽度大于576px时候，我们发现.col-sm-3并没有起作用，这时候起作用的是.col-6。<br>我们在源码里发现.col-sm-<em>的样式声明全部在@media (min-width: 576px) {…}的媒体查询中，<br>这就保证了在576px宽度以上的屏幕，只有在媒体查询之外的.col-</em>样式声明发挥了作用。</p>
-<p>2）在屏幕宽度小于576px时候，命中媒体查询，命中.col-sm-3的样式声明。他的优先级一定大于.col-6（媒体查询优先级高），这时候就保证了移动端的样式“占上风”。</p>
-<h3 id="flex讲解"><a href="#flex讲解" class="headerlink" title="flex讲解"></a>flex讲解</h3><p>我们从样式代码里看到类似flex: 0 0 25%的声明，为了理解它，我们从flex属性入手：<br>flex属性是flex-grow, flex-shrink 和 flex-basis的简写（类似backgroud是很多背景属性的简写一样），<br>它的默认值为0 1 auto。后两个属性可选。语法格式如下：</p>
-<pre><code>.item {
-    flex: none | [ &lt;&apos;flex-grow&apos;&gt; &lt;&apos;flex-shrink&apos;&gt;? || &lt;&apos;flex-basis&apos;&gt; ]
-}
-</code></pre><p>1）flex-grow：属性定义项目的放大比例，默认为0。我们看到BS代码里这个值一直为0，即如果存在剩余空间，也不放大。</p>
-<p>2）flex-shrink：属性定义了项目的缩小比例，默认为1，即如果空间不足，该项目将缩小。</p>
-<p>3）flex-basis：属性定义了在分配多余空间之前，项目占据的主轴空间（main size）。<br>浏览器根据这个属性，计算主轴是否有多余空间。它可以设为跟width或height属性一样的值（比如350px），则项目将占据固定空间。<br>当然BS4这里设置为比例值，这也是响应式自然而然实现的基础。</p>
-<h2 id="SASS在BS4工程化中的伟大作用"><a href="#SASS在BS4工程化中的伟大作用" class="headerlink" title="SASS在BS4工程化中的伟大作用"></a>SASS在BS4工程化中的伟大作用</h2><p>看到此，不难明白BS4栅格的实现，但是这并不是此文的最终目的。我们可以深入更多，比如，BS4的栅格系统里，一行一共是12栏。他的媒体查询断点又包括：xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px。<br>参考其源码dist/css目录下样式代码，我们会想组织生成如此大量的CSS样式，不用预处理器简直是反人类的。而BS4却是把sass用到了极致。</p>
-<h3 id="col-sm-是如何生成的"><a href="#col-sm-是如何生成的" class="headerlink" title=".col-sm-*是如何生成的"></a>.col-sm-*是如何生成的</h3><p>我们深入其scss目录下，scss/mixins/_grid.scss文件：</p>
-<pre><code>@if $enable-grid-classes {
-    @include make-grid-columns();
-}
-</code></pre><p>在enable-grid-classes变量为true的情况下（默认为true），调用make-grid-columns()</p>
-<p>make-grid-columns()这个mixin定义在scss/mixins/_grid-reamework.scss文件中（找的我好心累。。。）：</p>
-<pre><code>@mixin make-grid-columns($columns: $grid-columns, $gutters: $grid-gutter-widths, $breakpoints: $grid-breakpoints) {
-    ...
-}
-</code></pre><p>这个mixin接受三个参数：<br>1）$columns表示栅格数目默认为12<br>2）$gutters默认为30<br>3）$breakpoints表示断点设置，这是一个全局变量，为map类型。<br>这些你可以在scss/mixins/_breakpoints.scss文件中和scss/_variables.scss文件中找到。</p>
-<p>认识了这些参数，我们看.col-sm-<em>具体实现，下面代码我已经进行过大范围精简，只保留col-sm-</em>相关部分，并且加了注释：</p>
-<pre><code>@each $breakpoint in map-keys($breakpoints) {
-    // Returns a blank string if smallest breakpoint, otherwise returns the name with a dash infront.
-    $infix: breakpoint-infix($breakpoint, $breakpoints);
-    // Media of at least the minimum breakpoint width. No query for the smallest breakpoint.
-    // Makes the @content apply to the given breakpoint and wider.
-    @include media-breakpoint-up($breakpoint, $breakpoints) {
-        @for $i from 1 through $columns {
-            .col#{$infix}-#{$i} {
-                @include make-col($i, $columns);
-            }
-        }
-    }
-}
-</code></pre><p>我们一步一步来分析：<br>1）@each $breakpoint in map-keys($breakpoints)，对每一个断点进行遍历；<br>2）breakpoint-infix是一个函数，它定义在css/mixins/_breakpoints.scss文件当中， 返回一个带破折号的断点标识字符串，比如这里我们关系的就是“-sm”；<br>3）media-breakpoint-up是一个mixin：</p>
-<pre><code>@mixin media-breakpoint-up($name, $breakpoints: $grid-breakpoints) {
-    $min: breakpoint-min($name, $breakpoints);
-    @if $min {
-        @media (min-width: $min) {
-        @content;
-    }
-    } @else {
-        @content;
-    }
-}
-</code></pre><p>4）breakpoint-min又是一个函数，它返回了断点的具体数值。这里是用来拼媒体查询条件的。<br>5）最后最关键样式的生成又使用了另外一个定义在css/mixins/_grid.scss文件当中的mixin:</p>
-<pre><code>@mixin make-col($size, $columns: $grid-columns) {
-    flex: 0 0 percentage($size / $columns);
-    max-width: percentage($size / $columns);
-}
-</code></pre><p>到此为止，我们深入了Bootstrap V4的scss/目录下的源码，研究涉及了：<br>css/mixins/_grid-framework.scss文件;<br>css/mixins/_breakpoints.scss文件;<br>css/mixins/_grid.scss文件;<br>css/_variables.scss文件;<br>css/bootstrap-gris.scss文件;<br>……</p>
-<p>如果你理解了这些，那么再去读bootstrap新版源码就不会存在任何难度。相信你也能够在全局上，以“上帝视角”了解sass所起的作用，大型样式框架的架构组织。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过阅读源码的栅格系统部分，我们应该认识到sass对于这样大型样式框架系统的重要意义：<br>1）css模块化在管理组织上的灵活性；<br>2）复用的意义，我们使用了大量的mixin,function,全局变量；<br>3）像JS一样神奇的语法，包括条件、遍历等等等等。<br>我们也应该对flex这一神器有了更加深刻的认识。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布&lt;a href=&quot;https://github.com/twbs/bootstrap/pull/21389&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;放弃支持IE
-    
-    </summary>
-    
-      <category term="program" scheme="https://exp-team.github.io/categories/program/"/>
-    
-    
-      <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
-    
-  </entry>
-  
-  <entry>
     <title>揭秘babel的魔法之class继承的处理</title>
     <link href="https://exp-team.github.io/blog/2017/01/12/js/babel-class2/"/>
     <id>https://exp-team.github.io/blog/2017/01/12/js/babel-class2/</id>
@@ -1467,6 +1530,117 @@ Object.setPrototypeOf(Student, Person)
   </entry>
   
   <entry>
+    <title>深入新版BS4源码 探索flex和工程化sass奥秘</title>
+    <link href="https://exp-team.github.io/blog/2017/01/12/program/BS4/"/>
+    <id>https://exp-team.github.io/blog/2017/01/12/program/BS4/</id>
+    <published>2017-01-11T16:00:00.000Z</published>
+    <updated>2017-02-19T12:29:49.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布<a href="https://github.com/twbs/bootstrap/pull/21389" target="_blank" rel="external">放弃支持IE9，并默认使用flexbox弹性盒模型</a>。<br>这标志着前端开发全面步入“现代浏览器”的时代进一步来临；样式处理也再一次面向未来，拥抱更加灵活的弹性盒模型－Flex布局。</p>
+<p>这篇文章会带你深入Bootstrap最新版源码，窥探其架构组织奥秘，并解析最具亮点的栅格化系统。<br>你也会了解到sass的高阶用法和flex最新语法奥秘。</p>
+<h2 id="BS4的新特性"><a href="#BS4的新特性" class="headerlink" title="BS4的新特性"></a>BS4的新特性</h2><p>在开启我们的探索之前，有必要先梳理一下BS4添加的新特性：<br>1）从Less迁移到Sass：<br>现在，Bootstrap已加入Sass的大家庭中。得益于Libsass（Sass 解析器），Bootstrap的编译速度比以前更快；<br>2）改进网格系统：<br>新增一个网格层适配移动设备，并整顿语义混合。<br>3）默认弹性盒模型（flexbox）：<br>这是项划时代的变动，利用flexbox的优势快速布局。<br>4）废弃了wells、thumbnails和panels，使用cards代替。<br>5）新的自定义选项：<br>不再像上个版本一样，将渐变、淡入淡出、阴影等效果分放在单独的样式表中。而是将所有选项都移到一个Sass变量中。<br>想要给全局或考虑不到的角落定义一个默认效果？很简单，只要更新变量值，然后重新编译就可以了。<br>6）使用rem和em单位。<br>7）重构所有JavaScript插件：<br>Bootstrap 4用ES6重写了所有插件。现在提供UMD支持、泛型拆解方法、选项类型检查等特性。<br>8）改进工具提示和popovers自动定位：<br>这部分要感谢Tether（A positioning engine to make overlays, tooltips and dropdowns better）工具的帮助，<br>如果你还不知道Tether是什么，可以去他家<a href="https://github.com/HubSpot/tether" target="_blank" rel="external">Github地址</a>。</p>
+<h2 id="BS4栅格系统揭秘"><a href="#BS4栅格系统揭秘" class="headerlink" title="BS4栅格系统揭秘"></a>BS4栅格系统揭秘</h2><p>了解了以上新特性，我们主要研究BS从诞生以来最大的“卖点”－栅格系统。</p>
+<h2 id="一个栅格实例"><a href="#一个栅格实例" class="headerlink" title="一个栅格实例"></a>一个栅格实例</h2><p>我们选取代表性的BS4官网范例，可以<a href="http://v4.bootcss.com/examples/dashboard/#" target="_blank" rel="external">在线参考</a>, 或者参看以下截图，<br>在大屏幕下，我们看到：</p>
+<p>当屏幕宽度小于576px时候，我们有：</p>
+<p>对应代码：</p>
+<pre><code>&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
+    ...
+&lt;/div&gt;
+&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
+    ...
+&lt;/div&gt;
+&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
+    ...
+&lt;/div&gt;
+&lt;div class=&quot;col-6 col-sm-3&quot;&gt;
+    ...
+&lt;/div&gt;
+</code></pre><p>.col-6 class样式在源码里面可以简单归纳（不完全）为：</p>
+<pre><code>.col-6 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 50%;
+    -ms-flex: 0 0 50%;
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+</code></pre><p>.col-sm-3 class在源码里面可以归纳为：</p>
+<pre><code>.col-sm-3{
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 25%;
+        -ms-flex: 0 0 25%;
+            flex: 0 0 25%;
+    max-width: 25%;
+}
+</code></pre><h3 id="两种类的共存和交替作用"><a href="#两种类的共存和交替作用" class="headerlink" title="两种类的共存和交替作用"></a>两种类的共存和交替作用</h3><p>我们看到，代码里设置了这两个class进行样式声明，很明显他们的样式属性是有冲突的，那么他们是如何做到“和平共处”交替发挥作用的呢？</p>
+<p>1）在屏幕宽度大于576px时候，我们发现.col-sm-3并没有起作用，这时候起作用的是.col-6。<br>我们在源码里发现.col-sm-<em>的样式声明全部在@media (min-width: 576px) {…}的媒体查询中，<br>这就保证了在576px宽度以上的屏幕，只有在媒体查询之外的.col-</em>样式声明发挥了作用。</p>
+<p>2）在屏幕宽度小于576px时候，命中媒体查询，命中.col-sm-3的样式声明。他的优先级一定大于.col-6（媒体查询优先级高），这时候就保证了移动端的样式“占上风”。</p>
+<h3 id="flex讲解"><a href="#flex讲解" class="headerlink" title="flex讲解"></a>flex讲解</h3><p>我们从样式代码里看到类似flex: 0 0 25%的声明，为了理解它，我们从flex属性入手：<br>flex属性是flex-grow, flex-shrink 和 flex-basis的简写（类似backgroud是很多背景属性的简写一样），<br>它的默认值为0 1 auto。后两个属性可选。语法格式如下：</p>
+<pre><code>.item {
+    flex: none | [ &lt;&apos;flex-grow&apos;&gt; &lt;&apos;flex-shrink&apos;&gt;? || &lt;&apos;flex-basis&apos;&gt; ]
+}
+</code></pre><p>1）flex-grow：属性定义项目的放大比例，默认为0。我们看到BS代码里这个值一直为0，即如果存在剩余空间，也不放大。</p>
+<p>2）flex-shrink：属性定义了项目的缩小比例，默认为1，即如果空间不足，该项目将缩小。</p>
+<p>3）flex-basis：属性定义了在分配多余空间之前，项目占据的主轴空间（main size）。<br>浏览器根据这个属性，计算主轴是否有多余空间。它可以设为跟width或height属性一样的值（比如350px），则项目将占据固定空间。<br>当然BS4这里设置为比例值，这也是响应式自然而然实现的基础。</p>
+<h2 id="SASS在BS4工程化中的伟大作用"><a href="#SASS在BS4工程化中的伟大作用" class="headerlink" title="SASS在BS4工程化中的伟大作用"></a>SASS在BS4工程化中的伟大作用</h2><p>看到此，不难明白BS4栅格的实现，但是这并不是此文的最终目的。我们可以深入更多，比如，BS4的栅格系统里，一行一共是12栏。他的媒体查询断点又包括：xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px。<br>参考其源码dist/css目录下样式代码，我们会想组织生成如此大量的CSS样式，不用预处理器简直是反人类的。而BS4却是把sass用到了极致。</p>
+<h3 id="col-sm-是如何生成的"><a href="#col-sm-是如何生成的" class="headerlink" title=".col-sm-*是如何生成的"></a>.col-sm-*是如何生成的</h3><p>我们深入其scss目录下，scss/mixins/_grid.scss文件：</p>
+<pre><code>@if $enable-grid-classes {
+    @include make-grid-columns();
+}
+</code></pre><p>在enable-grid-classes变量为true的情况下（默认为true），调用make-grid-columns()</p>
+<p>make-grid-columns()这个mixin定义在scss/mixins/_grid-reamework.scss文件中（找的我好心累。。。）：</p>
+<pre><code>@mixin make-grid-columns($columns: $grid-columns, $gutters: $grid-gutter-widths, $breakpoints: $grid-breakpoints) {
+    ...
+}
+</code></pre><p>这个mixin接受三个参数：<br>1）$columns表示栅格数目默认为12<br>2）$gutters默认为30<br>3）$breakpoints表示断点设置，这是一个全局变量，为map类型。<br>这些你可以在scss/mixins/_breakpoints.scss文件中和scss/_variables.scss文件中找到。</p>
+<p>认识了这些参数，我们看.col-sm-<em>具体实现，下面代码我已经进行过大范围精简，只保留col-sm-</em>相关部分，并且加了注释：</p>
+<pre><code>@each $breakpoint in map-keys($breakpoints) {
+    // Returns a blank string if smallest breakpoint, otherwise returns the name with a dash infront.
+    $infix: breakpoint-infix($breakpoint, $breakpoints);
+    // Media of at least the minimum breakpoint width. No query for the smallest breakpoint.
+    // Makes the @content apply to the given breakpoint and wider.
+    @include media-breakpoint-up($breakpoint, $breakpoints) {
+        @for $i from 1 through $columns {
+            .col#{$infix}-#{$i} {
+                @include make-col($i, $columns);
+            }
+        }
+    }
+}
+</code></pre><p>我们一步一步来分析：<br>1）@each $breakpoint in map-keys($breakpoints)，对每一个断点进行遍历；<br>2）breakpoint-infix是一个函数，它定义在css/mixins/_breakpoints.scss文件当中， 返回一个带破折号的断点标识字符串，比如这里我们关系的就是“-sm”；<br>3）media-breakpoint-up是一个mixin：</p>
+<pre><code>@mixin media-breakpoint-up($name, $breakpoints: $grid-breakpoints) {
+    $min: breakpoint-min($name, $breakpoints);
+    @if $min {
+        @media (min-width: $min) {
+        @content;
+    }
+    } @else {
+        @content;
+    }
+}
+</code></pre><p>4）breakpoint-min又是一个函数，它返回了断点的具体数值。这里是用来拼媒体查询条件的。<br>5）最后最关键样式的生成又使用了另外一个定义在css/mixins/_grid.scss文件当中的mixin:</p>
+<pre><code>@mixin make-col($size, $columns: $grid-columns) {
+    flex: 0 0 percentage($size / $columns);
+    max-width: percentage($size / $columns);
+}
+</code></pre><p>到此为止，我们深入了Bootstrap V4的scss/目录下的源码，研究涉及了：<br>css/mixins/_grid-framework.scss文件;<br>css/mixins/_breakpoints.scss文件;<br>css/mixins/_grid.scss文件;<br>css/_variables.scss文件;<br>css/bootstrap-gris.scss文件;<br>……</p>
+<p>如果你理解了这些，那么再去读bootstrap新版源码就不会存在任何难度。相信你也能够在全局上，以“上帝视角”了解sass所起的作用，大型样式框架的架构组织。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过阅读源码的栅格系统部分，我们应该认识到sass对于这样大型样式框架系统的重要意义：<br>1）css模块化在管理组织上的灵活性；<br>2）复用的意义，我们使用了大量的mixin,function,全局变量；<br>3）像JS一样神奇的语法，包括条件、遍历等等等等。<br>我们也应该对flex这一神器有了更加深刻的认识。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;你可能已经听说了一个“大新闻”：Bootstrap4 合并了代号为#21389的PR，宣布&lt;a href=&quot;https://github.com/twbs/bootstrap/pull/21389&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;放弃支持IE
+    
+    </summary>
+    
+      <category term="program" scheme="https://exp-team.github.io/categories/program/"/>
+    
+    
+      <category term="program" scheme="https://exp-team.github.io/tags/program/"/>
+    
+  </entry>
+  
+  <entry>
     <title>expfe技术周刊第10011期</title>
     <link href="https://exp-team.github.io/blog/2017/01/07/weekly/weekly-10011/"/>
     <id>https://exp-team.github.io/blog/2017/01/07/weekly/weekly-10011/</id>
@@ -1556,43 +1730,6 @@ Object.setPrototypeOf(Student, Person)
 &lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;若你已做多年前端（5年-），你觉得你目前的核心竞争力在哪？&quot;&gt;&lt;a href=&quot;#若你已做多年前端（5年-），你觉得你目前的核心竞争力在哪？&quot; class=&quot;headerlink&quot; title=&quot;若你已做多年前端（5年+），你觉得你目前的核心竞争力在哪？&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://www.zhihu.com/question/53542412/answer/137031732?utm_source=wechat_timeline&amp;amp;utm_medium=social&amp;amp;from=groupmessage&amp;amp;isappinstalled=0&quot;&gt;若你已做多年前端（5年+），你觉得你目前的核心竞争力在哪？&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;我觉得大概在知识，经验，软素质等方面。&lt;/p&gt;
 &lt;h3 id=&quot;不管你在哪里上班，至少记住这个字！&quot;&gt;&lt;a href=&quot;#不管你在哪里上班，至少记住这个字！&quot; class=&quot;headerlink&quot; title=&quot;不管你在哪里上班，至少记住这个字！&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MjM5OTU0NDA4Nw==&amp;amp;mid=2655455671&amp;amp;idx=1&amp;amp;sn=ee93cea6da065486ebdd5b5f42004511&amp;amp;chksm=bc8a7dcf8bfdf4d9b4eda79b07a76c5f3be24636a6622100ed5407cce51c2b85c44c7be6a8b0&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1220ANjVrdaoTRU3L9m99ql8#rd&quot;&gt;不管你在哪里上班，至少记住这个字！&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;你也许认为本文是鸡汤文，但我不这么认为，我其实很希望自己能早点看到这篇文章，不管你做什么工作，如果你做到本文提到的点，那你应该不会太差。&lt;/p&gt;
 &lt;h3 id=&quot;React-组件间通讯&quot;&gt;&lt;a href=&quot;#React-组件间通讯&quot; class=&quot;headerlink&quot; title=&quot;React 组件间通讯&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://taobaofed.org/blog/2016/11/17/react-components-communication/&quot;&gt;React 组件间通讯&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;最近面试了很多人，发现能把这个问题讲清楚的，真没有几个人。。。很尴尬。实在不能想象是怎么用react做东西的。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="weekly" scheme="https://exp-team.github.io/categories/weekly/"/>
-    
-    
-      <category term="weekly" scheme="https://exp-team.github.io/tags/weekly/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>expfe技术周刊第10000期</title>
-    <link href="https://exp-team.github.io/blog/2016/12/17/weekly/weekly-10000/"/>
-    <id>https://exp-team.github.io/blog/2016/12/17/weekly/weekly-10000/</id>
-    <published>2016-12-16T16:00:00.000Z</published>
-    <updated>2017-01-13T08:09:51.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>12.11-12.17，合抱之木生于毫末，九层之台起于垒土。</p>
-<h2 id="本期推荐"><a href="#本期推荐" class="headerlink" title="本期推荐"></a>本期推荐</h2><h3 id="资深Web技术专家曹刘阳：2016年前端技术观察"><a href="#资深Web技术专家曹刘阳：2016年前端技术观察" class="headerlink" title="资深Web技术专家曹刘阳：2016年前端技术观察"></a><a href="http://geek.csdn.net/news/detail/128912" target="_blank" rel="external">资深Web技术专家曹刘阳：2016年前端技术观察</a></h3><p>合抱之木生于毫末，九层之台起于垒土，万丈高楼平地起。万里长城非一日而成，冰冻三尺非一日之寒。旧雨三年精化碧，孤灯午夜眼常青。不积跬步无以至千里，不积小流无以成江河。决定你速度的是智商，决定你高度的是基础。偷的懒迟早要补上，切记赶早不赶晚。</p>
-<h3 id="开源大神-James-Kyle-写给-JavaScript-的一封信"><a href="#开源大神-James-Kyle-写给-JavaScript-的一封信" class="headerlink" title="开源大神 James Kyle 写给 JavaScript 的一封信"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963957&amp;idx=1&amp;sn=d39eda3548256310ddcc249ce29af42a&amp;chksm=843a1393b34d9a85d08139aa53d6d885efbf117a3e6320a52433f5784d606bd20d14101f6928&amp;mpshare=1&amp;scene=1&amp;srcid=1213wlqwX0Q6DkZD9Wqn8Wb4#rd" target="_blank" rel="external">开源大神 James Kyle 写给 JavaScript 的一封信</a></h3><p>请尊重开源的人，他们是最无私的，向开源致敬。</p>
-<h3 id="五个典型的-JavaScript-面试题"><a href="#五个典型的-JavaScript-面试题" class="headerlink" title="五个典型的 JavaScript 面试题"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963939&amp;idx=1&amp;sn=ffa0ce59fc3a5691ee5be7520d1692d2&amp;chksm=843a1385b34d9a932f11138f3332231b26c71067b2ebc59e31f27faedb7a40c9b960bb4330a2&amp;mpshare=1&amp;scene=1&amp;srcid=1212E8wJvLX84dWuLLgI0PLy#rd" target="_blank" rel="external">五个典型的 JavaScript 面试题</a></h3><p>你一定知道我们最近在招人吧，如果你对这五个题都能看懂，那么快快发你的简历发给我吧。</p>
-<a id="more"></a>
-<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><h3 id="JavaScript-中-console-的用法"><a href="#JavaScript-中-console-的用法" class="headerlink" title="JavaScript 中 console 的用法"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651224517&amp;idx=2&amp;sn=a2a36361fa8010e8f041055192f5313c&amp;chksm=bd49a0418a3e2957e453a28c918988fcb27ccf998ce57fc733dcc8a282d6626e6db08bcc4e22&amp;mpshare=1&amp;scene=1&amp;srcid=1212zJeB8tKpRMpNNo0BkSZa#rd" target="_blank" rel="external">JavaScript 中 console 的用法</a></h3><p>用了这么久的console，你一定还有很多技巧不知道，来看看这篇文章，一定不会让你失望的。</p>
-<h3 id="ES-5-新增特性汇总"><a href="#ES-5-新增特性汇总" class="headerlink" title="ES 5 新增特性汇总"></a><a href="https://zhuanlan.zhihu.com/p/24336831" target="_blank" rel="external">ES 5 新增特性汇总</a></h3><p>最近面试了不少人，发现大家的基础都不太好，快来补习补习基础吧。</p>
-<h3 id="你可能不需要Redux"><a href="#你可能不需要Redux" class="headerlink" title="你可能不需要Redux"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963909&amp;idx=1&amp;sn=e70000f256e6f53eedf077cd3c8cc19e&amp;chksm=843a13a3b34d9ab51b3231385a8c28f6fb2e7b45181c30ddd6fd0c525dfdbf8f97e7d7f83e66&amp;mpshare=1&amp;scene=1&amp;srcid=1212gEm4QOfQ9G7SfY1rTSjM#rd" target="_blank" rel="external">你可能不需要Redux</a></h3><p>在你犹豫要不要使用redux是，那就选择不用。</p>
-<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="浅析渲染引擎与前端优化"><a href="#浅析渲染引擎与前端优化" class="headerlink" title="浅析渲染引擎与前端优化"></a><a href="http://jdc.jd.com/archives/2806" target="_blank" rel="external">浅析渲染引擎与前端优化</a></h3><h3 id="雅虎这35条前端优化规则，你值得拥有！"><a href="#雅虎这35条前端优化规则，你值得拥有！" class="headerlink" title="雅虎这35条前端优化规则，你值得拥有！"></a><a href="http://mp.weixin.qq.com/s?__biz=MjM5ODI5Njc2MA==&amp;mid=2655808361&amp;idx=1&amp;sn=93826ac350683dbdc42e35b94d546be9&amp;chksm=bd7426be8a03afa80e13f5dcaa5e66337196453ae540fc829d983d9e0a04ad1a0f96fa3c8a9a&amp;mpshare=1&amp;scene=1&amp;srcid=1213FExvfbWRj2D2zRqjEovI#rd" target="_blank" rel="external">雅虎这35条前端优化规则，你值得拥有！</a></h3><p>曾几何时还是雅虎14条原则，现在都35条了，快来看看你掌握几条。</p>
-<h3 id="FIS-与-FIS-PLUS-的渊源"><a href="#FIS-与-FIS-PLUS-的渊源" class="headerlink" title="FIS 与 FIS-PLUS 的渊源"></a><a href="http://fex.baidu.com/blog/2014/03/fis-plus/" target="_blank" rel="external">FIS 与 FIS-PLUS 的渊源</a></h3><p>对于刚刚入门的同学，傻傻的分不清楚fis和fisp的关系</p>
-<h3 id="在-2017-年将会更加流行的-6-个-Web-开发趋势"><a href="#在-2017-年将会更加流行的-6-个-Web-开发趋势" class="headerlink" title="在 2017 年将会更加流行的 6 个 Web 开发趋势"></a><a href="http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;mid=2650963966&amp;idx=1&amp;sn=0295680af559dc286ec5fa9c9b0a4d7e&amp;chksm=843a1398b34d9a8e63b8b8f3b5af14f85dfc52977ace0c6069c4d0aac5ea7abaef47f76319fc&amp;mpshare=1&amp;scene=1&amp;srcid=1216yXoFXdS5jg9DDEwq8HnG#rd" target="_blank" rel="external">在 2017 年将会更加流行的 6 个 Web 开发趋势</a></h3><p>值此辞旧迎新之际，如果你是一个弄潮儿，可以看看这篇文章，内容很超前。</p>
-<h3 id="魔法哥-2013-前端笔试题曝光（附完整解答）"><a href="#魔法哥-2013-前端笔试题曝光（附完整解答）" class="headerlink" title="魔法哥 2013 前端笔试题曝光（附完整解答）"></a><a href="http://mp.weixin.qq.com/s?__biz=MzIyMjE0ODQ0OQ==&amp;mid=2651552755&amp;idx=1&amp;sn=d89fd543a549d53678ae984a93e759ba&amp;chksm=f3ce39fdc4b9b0eb379b050925721e1add3ac4223cd5294cbac591440320e17fedd0203382a5&amp;mpshare=1&amp;scene=1&amp;srcid=1216S8oDe9CPuyaRIHLuvKLb#rd" target="_blank" rel="external">魔法哥 2013 前端笔试题曝光（附完整解答）</a></h3><p>这是魔法哥在 2013 年整理的一套笔试题，显然，其中有些内容已经过时了。尽管如此，我相信这套题还是有一定的参考价值，每道题后面都有出题意图、解题思路、参考答案或评分标准</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;12.11-12.17，合抱之木生于毫末，九层之台起于垒土。&lt;/p&gt;
-&lt;h2 id=&quot;本期推荐&quot;&gt;&lt;a href=&quot;#本期推荐&quot; class=&quot;headerlink&quot; title=&quot;本期推荐&quot;&gt;&lt;/a&gt;本期推荐&lt;/h2&gt;&lt;h3 id=&quot;资深Web技术专家曹刘阳：2016年前端技术观察&quot;&gt;&lt;a href=&quot;#资深Web技术专家曹刘阳：2016年前端技术观察&quot; class=&quot;headerlink&quot; title=&quot;资深Web技术专家曹刘阳：2016年前端技术观察&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://geek.csdn.net/news/detail/128912&quot;&gt;资深Web技术专家曹刘阳：2016年前端技术观察&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;合抱之木生于毫末，九层之台起于垒土，万丈高楼平地起。万里长城非一日而成，冰冻三尺非一日之寒。旧雨三年精化碧，孤灯午夜眼常青。不积跬步无以至千里，不积小流无以成江河。决定你速度的是智商，决定你高度的是基础。偷的懒迟早要补上，切记赶早不赶晚。&lt;/p&gt;
-&lt;h3 id=&quot;开源大神-James-Kyle-写给-JavaScript-的一封信&quot;&gt;&lt;a href=&quot;#开源大神-James-Kyle-写给-JavaScript-的一封信&quot; class=&quot;headerlink&quot; title=&quot;开源大神 James Kyle 写给 JavaScript 的一封信&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;amp;mid=2650963957&amp;amp;idx=1&amp;amp;sn=d39eda3548256310ddcc249ce29af42a&amp;amp;chksm=843a1393b34d9a85d08139aa53d6d885efbf117a3e6320a52433f5784d606bd20d14101f6928&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1213wlqwX0Q6DkZD9Wqn8Wb4#rd&quot;&gt;开源大神 James Kyle 写给 JavaScript 的一封信&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;请尊重开源的人，他们是最无私的，向开源致敬。&lt;/p&gt;
-&lt;h3 id=&quot;五个典型的-JavaScript-面试题&quot;&gt;&lt;a href=&quot;#五个典型的-JavaScript-面试题&quot; class=&quot;headerlink&quot; title=&quot;五个典型的 JavaScript 面试题&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://mp.weixin.qq.com/s?__biz=MzA4NjE3MDg4OQ==&amp;amp;mid=2650963939&amp;amp;idx=1&amp;amp;sn=ffa0ce59fc3a5691ee5be7520d1692d2&amp;amp;chksm=843a1385b34d9a932f11138f3332231b26c71067b2ebc59e31f27faedb7a40c9b960bb4330a2&amp;amp;mpshare=1&amp;amp;scene=1&amp;amp;srcid=1212E8wJvLX84dWuLLgI0PLy#rd&quot;&gt;五个典型的 JavaScript 面试题&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;你一定知道我们最近在招人吧，如果你对这五个题都能看懂，那么快快发你的简历发给我吧。&lt;/p&gt;
     
     </summary>
     
