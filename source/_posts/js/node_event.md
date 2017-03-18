@@ -1,5 +1,5 @@
 ---
-title: 由nodeJS源码激发的灵感：“打造属于自己的事件发布订阅系统”
+title: 探索nodeJS事件机制源码 打造属于自己的事件发布订阅系统
 categories: js
 tags: js
 date: 2017-03-17
