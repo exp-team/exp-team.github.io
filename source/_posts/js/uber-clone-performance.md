@@ -284,8 +284,6 @@ preload的出现就是为了优化这个过程。
 
     <link rel="preload" ... as="script">
 
-并在最终的<body>标签闭合处，正常的使用<script>标签去加载脚本。
-
 最终优化的结果如图：
 
 
