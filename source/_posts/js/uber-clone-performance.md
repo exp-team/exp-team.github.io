@@ -286,12 +286,7 @@ preload的出现就是为了优化这个过程。
 
 最终优化的结果如图：
 
-
-
 ![最终结果](http://upload-images.jianshu.io/upload_images/4363003-8823ee4b69444430.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-
-
 
 
 ## 总结
