@@ -2,9 +2,128 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://exp-team.github.io/about/index.html</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/08/weekly/weekly-11011/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/24/weekly/weekly-11010/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/20/js/uber-clone-performance/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/20/js/shuffle-array/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://exp-team.github.io/blog/2017/03/22/js/node_event/</loc>
     
-    <lastmod>2017-03-18T06:37:37.000Z</lastmod>
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/05/js/react-tree-data/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/20/js/twitter/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/14/js/react-conf-es6/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/14/js/react-best-pratice/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/10/js/node_crawler/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/02/js/match-lovers/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/30/js/news-early/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/25/js/immutable/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/04/js/const/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/04/js/array_hack/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/14/js/async/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/04/js/access/</loc>
+    
+    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
     
   </url>
   
@@ -44,14 +163,14 @@
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/02/24/weekly/weekly-10110/</loc>
+    <loc>https://exp-team.github.io/blog/2017/03/04/weekly/weekly-10111/</loc>
     
     <lastmod>2017-03-06T10:31:09.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/03/04/weekly/weekly-10111/</loc>
+    <loc>https://exp-team.github.io/blog/2017/02/24/weekly/weekly-10110/</loc>
     
     <lastmod>2017-03-06T10:31:09.000Z</lastmod>
     
@@ -79,6 +198,13 @@
   </url>
   
   <url>
+    <loc>https://exp-team.github.io/blog/2017/01/12/program/BS4/</loc>
+    
+    <lastmod>2017-02-19T12:29:49.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://exp-team.github.io/blog/2017/01/21/other/wujiang-2016/</loc>
     
     <lastmod>2017-02-19T12:29:49.000Z</lastmod>
@@ -87,13 +213,6 @@
   
   <url>
     <loc>https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/</loc>
-    
-    <lastmod>2017-02-19T12:29:49.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/01/12/program/BS4/</loc>
     
     <lastmod>2017-02-19T12:29:49.000Z</lastmod>
     
@@ -138,125 +257,6 @@
     <loc>https://exp-team.github.io/blog/2017/01/07/weekly/weekly-10011/</loc>
     
     <lastmod>2017-01-13T10:11:31.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/12/weekly/weekly-10/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/20/tool/chrome-install/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/09/02/program/about-coupling/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/10/19/web/study-webp/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/10/tool/xshell-commond/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/07/28/hexo/hello-world/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/07/weekly/weekly-1/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/27/weekly/weekly-100/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/10/13/weekly/weekly-1000/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/12/17/weekly/weekly-10000/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/12/24/weekly/weekly-10001/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/10/22/weekly/weekly-1001/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/12/31/weekly/weekly-10010/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/09/04/weekly/weekly-101/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/21/linux/how-to-install-linux-on-vm/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/10/31/weekly/weekly-1010/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/09/04/program/event/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     
   </url>
   
@@ -352,7 +352,119 @@
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/about/index.html</loc>
+    <loc>https://exp-team.github.io/blog/2016/08/20/tool/chrome-install/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/09/02/program/about-coupling/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/10/19/web/study-webp/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/10/tool/xshell-commond/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/12/weekly/weekly-10/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/07/weekly/weekly-1/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/27/weekly/weekly-100/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/10/13/weekly/weekly-1000/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/12/17/weekly/weekly-10000/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/12/24/weekly/weekly-10001/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/10/22/weekly/weekly-1001/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/12/31/weekly/weekly-10010/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/07/28/hexo/hello-world/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/21/linux/how-to-install-linux-on-vm/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/10/31/weekly/weekly-1010/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/09/04/program/event/</loc>
+    
+    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/09/04/weekly/weekly-101/</loc>
     
     <lastmod>2017-01-13T08:09:51.000Z</lastmod>
     

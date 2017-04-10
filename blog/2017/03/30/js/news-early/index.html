@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>React+Redux打造“NEWS EARLY”单页应用 一步步让你理解最前沿技术栈的真谛 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="之前写过一篇文章，分享了我利用闲暇时间，使用React+Redux技术栈重构的百度某产品个人中心页面。您可以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React+Redux打造“NEWS EARLY”单页应用 一步步让你理解最前沿技术栈的真谛">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/03/30/js/news-early/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="之前写过一篇文章，分享了我利用闲暇时间，使用React+Redux技术栈重构的百度某产品个人中心页面。您可以">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-f960f8050f049833.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-df843395274f854c.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-abcbfc9811943bd2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-c9da38782a2473d6.gif?imageMogr2/auto-orient/strip">
+<meta property="og:updated_time" content="2017-04-10T04:52:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="React+Redux打造“NEWS EARLY”单页应用 一步步让你理解最前沿技术栈的真谛">
+<meta name="twitter:description" content="之前写过一篇文章，分享了我利用闲暇时间，使用React+Redux技术栈重构的百度某产品个人中心页面。您可以">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/4363003-f960f8050f049833.gif?imageMogr2/auto-orient/strip">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/news-early" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/03/30/js/news-early/" class="article-date">
+  <time datetime="2017-03-29T16:00:00.000Z" itemprop="datePublished">2017-03-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      React+Redux打造“NEWS EARLY”单页应用 一步步让你理解最前沿技术栈的真谛
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>之前写过一篇文章，分享了我利用闲暇时间，使用React+Redux技术栈重构的百度某产品个人中心页面。您可以<a href="http://www.jianshu.com/p/8e28be0e7ab1" target="_blank" rel="external">参考这里</a>，或者参考<a href="https://github.com/HOUCe/react-redux-demo" target="_blank" rel="external">Github代码仓库地址。</a><br>这个工程实例中，我采用了厂内的工程构建工具－FIS，并贯穿了react+redux基本思想。</p>
+<p>今天这篇文章给大家分享一个更加复杂，但是非常有趣的一个项目-</p>
+<blockquote>
+<p>News Early单页应用。</p>
+</blockquote>
+<p>我把这个项目所有代码托管在了我个人Github之中，感兴趣的读者可以跟我探讨。</p>
+<p>最近我发现，React Redux生态圈项目活跃。但是作品质量“良莠不齐”，很多非常热门的项目不仅没有起到“布道”作用，而且在一定程度上“误导”了读者。在这篇文章里面我会有详细说明。当然，我自己也是资历浅显，水平有限。希望大神能够给与斧正。</p>
+<p>同时通过这个项目实例和这篇文章，一步一步说明了这个项目开发细节，并且包括了优化手段等内容。希望使大家对于React技术栈，包括：Redux数据流框架＋React Router路由管理＋Webpack构建工具等，有一个更加清晰深刻的理解。</p>
+<h2 id="项目背景"><a href="#项目背景" class="headerlink" title="项目背景"></a>项目背景</h2><p>在国外上学和工作期间，能畅通无阻的访问诸如：BBC，CNN，ESPN，Le Figaro等新闻媒体是一大便利，也是我个人闲暇时期一个喜好之一。<br>甚至外出旅游时，在酒店收看这些媒体卫视（尤其CNN）竟然也是放松休闲的一大方式。。。</p>
+<p>当然，国内环境对于这些境外媒体显然不是太友好。<br>基于此，我设计开发了News Early项目。</p>
+<blockquote>
+<p>这个项目是一个包括：BBC，CNN，The NewYork Times等70多个国际知名媒体的即时头条新闻聚合APP。</p>
+<p>News Early is a simple and easy-to-use Web APP that gathers the headlines currently published on a range of news sources and blogs (70 and counting so far).</p>
+</blockquote>
+<p>整个项目我使用了包括但不限于以下技术栈和构建工具：<br>1）React UI框架from Facebook；<br>2）JSX模版；<br>3）Redux数据流设计；<br>4）Webpack构建工具；<br>5）Less预处理器；<br>……</p>
+<h2 id="项目设计"><a href="#项目设计" class="headerlink" title="项目设计"></a>项目设计</h2><p>整个Web APP的部分使用体验，我用以下GIF图示来呈现：<br>（请耐心等待GIF图加载）</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-f960f8050f049833.gif?imageMogr2/auto-orient/strip" alt="APP 使用截图"></p>
+<ul>
+<li>1）<strong>页面顶部导航条</strong><br>包括：侧栏菜单开启按钮和右侧的刷新页面按钮。</li>
+<li>2）<strong>页面内容头部轮播图</strong><br>支持自动播放和手势滑动操控。</li>
+<li>3）<strong>页面主体部分</strong><br>主体部分是所对应的新闻频道的headlines头条新闻，一般有10-20个items左右。每一个item包含一张新闻图片，新闻导读（Abstract）以及新闻发布时间（publish time）。</li>
+<li>4）<strong>左侧折叠菜单栏</strong><br>功能用于新闻频道的筛选。<br>以Gif图截取为止，一共接入了：BBC News，BBC Sport，CNN，ESPN，Financial Times，USA Today，MTV News7家国际媒体。</li>
+</ul>
+<p>因为我不是搞视觉设计的，也不是做页面交互设计的。我只是一枚码农。所以为了节省时间，整体APP的样式上，包括界面颜色等，我参考了<a href="http://m.maizuo.com/v4/?co=maizuo#/?_k=h7qksx" target="_blank" rel="external">卖座网</a>的实现。</p>
+<h2 id="项目架构和落地"><a href="#项目架构和落地" class="headerlink" title="项目架构和落地"></a>项目架构和落地</h2><p>下面，我为大家介绍一下整个项目的设计构成和开发细节。</p>
+<h3 id="数据流状态演示"><a href="#数据流状态演示" class="headerlink" title="数据流状态演示"></a>数据流状态演示</h3><p>熟悉Redux数据流框架的同学，应该对于store，dispatch，action，reducer，以及中间件等概念比较熟悉。这里不再进行讲解。<br>这套架构中，最重要的就是<strong>数据流的设计。</strong></p>
+<p>首先，我们先整体看一下在“切换频道”这个交互发生时，整个项目的数据流向和数据结构的演示：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-df843395274f854c.gif?imageMogr2/auto-orient/strip" alt="数据流动示意图"></p>
+<h3 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h3><p>如图所示：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-abcbfc9811943bd2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="目录结构"></p>
+<p>整个项目业务代码部分，我拆分成9个UI组件，1个全局Store，一个actions定义文件。</p>
+<ul>
+<li>app是开发目录<ul>
+<li>actions目录集中了全局所有的actions</li>
+<li>components目录集中了全局用到的所有UI组件</li>
+<li>reducers目录集中了Redux架构中的所有reducers</li>
+<li>store目录定义全局唯一的store</li>
+<li>style目录集中了全局所有组件的样式文件</li>
+<li>main.js为全局的入口函数</li>
+</ul>
+</li>
+<li>build是打包后结果目录<ul>
+<li>index.html是输出页面文件</li>
+<li>bundle.js开发目录下脚本文件打包后的产出</li>
+<li>img文件定义了APP开启时的loading图片</li>
+</ul>
+</li>
+<li>node_modules相信大家不会陌生，这是依赖文件<br>…<br>其他配置文件不再一一介绍。</li>
+</ul>
+<p>10个组件包括：</p>
+<ul>
+<li>appIndex: 组件容器</li>
+<li>billboardCarousel: 页面轮播图组件</li>
+<li>currentChanel: 页面headlines新闻头条组件</li>
+<li>homeView: 主体页面</li>
+<li>imagePlaceholder: 占位图组件</li>
+<li>loading: 加载提示组件</li>
+<li>navBar :顶部导航组件</li>
+<li>sideBar: 侧边栏组件</li>
+<li>routerWrap: 路由相关组件</li>
+</ul>
+<h3 id="骨架构建"><a href="#骨架构建" class="headerlink" title="骨架构建"></a>骨架构建</h3><p>我认为，redux之所以学习曲线陡，很大程度上就在于<strong>数据流的贯通上。</strong></p>
+<blockquote>
+<p>“组件触发(dispatch)各种action，单向数据流流向reducer，reducer是一个纯函数(函数式编程思想)，接收处理action，返回新的数据，组件进而更新”</p>
+</blockquote>
+<p>这一套理论并不难理解。</p>
+<p>但是落实在工程上，尤其要结合react，那就不好做了。即使有人做出来，业务就算可以跑得通，但是相比核心思想，却是背道而驰。社区上我看过很多项目，在写法上不分青红皂白，只要能运行，胡乱设计一通，误导初学者。</p>
+<p>比如在整个项目中，存在多个stores这种常见的问题。</p>
+<p><strong>那么，为什么不建议存在多个store呢？</strong><br>答案可以在<a href="http://redux.js.org/docs/faq/StoreSetup.html" target="_blank" rel="external">官方FAQ</a>中找到。内容较多，如果英文阅读吃力，我大体翻译一下：<br><em>熟悉Flux原始模型的读者可能了解，Flux存在多个stores，每个store都维护了不同层次的数据。这样设计的问题在于，一个store需要等待另外一个store的操作处理。我们Redux实现了切分数据层次，避免了这种情况的发生。<br>仅维持单个store不仅可以使用Redux DevTools，还能简化数据的持久化及深加工、精简订阅的逻辑处理。<br>单一store这种方式，我们不用考虑store模块的导入、 Redux应用的封装，后期支持服务器渲染也将变得更为简便。</em></p>
+<p>如果上边这段话过于抽象，难以理解的话，那就直接看我的代码实现吧。</p>
+<p>定义全局唯一的store：</p>
+<pre><code>const store = createStore(
+    combineReducers({
+        sideBarChange,
+        contents,
+        routing: routerReducer
+    }),
+    composeEnhancers(applyMiddleware(thunkMiddleware)),
+);
+</code></pre><p>其中，我使用了redux-thunk作为中间件，用于处理异步action。这样，把异步过程放在action级别解决，对component没有影响。<br>另外composeEnhancers是用于使用redux devtool的设置。</p>
+<p>容器组件构建：</p>
+<pre><code>const mapStateToProps = (state) =&gt; {
+    return {
+        showLeftNav: state.sideBarChange.showLeftNav,
+        loading: state.contents.loading,
+        contents: state.contents.contents,
+        currentChanel: state.contents.currentChanel
+    }
+}
+
+var App = connect(mapStateToProps)(AppIndex);
+render(
+    &lt;Provider store={store}&gt;
+        &lt;Router history={history}&gt;
+            &lt;Route path=&quot;/&quot; component={App}&gt;
+                &lt;Route path=&quot;home&quot; component={HomeView}/&gt;
+            &lt;/Route&gt;
+        &lt;/Router&gt;
+    &lt;/Provider&gt;,
+    document.getElementById(&apos;app&apos;)
+);
+</code></pre><p>其中，我使用了react-redux进行连接。AppIndex是整个项目唯一的容器组件。进行action的dispatch，以及向下传递props给UI组件（木偶组件）。</p>
+<p>如果你还不理解<strong>容器组件</strong>和<strong>UI组件</strong>的区别，可以去<a href="http://redux.js.org/docs/basics/UsageWithReact.html" target="_blank" rel="external">官方文档学习。</a>这两个概念极其重要，它直接决定你是否能设计出有效且合理的组件架构。</p>
+<p>另外，你会发现我使用了react－router进行路由管理。其实整个项目没有必要使用单页路由。这个路由管理的引入，说实话，比较鸡肋。但并不会对项目产生任何影响。我引入他的原因主要有两点。</p>
+<ul>
+<li>第一是，后续进行二次开发，考虑到更多的产品迭代的话，使用路由管理是必须的，我们要为长远准备。</li>
+<li>另一个原因就是，我从来没用用过，好吧，想尝鲜下。</li>
+</ul>
+<h3 id="actions设计"><a href="#actions设计" class="headerlink" title="actions设计"></a>actions设计</h3><p>actions当然是必不可少的，我这里选取最重要的“fetchContents”这个action creator来讨论一下。</p>
+<p>初次进入页面时，以及左侧边栏点击选择新闻频道时，都要去拉取数据。比如，APP第一次渲染，默认加载“BBC News”新闻频道，页面主体组件在挂载完成后：</p>
+<pre><code>componentDidMount() {
+    //获取内容
+    this.props.fetchContents(&apos;bbc-news&apos;);
+}
+</code></pre><p>向上调用fetchContents方法，并逐级上传到容器组件。由容器组件进行dispatch:</p>
+<pre><code>fetchContents={(source)=&gt;{this.props.dispatch(action.fetchContents(source))}}
+</code></pre><p>source表示拉取的新闻频道。此处当然是’bbc-news’。</p>
+<p>在actions.js文件中，进行异步action的处理并拉取数据。这里，我使用了最新的<strong>fetch API</strong>来代替古老的XHR，并利用fetch的promise的理念，封装了一层_get方法，用于AJAX异步请求：</p>
+<pre><code>const sendByGet = ({url}, dispatch) =&gt; {
+let finalUrl = url + &apos;&amp;apiKey=1a445a0861e&apos;
+return fetch(finalUrl)
+        .then(res =&gt; {
+            if (res.status &gt;= 200 &amp;&amp; res.status &lt; 300) {
+                return res.json();
+            }
+            return Promise.reject(new Error(res.status));
+        })
+}
+</code></pre><p>对应的action操作：</p>
+<pre><code>export const fetchContents = (source) =&gt; {
+    const url = &apos;...&apos;;
+    return (dispatch) =&gt; {
+        dispatch({type: FETCH_CONTENTS_START});
+        if (sessionStorage.getItem(source)) {
+            console.log(&apos;get from sessionStorage&apos;);
+            let articles = JSON.parse(sessionStorage.getItem(source));
+            dispatch({type: FETCH_CONTENTS_SUCCESS, contents: Object.assign(articles, {currentChanel: source.toUpperCase()})})
+        }
+        else {
+            sendByGet({url}, dispatch)
+            .then((json) =&gt; {
+                if (json.status === &apos;ok&apos;) {
+                    sessionStorage.setItem(source, JSON.stringify(json.articles)); 
+                    return dispatch({type: FETCH_CONTENTS_SUCCESS, contents: Object.assign(json.articles, {currentChanel: source.toUpperCase()})})
+                }
+                return Promise.reject(new Error(&apos;FETCH_CONTENTS_SUCCESS failure&apos;));
+            })
+            .catch((error) =&gt; {
+                return Promise.reject(error)
+            })
+        }
+    }
+}
+</code></pre><h3 id="请求优化"><a href="#请求优化" class="headerlink" title="请求优化"></a>请求优化</h3><p>我们知道，这些异步请求的访问速度是很慢的。因此，我采用了几种方法来进行优化。</p>
+<ul>
+<li>第一个方法就是加载时的loading美化。<br>我使用了<a href="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1489644681768&amp;di=2b78e7baf0749987d6bd1879b4d9f9f8&amp;imgtype=0&amp;src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F02dd4155c1c09a000001a5f0498dd6.gif" target="_blank" rel="external">来自网络的图片</a>占位。<br>当我把控制台中网络环境人为的模拟为3G时，页面效果如下：<br>（请耐心等待GIF图加载）</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-c9da38782a2473d6.gif?imageMogr2/auto-orient/strip" alt="加载占为图"></p>
+<p>原谅我使用了这么粉嫩少女的加载图。。。</p>
+<ul>
+<li><p>第二个方法其实是一个trick，我的全局图片在初始状态时opacity设置为0，在onload事件触发时设置一个fadeIn的效果：</p>
+<pre><code>&lt;img ref=&quot;image&quot; src={imgSrc} onLoad=
+{this.handleImageLoaded.bind(this)}/&gt;
+
+handleImageLoaded() {
+    this.refs[&apos;image&apos;].style.opacity = 1;
+}
+</code></pre></li>
+</ul>
+<p>这样的一个小技巧最初来自Facebook对用户体验的研究。如果您对此有兴趣，可以在我的<a href="http://www.jianshu.com/p/2f3bc2598dc5" target="_blank" rel="external">另外一篇文章</a>中找到相关内容。</p>
+<ul>
+<li>Web Storage来进行优化<br>因为各大新闻媒体的headlines发布更新是不定时的，这个时间间隔可能较长。而我考虑到用户使用这个Web APP一般都是在碎片时间中。因此我采用了sessionStorage进行缓存内容。不要问我为什么不使用localStorage…，如果你存在疑问，建议对于Web Storage的特性再去回炉重修一下。</li>
+</ul>
+<p>具体实现方式就是在发送请求时判断sessionStorage是否已经存在此新闻媒体（比如bbc）的数据。如果存在就使用缓存。否则就去进行AJAX请求，请求成功的回调函数里进行缓存的种植。<br>代码部分如下：</p>
+<pre><code>if (sessionStorage.getItem(source)) {
+    console.log(&apos;get from sessionStorage&apos;);
+    let articles = JSON.parse(sessionStorage.getItem(source));
+    dispatch({type: FETCH_CONTENTS_SUCCESS, contents: Object.assign(articles, {currentChanel: source.toUpperCase()})})
+}
+else {
+    sendByGet({url}, dispatch)
+    .then((json) =&gt; {
+        if (json.status === &apos;ok&apos;) {
+            sessionStorage.setItem(source, JSON.stringify(json.articles)); 
+            return dispatch({type: FETCH_CONTENTS_SUCCESS, contents: Object.assign(json.articles, {currentChanel: source.toUpperCase()})})
+        }
+        return Promise.reject(new Error(&apos;FETCH_CONTENTS_SUCCESS failure&apos;));
+    })
+    .catch((error) =&gt; {
+        return Promise.reject(error)
+    })
+}
+</code></pre><p>当然，有种植缓存，就要有清除缓存。这个按钮我设置在里navBar组件的最右侧：</p>
+<pre><code>const CLEAR_SESSIONSTORAGE = &apos;CLEAR_SESSIONSTORAGE&apos;;
+export const refresh = () =&gt; {
+    sessionStorage.clear();
+    return dispatch =&gt; dispatch({type: CLEAR_SESSIONSTORAGE});
+}
+</code></pre><h3 id="其他细节"><a href="#其他细节" class="headerlink" title="其他细节"></a>其他细节</h3><p>为了使用先进的构建工具的需求，我使用了node最新版本。但是因为工作业务的需要，又要同时保留低版本node环境。为此，我使用了：n这个利器进行node版本管理。</p>
+<p>同时，我使用了webPack一系列强大开发功能和构建功能。包括但不限于：</p>
+<ul>
+<li>热更新</li>
+<li>Less编译插件</li>
+<li>服务器构建，使用了8088端口</li>
+<li>jsx,es6编译</li>
+<li>打包发布</li>
+<li>彩色日志</li>
+</ul>
+<p>…等等，但是我可不是webpack专家。在狼厂，当然使用更多的是FIS构建工具。关于FIS和webpack的比较，我的网红同事@颜大神有过<a href="https://www.zhihu.com/question/50829160" target="_blank" rel="external">探索</a>。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章涉及到了较为前沿的前端开发技术栈。包括了React框架，Redux数据流框架以及函数式编程、异步action中间件，fetch异步请求，webpack配置等等。也无形中涉及到了一些成熟产品的设计理念思路。当然这个项目还远没有成熟。在代码仓库中，我会不间断进行更新。<br>希望本文对大家在各个维度都有所启发。也恳请业界大牛不吝赐教，进行斧正。</p>
+<p>最后想跟大家谈一下对于框架和前端学习的一些感受。我记得我刚开始工作，在初次接触前端时，是使用ionic，即Angular框架和phoneGap开发hybrid移动APP。当时我是完全懵b的，只是感觉比利时同事用的超high，6到飞起。每次他用浓重的比利时口音法语给我讲解时，我听的云里雾里，不知所以。</p>
+<p>现在想想当时那么菜的原因还是在于自己的JS基础不够牢固。当你面对迅速更新换代的前端技术踟蹰茫然时，唯一的捷径就是从基础抓起，从JS原型原型链，this，执行环境上下文等等看起。</p>
+<p>觉得前端知识有欠缺的读者们，欢迎follow我。最近我会带大家“重读”JS经典书籍，以code demo的形式提炼知识点，并会同步到博客和个人Github上。</p>
+<p>Happying code!</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/03/30/js/news-early/" data-id="cj1bn7dsn000cdowh9279r0cm" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/03/30/js/news-early/" data-title="React+Redux打造“NEWS EARLY”单页应用 一步步让你理解最前沿技术栈的真谛" data-url="https://exp-team.github.io/blog/2017/03/30/js/news-early/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/04/02/js/match-lovers/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          从一个拖拽类小游戏开发 谈一谈ES6中面向对象思路设计组件
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/03/25/js/immutable/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">从JS对象开始，谈一谈究竟什么是“不可变数据”和函数式编程</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 18px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/04/20/js/twitter/">解析Twitter前端架构 学习复杂场景数据设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/20/js/uber-clone-performance/">做出Uber移动网页版还不够 极致性能打造才见真章</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/20/js/shuffle-array/">关于数组乱序的深挖——“感觉一直在写毒代码”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/14/js/async/">ES6 Async/Await 完爆Promise的6个原因</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/14/js/react-best-pratice/">通过实例，学习编写React组件的最佳实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

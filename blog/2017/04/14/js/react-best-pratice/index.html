@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>通过实例，学习编写React组件的最佳实践 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="现在前端程序员都知道，React是组件化的。当我开始学习React的时候，我记得当时已经存在了很多不同编写组件的方式了。这个教程，那个教程，也许组件的组织方式不尽相同。如今，React社区已经愈发成熟，但是对于组件正确编写姿势却没有一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过实例，学习编写React组件的最佳实践">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/04/14/js/react-best-pratice/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="现在前端程序员都知道，React是组件化的。当我开始学习React的时候，我记得当时已经存在了很多不同编写组件的方式了。这个教程，那个教程，也许组件的组织方式不尽相同。如今，React社区已经愈发成熟，但是对于组件正确编写姿势却没有一">
+<meta property="og:updated_time" content="2017-04-10T04:52:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="通过实例，学习编写React组件的最佳实践">
+<meta name="twitter:description" content="现在前端程序员都知道，React是组件化的。当我开始学习React的时候，我记得当时已经存在了很多不同编写组件的方式了。这个教程，那个教程，也许组件的组织方式不尽相同。如今，React社区已经愈发成熟，但是对于组件正确编写姿势却没有一">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/react-best-pratice" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/04/14/js/react-best-pratice/" class="article-date">
+  <time datetime="2017-04-13T16:00:00.000Z" itemprop="datePublished">2017-04-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      通过实例，学习编写React组件的最佳实践
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>现在前端程序员都知道，React是组件化的。当我开始学习React的时候，我记得当时已经存在了很多不同编写组件的方式了。这个教程，那个教程，也许组件的组织方式不尽相同。如今，React社区已经愈发成熟，但是对于组件正确编写姿势却没有一个相对完备的指导。<br>这篇文章从作者的观点出发，来谈一谈我们究竟应该如何来写React组件。</p>
+<p>在开始前，需要说明以下几个问题：<br>1）这篇文章以及代码实例，都采用了ES6或者ES7的写法；<br>2）对于一些基本概念不再进行科普。比如，如果你还不知道木偶组件（展示组件）和容器组件的区别，建议先对React基础进行学习；<br>3）如果有任何问题，欢迎留言交流。</p>
+<p>另外，这篇文章并不是我原创，我翻译了<a href="https://engineering.musefind.com/our-best-practices-for-writing-react-components-dec3eb5c3fc8" target="_blank" rel="external">Our Best Practices for Writing React Components</a>一文，并在此基础上进行了较大扩展。<br>如果您对React生态有兴趣，推荐我的其他几篇文章：</p>
+<h2 id="基于Class的组件编写Class-Based-Components"><a href="#基于Class的组件编写Class-Based-Components" class="headerlink" title="基于Class的组件编写Class Based Components"></a>基于Class的组件编写Class Based Components</h2><p>基于Class的组件是状态化的，包含有方法和属性等。最佳实践包括但不限于以下内容：</p>
+<h3 id="引入CSS依赖Importing-CSS"><a href="#引入CSS依赖Importing-CSS" class="headerlink" title="引入CSS依赖Importing CSS"></a>引入CSS依赖Importing CSS</h3><p>我很喜欢CSS in JavaScript这一理念。但是在此之前，这都是停留于理论层面的。直到我们可以为每一个React组件引入相应的CSS文件，这一“梦想”成为了现实。在下面的代码示例中，我把CSS文件的引入与其他依赖隔行分开，以示区别：</p>
+<pre><code>import React, {Component} from &apos;react&apos;
+import {observer} from &apos;mobx-react&apos;
+
+import ExpandableForm from &apos;./ExpandableForm&apos;
+import &apos;./styles/ProfileContainer.css&apos;
+</code></pre><h3 id="设定初始状态Initializing-State"><a href="#设定初始状态Initializing-State" class="headerlink" title="设定初始状态Initializing State"></a>设定初始状态Initializing State</h3><p>在编写组件过程中，一定要注意的是初始状态的设定。并且利用ES6模块化的知识，我们确保该组件的对外暴露都是“export default”形式，方便其他模块（组件）的调用。</p>
+<pre><code>import React, {Component} from &apos;react&apos;
+import {observer} from &apos;mobx-react&apos;
+
+import ExpandableForm from &apos;./ExpandableForm&apos;
+import &apos;./styles/ProfileContainer.css&apos;
+
+export default class ProfileContainer extends Component {
+    state = { expanded: false }
+</code></pre><h3 id="设定propTypes和defaultProps"><a href="#设定propTypes和defaultProps" class="headerlink" title="设定propTypes和defaultProps"></a>设定propTypes和defaultProps</h3><p>propTypes和defaultProps都是组件的静态属性。在组件的代码中，这两个属性的设定位置越高越好。因为这样方便其他阅读代码者或者自己，一眼就能看到这些信息。这些信息就如同组件文档一样，对于理解或熟悉当前组件非常重要。<br>同样，原则上，你编写的组件都需要有propTypes属性。如同以下代码：</p>
+<pre><code>export default class ProfileContainer extends Component {
+    state = { expanded: false }
+
+    static propTypes = {
+        model: React.PropTypes.object.isRequired,
+        title: React.PropTypes.string
+    }
+
+    static defaultProps = {
+        model: {
+            id: 0
+        },
+        title: &apos;Your Name&apos;
+    }
+</code></pre><h3 id="组件方法Methods"><a href="#组件方法Methods" class="headerlink" title="组件方法Methods"></a>组件方法Methods</h3><p>在编写方法时，尤其是你将一个方法作为props传递给子组件时，你需要确保this的正确指向。我们通常使用bind或者ES6箭头函数来达到此目的。</p>
+<pre><code>export default class ProfileContainer extends Component {
+    state = { expanded: false }
+
+    handleSubmit = (e) =&gt; {
+        e.preventDefault()
+        this.props.model.save()
+    }
+
+    handleNameChange = (e) =&gt; {
+        this.props.model.changeName(e.target.value)
+    }
+
+    handleExpand = (e) =&gt; {
+        e.preventDefault()
+        this.setState({ expanded: !this.state.expanded })
+    }
+</code></pre><h3 id="setState接受一个函数作为参数Passing-setState-a-Function"><a href="#setState接受一个函数作为参数Passing-setState-a-Function" class="headerlink" title="setState接受一个函数作为参数Passing setState a Function"></a>setState接受一个函数作为参数Passing setState a Function</h3><p>在上面的代码示例中，我们使用了：</p>
+<pre><code>this.setState({ expanded: !this.state.expanded })
+</code></pre><p>这里，关于setState hook函数，其实有一个非常“有意思”的问题。React在设计时，为了性能上的优化，采用了Batch思想，会收集“一波”state的变化，统一进行处理。就像浏览器绘制的实现一样。所以setState之后，state也许不会马上就发生变化。</p>
+<p>这说明，我们要谨慎地在setState中使用当前的state，因为当前的state也许是不可靠的。<br>为了规避这个问题，我们可以这样做：</p>
+<pre><code>this.setState(prevState =&gt; ({ expanded: !prevState.expanded }))
+</code></pre><p>我们给setState方法传递一个函数，函数参数为上一刻state，来保证setState能够立刻执行。</p>
+<p>关于React setState的设计，我的长发“男神”Eric Elliott也曾经这么喷过：<a href="https://medium.com/javascript-scene/setstate-gate-abc10a9b2d82#.ftefj7nn2" target="_blank" rel="external">setState() Gate</a><br>如果你对setState方法的异步性还有困惑，可以同我讨论，这里不再展开。</p>
+<h3 id="合理利用解构Destructuring-Props"><a href="#合理利用解构Destructuring-Props" class="headerlink" title="合理利用解构Destructuring Props"></a>合理利用解构Destructuring Props</h3><p>这个其实没有太多可说的，仔细观察代码吧。我们使用了解构赋值。除此之外，如果一个组件有很多的props的话，每个props应该都另起一行，这样子书写上和阅读性上都有更好的体验。</p>
+<pre><code>export default class ProfileContainer extends Component {
+    state = { expanded: false }
+
+    handleSubmit = (e) =&gt; {
+    e.preventDefault()
+    this.props.model.save()
+    }
+
+    handleNameChange = (e) =&gt; {
+        this.props.model.changeName(e.target.value)
+    }
+
+    handleExpand = (e) =&gt; {
+        e.preventDefault()
+        this.setState(prevState =&gt; ({ expanded: !prevState.expanded }))
+    }
+
+    render() {
+        const {model, title} = this.props
+
+        return ( 
+            &lt;ExpandableForm 
+            onSubmit={this.handleSubmit} 
+            expanded={this.state.expanded} 
+            onExpand={this.handleExpand}&gt;
+                &lt;div&gt;
+                    &lt;h1&gt;{title}&lt;/h1&gt;
+                    &lt;input
+                    type=&quot;text&quot;
+                    value={model.name}
+                    onChange={this.handleNameChange}
+                    placeholder=&quot;Your Name&quot;/&gt;
+                &lt;/div&gt;
+            &lt;/ExpandableForm&gt;
+        )
+    }
+}
+</code></pre><h3 id="使用修饰器Decorators"><a href="#使用修饰器Decorators" class="headerlink" title="使用修饰器Decorators"></a>使用修饰器Decorators</h3><p>这一条是对使用mobx的开发者来说的。如果你不懂mobx，可以大体扫一眼（作为翻译者，其实我也不是用mobx的）。<br>我们强调使用decorate来修饰我们的组件，如同：</p>
+<pre><code>@observer
+export default class ProfileContainer extends Component {
+</code></pre><p>使用修饰器更加灵活且可读性更高的实践。即便你不使用修饰器，也需要如此暴露你的组件：</p>
+<pre><code>class ProfileContainer extends Component {
+    // Component code
+}
+export default observer(ProfileContainer)
+</code></pre><h3 id="闭包Closures"><a href="#闭包Closures" class="headerlink" title="闭包Closures"></a>闭包Closures</h3><p>一定要尽量避免以下用法：</p>
+<pre><code>&lt;input
+    type=&quot;text&quot;
+    value={model.name}
+    // onChange={(e) =&gt; { model.name = e.target.value }}
+    // ^ Not this. Use the below:
+    onChange={this.handleChange}
+    placeholder=&quot;Your Name&quot;/&gt;
+</code></pre><p>总结一下，就是不要</p>
+<pre><code>onChange = {(e) =&gt; { model.name = e.target.value }}
+</code></pre><p>而是：</p>
+<pre><code>onChange = {this.handleChange}
+</code></pre><p>原因其实很简单，每次父组件render的时候，都会新建一个新的函数并传递给input。<br>如果input是一个React组件，这会粗暴地直接导致这个组件的re-render，需要知道，Reconciliation可是React成本最高的部分。<br>另外，我们推荐的方法，会使得阅读、调试和更改更加方便。</p>
+<h2 id="函数式组件Functional-Components"><a href="#函数式组件Functional-Components" class="headerlink" title="函数式组件Functional Components"></a>函数式组件Functional Components</h2><p>以上内容是针对Class Components来讲的，下面我们看一下Functional Components的最佳实践。<br>Functional Components是指没有状态、没有方法，纯组件。我们应该最大限度地编写和使用这一类组件。</p>
+<h3 id="使用propTypes"><a href="#使用propTypes" class="headerlink" title="使用propTypes"></a>使用propTypes</h3><p>在组件声明之前，我们需要使用propTypes，以达到更好的代码组织效果。<br>当然，依赖JavaScript的函数提升function hoisting，这么做不会报错。</p>
+<pre><code>ExpandableForm.propTypes = {
+    onSubmit: React.PropTypes.func.isRequired,
+    expanded: React.PropTypes.bool
+}
+// Component declaration
+</code></pre><h3 id="解构Destructuring-Props-and-defaultProps"><a href="#解构Destructuring-Props-and-defaultProps" class="headerlink" title="解构Destructuring Props and defaultProps"></a>解构Destructuring Props and defaultProps</h3><p>我们先来看一下反例：</p>
+<pre><code>ExpandableForm.propTypes = {
+    onSubmit: React.PropTypes.func.isRequired,
+    expanded: React.PropTypes.bool,
+    onExpand: React.PropTypes.func.isRequired
+}
+function ExpandableForm(props) {
+    const formStyle = props.expanded ? {height: &apos;auto&apos;} : {height: 0}
+    return (
+        &lt;form style={formStyle} onSubmit={props.onSubmit}&gt;
+            {props.children}
+            &lt;button onClick={props.onExpand}&gt;Expand&lt;/button&gt;
+        &lt;/form&gt;
+    )
+}
+</code></pre><p>Our component is a function, which takes its props as its argument. We can expand them like so:<br>组件其实是一个function，他的参数为props，在充分利用解构的情况下，我们可以这样重构：</p>
+<pre><code>function ExpandableForm({ onExpand, expanded = false, children, onSubmit }) {
+    const formStyle = expanded ? {height: &apos;auto&apos;} : {height: 0}
+    return (
+        &lt;form style={formStyle} onSubmit={onSubmit}&gt;
+            {children}
+        &lt;button onClick={onExpand}&gt;Expand&lt;/button&gt;
+        &lt;/form&gt;
+    )
+}
+</code></pre><p>上面代码，我们也给expanded参数设置了默认值。</p>
+<h3 id="封装Wrapping"><a href="#封装Wrapping" class="headerlink" title="封装Wrapping"></a>封装Wrapping</h3><p>对于functional components，无法使用修饰符。这种情况下，只需要简单地将函数作为参数传递就可以了：</p>
+<pre><code>function ExpandableForm({ onExpand, expanded = false, children, onSubmit }) {
+    const formStyle = expanded ? {height: &apos;auto&apos;} : {height: 0}
+    return (
+        &lt;form style={formStyle} onSubmit={onSubmit}&gt;
+            {children}
+            &lt;button onClick={onExpand}&gt;Expand&lt;/button&gt;
+        &lt;/form&gt;
+    )
+}
+</code></pre><h2 id="JSX中的条件判别Conditionals-in-JSX"><a href="#JSX中的条件判别Conditionals-in-JSX" class="headerlink" title="JSX中的条件判别Conditionals in JSX"></a>JSX中的条件判别Conditionals in JSX</h2><p>真正写过React项目的同学一定会明白，JSX中可能会存在大量的条件判别，以达到根据不同的情况渲染不同组件形态的效果。<br>就像下图这样：</p>
+<pre><code>图片
+</code></pre><p>然后，这样的结果是不理想的。我们丢失了代码的可读性，也使得代码组织显得混乱异常。多层次的嵌套也是应该避免的。</p>
+<p>针对于此，有很对类库来解决此类问题JSX-Control Statements，但是与其引入第三方类库的依赖，还不如我们先自己尝试探索解决问题。<br>是不是有点怀念if…else？<br>我们可以使用大括号内包含立即执行函数IIFE，来达到使用if…else的目的：</p>
+<pre><code>图片
+</code></pre><p>当然，大量使用立即执行函数会造成性能上的损失。所以，考虑代码可读性上的权衡，还是有必要好好斟酌的。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>原文的总结部分其实没什么营养。我决定选取原文下的一些有道理的评论奉献给大家吧。<br>相信下面的很多评论也能让你收获不少：</p>
+<blockquote>
+<p>Instead of styled-components, I think css-modules is the best way to write a react component style. It totally avoid css pollution on pages. Besides, some react ui libraries have already used it in production: react-toolbox and light-ui.</p>
+<p>For conditionals in JSX you could use a “do expression”. It is a new proposal in ES7 and babel can transform it.</p>
+<p>have you checked out cxs for your css in js concerns? it’s fantastic.</p>
+<p>what do you feel about the approach of moving all that logic from the IIFE to a helper method? Something like {this.renderFooter()} and then putting all that logic in there as regular javascript?</p>
+<p>Our approach is a bit different from others in that we use MobX for state management, which encourages direct modification of data, as opposed to something like Redux where you would dispatch an action there.<br>However, I’ve realized that since MobX is still an alternative choice and so direct modification of props isn’t really a best practice for React in general, so I’m going to revise the article to phase that out.</p>
+</blockquote>
+<p>PS: 作者<a href="https://github.com/HOUCe" target="_blank" rel="external">Github仓库</a>，欢迎通过代码各种形式交流。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/04/14/js/react-best-pratice/" data-id="cj1bn7dss000ldowh9q6bqf2u" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/04/14/js/react-best-pratice/" data-title="通过实例，学习编写React组件的最佳实践" data-url="https://exp-team.github.io/blog/2017/04/14/js/react-best-pratice/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/04/14/js/async/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          ES6 Async/Await 完爆Promise的6个原因
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/04/14/js/react-conf-es6/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">React大会上我们能学到什么？React + ES next = ♥</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 18px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/04/20/js/twitter/">解析Twitter前端架构 学习复杂场景数据设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/20/js/uber-clone-performance/">做出Uber移动网页版还不够 极致性能打造才见真章</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/20/js/shuffle-array/">关于数组乱序的深挖——“感觉一直在写毒代码”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/14/js/async/">ES6 Async/Await 完爆Promise的6个原因</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/14/js/react-best-pratice/">通过实例，学习编写React组件的最佳实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

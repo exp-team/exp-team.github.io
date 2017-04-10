@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>万军丛中取敌将首级－如何优雅安全地在深层数据结构中取值 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="古有赵子龙面对“冲锋之势，有进无退，陷阵之志，有死无生”的局面，能万军丛中取敌将首级。在我们的Javascript中，往往用对象（Object）来存储一个数据结构。如果这个结构非常复杂，那么想要安全优雅地取出一个值，也并非简单">
+<meta property="og:type" content="article">
+<meta property="og:title" content="万军丛中取敌将首级－如何优雅安全地在深层数据结构中取值">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/04/04/js/access/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="古有赵子龙面对“冲锋之势，有进无退，陷阵之志，有死无生”的局面，能万军丛中取敌将首级。在我们的Javascript中，往往用对象（Object）来存储一个数据结构。如果这个结构非常复杂，那么想要安全优雅地取出一个值，也并非简单">
+<meta property="og:updated_time" content="2017-04-10T04:52:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="万军丛中取敌将首级－如何优雅安全地在深层数据结构中取值">
+<meta name="twitter:description" content="古有赵子龙面对“冲锋之势，有进无退，陷阵之志，有死无生”的局面，能万军丛中取敌将首级。在我们的Javascript中，往往用对象（Object）来存储一个数据结构。如果这个结构非常复杂，那么想要安全优雅地取出一个值，也并非简单">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/access" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/04/04/js/access/" class="article-date">
+  <time datetime="2017-04-03T16:00:00.000Z" itemprop="datePublished">2017-04-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      万军丛中取敌将首级－如何优雅安全地在深层数据结构中取值
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>古有赵子龙面对“冲锋之势，有进无退，陷阵之志，有死无生”的局面，能万军丛中取敌将首级。<br>在我们的Javascript中，往往用对象（Object）来存储一个数据结构。如果这个结构非常复杂，那么想要安全优雅地取出一个值，也并非简单。</p>
+<p>这篇文章将会详细阐述在一个嵌套较深的场景中，如何安全的完成读写操作。先后会尝试多种方法，希望对读者有所启发。</p>
+<p>本文示例借鉴A.Sharif的最新文章：<a href="https://medium.com/javascript-inside/safely-accessing-deeply-nested-values-in-javascript-99bf72a0855a" target="_blank" rel="external">Safely Accessing Deeply Nested Values In JavaScript</a>，喜欢看英文原版的同学可以直接戳链接。</p>
+<h2 id="场景介绍"><a href="#场景介绍" class="headerlink" title="场景介绍"></a>场景介绍</h2><p>在React开发中，我们根据数据来渲染视图。经常会出现类似下面这种情况：</p>
+<pre><code>const props = {
+    user: {
+        posts: [
+            { title: &apos;Foo&apos;, comments: [ &apos;Good one!&apos;, &apos;Interesting...&apos; ] },
+            { title: &apos;Bar&apos;, comments: [ &apos;Ok&apos; ] },
+            { title: &apos;Baz&apos;, comments: []}
+        ],
+        comments: [...]
+    }
+}
+</code></pre><p>这是一个典型的获取用户评论信息并加以展示的场景。其实，这还嵌套的不够深，试想一个回复存在多层：回复的回复，回复的回复的回复。。。</p>
+<p>姑且先看我们的示例吧，此时我们想获取第一个post的评论信息。用传统的javascript方法应该这么做：</p>
+<pre><code>props.user &amp;&amp;
+props.user.posts &amp;&amp;
+props.user.posts[0] &amp;&amp;
+props.user.posts[0].comments
+</code></pre><p>也许经验丰富的javascript开发者会明白使用这么多&amp;&amp;的意义。这是为了在对象中相关取值的过程，需要验证每一个key和index的存在性。否则会有报错，这将会是致命性的。并且props这个数据结构必然是动态生成的，存在有时valid有时invalid的情况。在测试过程中，很难复现。</p>
+<p>同样的尴尬场景比比皆是，想象一下，如果我们需要获取一名用户最后一个评论博客的题目，就需要：</p>
+<pre><code>props.user &amp;&amp;
+props.user.comments &amp;&amp;
+props.user.comments[0] &amp;&amp;
+props.user.comments[0].blog.title
+</code></pre><p>这些例子夸张吗？其实不然。我们明白了，想要获取一个数据值，需要一层一层遍历属性的存在性。这无疑是繁琐的。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>现在明白了我们面临的困扰，接下来我会用纯JavaScript方法，以及最具有函数式代表的JavaScript库－Ramda，辅以柯粒化（currying）等思想和方案解决问题。</p>
+<h3 id="JavaScript方案"><a href="#JavaScript方案" class="headerlink" title="JavaScript方案"></a>JavaScript方案</h3><p>先直接上代码：</p>
+<pre><code>const get = (p, o) =&gt; p.reduce((xs, x) =&gt; (xs &amp;&amp; xs[x]) ? xs[x] : null, o)
+
+console.log(get([&apos;user&apos;, &apos;posts&apos;, 0, &apos;comments&apos;], props)) // [ &apos;Good one!&apos;, &apos;Interesting...&apos; ]
+console.log(get([&apos;user&apos;, &apos;post&apos;, 0, &apos;comments&apos;], props)) // null
+</code></pre><p>注意这里我使用了一个ES5中，比较偏向函数式思想的reduce方法。关于这个方法，我想很多人其实还并不理解，建议先去进行学习，或者参考我之前的<a href="http://www.jianshu.com/p/5b4c2f4c7a52" target="_blank" rel="external">一篇文章。</a><br>同时，我尝试获取：user－&gt;posts[0]－&gt;comments，<br>并配以一个反例：user－&gt;post[0]－&gt;comments；<br>当然，在反例中，post数组并不存在。</p>
+<p>我们来分析一下代码。</p>
+<pre><code>const get = (p, o) =&gt;
+    p.reduce((xs, x) =&gt;
+        (xs &amp;&amp; xs[x]) ? xs[x] : null, o)
+</code></pre><p>我们实现的get方法中，接收两个参数，第一个p表示获取值的路径（path）；另外一个参数表示目标对象。</p>
+<p>同样，为了设计上的更加灵活和抽象。我们可以柯粒化我们的方法：</p>
+<pre><code>const get = p =&gt; o =&gt;
+    p.reduce((xs, x) =&gt;
+        (xs &amp;&amp; xs[x]) ? xs[x] : null, o)
+</code></pre><p>这样的话，就可以这个姿势调用：</p>
+<pre><code>const getUserComments = get([&apos;user&apos;, &apos;posts&apos;, 0, &apos;comments&apos;])
+console.log(getUserComments(props))
+// [ &apos;Good one!&apos;, &apos;Interesting...&apos; ]
+console.log(getUserComments({user:{posts: []}}))
+// null
+</code></pre><p>如果关于get方法中reduce的使用还不清楚，那就再看一个简单的例子：</p>
+<pre><code>[&apos;id&apos;].reduce((xs, x) =&gt; (xs &amp;&amp; xs[x]) ? xs[x] : null, {id: 10})
+// 返回10
+</code></pre><h3 id="Ramda方案"><a href="#Ramda方案" class="headerlink" title="Ramda方案"></a>Ramda方案</h3><p>如果不自己手动设计上述方法的话，我们可以使用Ramda函数式类库完成：</p>
+<pre><code>const getUserComments = R.path([&apos;user&apos;, &apos;posts&apos;, 0, &apos;comments&apos;])
+</code></pre><p>接下来调用需要这个姿势：</p>
+<pre><code>getUserComments(props) // [ &apos;Good one!&apos;, &apos;Interesting...&apos; ]
+getUserComments({}) // null
+</code></pre><p>如果我们想在指定路径下未找到一个值时，不返回null，而是返回自定义的内容呢？我们可以使用pathOr方法，第一个参数用来设置默认输出。</p>
+<pre><code>const getUserComments = R.pathOr([], [&apos;user&apos;, &apos;posts&apos;, 0, &apos;comments&apos;])
+getUserComments(props) // [ &apos;Good one!&apos;, &apos;Interesting...&apos; ]
+getUserComments({}) // []
+</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章翻译自A.Sharif的最新文章：<a href="https://medium.com/javascript-inside/safely-accessing-deeply-nested-values-in-javascript-99bf72a0855a" target="_blank" rel="external">Safely Accessing Deeply Nested Values In JavaScript</a>，其中后半部分未做翻译。<br>后半部分其实分析了 Ramda＋<a href="http://folktalejs.org/" target="_blank" rel="external">Folktale</a>的实现，以及Ramda＋<a href="https://medium.com/@dtipson/functional-lenses-d1aba9e52254" target="_blank" rel="external">Lenses</a>的实现。Folktale和Lenses是非常函数式Functional Programming的思想，理解起来相对晦涩且比较小众。有兴趣的读者可以点击原文去自行了解。</p>
+<p>如果你对函数式编程并不感冒，大可只学习第一部分的实现。对于函数式编程有兴趣的同学，希望这篇文章能够抛砖引玉，欢迎与我交流。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/04/04/js/access/" data-id="cj1bn7dsc0000dowhba40gz18" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/04/04/js/access/" data-title="万军丛中取敌将首级－如何优雅安全地在深层数据结构中取值" data-url="https://exp-team.github.io/blog/2017/04/04/js/access/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/04/05/js/react-tree-data/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          一个有趣的react demo 教你如何处理树形结构
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/04/04/js/const/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">从ES6 Const看Javascript语言的诡异与灵活</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 18px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/04/20/js/twitter/">解析Twitter前端架构 学习复杂场景数据设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/20/js/uber-clone-performance/">做出Uber移动网页版还不够 极致性能打造才见真章</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/20/js/shuffle-array/">关于数组乱序的深挖——“感觉一直在写毒代码”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/14/js/async/">ES6 Async/Await 完爆Promise的6个原因</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/14/js/react-best-pratice/">通过实例，学习编写React组件的最佳实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

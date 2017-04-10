@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>React大会上我们能学到什么？React + ES next = ♥ | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="React Conf 2017在加利福尼亚州的圣克拉拉万豪酒店圆满落幕，这已经是Facebook举办的第三届React官方大会了。虽然不能参会，但是作为前端开发者，我们当然不能错过这个绝佳的学习契机。
+笔者利用清">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React大会上我们能学到什么？React + ES next = ♥">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/04/14/js/react-conf-es6/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="React Conf 2017在加利福尼亚州的圣克拉拉万豪酒店圆满落幕，这已经是Facebook举办的第三届React官方大会了。虽然不能参会，但是作为前端开发者，我们当然不能错过这个绝佳的学习契机。
+笔者利用清">
+<meta property="og:updated_time" content="2017-04-10T04:52:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="React大会上我们能学到什么？React + ES next = ♥">
+<meta name="twitter:description" content="React Conf 2017在加利福尼亚州的圣克拉拉万豪酒店圆满落幕，这已经是Facebook举办的第三届React官方大会了。虽然不能参会，但是作为前端开发者，我们当然不能错过这个绝佳的学习契机。
+笔者利用清">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/react-conf-es6" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/04/14/js/react-conf-es6/" class="article-date">
+  <time datetime="2017-04-13T16:00:00.000Z" itemprop="datePublished">2017-04-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      React大会上我们能学到什么？React + ES next = ♥
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>React Conf 2017在加利福尼亚州的圣克拉拉万豪酒店圆满落幕，这已经是Facebook举办的第三届React官方大会了。<br>虽然不能参会，但是作为前端开发者，我们当然不能错过这个绝佳的学习契机。</p>
+<p>笔者利用清明假期，参看了YouTube上关于这次大会的记录。一共34个精彩演讲，对应34个视频。获益匪浅。</p>
+<p>这里，将会作为一个系列，对其中的几篇演讲进行翻译和分析。并辅助以code demo，帮助大家理解。<br>欢迎关注我的<a href="http://www.jianshu.com/u/452568260db5" target="_blank" rel="external">简书</a>或<a href="https://juejin.im/user/58305395a22b9d006b83d214" target="_blank" rel="external">掘金</a>账号，也欢迎在Github上floow，相信你一定也会有所收获。</p>
+<p>今天为大家介绍的是Ben Ilegbodu的主题：React + ES next = ♥ </p>
+<p>Ben Ilegbodu是“为数不多的”参会有色程序员，黑人程序员如同女性程序员一样凤毛麟角，同样，本次分享主题也很有爱，很有营养。如果你不了解React也不要紧，因为这次讲的是ES6、ES7在React中的应用。所以，其实是对下一代ES的普及和介绍。</p>
+<p>本文将以Destructuring、Spread Opetator、Arrow Function、Promises、Async Functions展开。并通过nodeJS实现一个兼具前端和后端的小型“评论／留言发布阅读系统”。</p>
+<h2 id="实现预览"><a href="#实现预览" class="headerlink" title="实现预览"></a>实现预览</h2><p>如图，我们实现了如下的页面。当然，样式是极其简陋的。作为“粗糙”的程序员，实在懒得在页面上花时间。<br>我们可以在输入框内输入姓名和留言内容。并点击按钮提交。后台使用nodeJS express框架，实现对文件的读写更新。</p>
+<pre><code>app.post(&apos;/api/comments&apos;, function(req, res) {
+    fs.readFile(COMMENTS_FILE, function(err, data) {
+        if (err) {
+            console.error(err);
+            process.exit(1);
+        }
+        var comments = JSON.parse(data);
+        var newComment = {
+            id: Date.now(),
+            author: req.body.author,
+            text: req.body.text,
+        };
+        comments.push(newComment);
+        fs.writeFile(COMMENTS_FILE, JSON.stringify(comments, null, 4), function(err) {
+            if (err) {
+                console.error(err);
+                process.exit(1);
+            }
+            res.json(comments);
+        });
+    });
+});
+</code></pre><p>这是nodeJS的后端代码，是为了介绍实现的这个project前后端协作。<br>接下来我们继续回到演讲。</p>
+<h2 id="解构Destructuring"><a href="#解构Destructuring" class="headerlink" title="解构Destructuring"></a>解构Destructuring</h2><p>在我们的项目中，最初版存在这样的一段代码：</p>
+<pre><code>_handleCommentSubmit(comment) {
+    let comments = this.state.comments;
+    ...
+    // remaining code
+}
+</code></pre><p>请务必记住这个_handleCommentSubmit函数，接下来的全文都是围绕他展开，并进行一步步拓展。<br>这个函数的逻辑是对新提交的comment进行处理，首先他需要从state中读取现有的comments数组。<br>在使用解构赋值的情况下，我们重构为：</p>
+<pre><code>_handleCommentSubmit(comment) {
+    let {comments} = this.state;
+    ...
+    // remaining code
+}
+</code></pre><p>也许这还看不出来解构到底有什么作用，但是在逻辑多的时候，他是很有必要的。比如：</p>
+<pre><code>let author = this.state.author;
+let text = this.state.text;
+</code></pre><p>就可以写为：</p>
+<pre><code>let {author, text} = this.state;
+</code></pre><p>如果需要改变变量名时，就可以从：</p>
+<pre><code>let authorName = this.state.author;
+let fullText = this.state.text;
+</code></pre><p>改为：</p>
+<pre><code>let {author: authorName, text: fullText} = this.state;
+</code></pre><p>再举一个例子，在function component情况下：</p>
+<pre><code>function MyComponent(props) {
+    return (
+        &lt;div style={props.style}&gt;{props.children}&lt;/div&gt;
+    )
+}
+&lt;MyComponent style=&quot;dark&quot;&gt;Stateless function!&lt;/MyComponent&gt;
+</code></pre><p>我们可以改写为：</p>
+<pre><code>function MyComponent({children, style}) {
+    return (
+        &lt;div style={style}&gt;{children}&lt;/div&gt;
+    )
+}
+&lt;MyComponent style=&quot;dark&quot;&gt;Stateless function!&lt;/MyComponent&gt;
+</code></pre><h2 id="展开符Spread-Opetator"><a href="#展开符Spread-Opetator" class="headerlink" title="展开符Spread Opetator"></a>展开符Spread Opetator</h2><p>还记得上面那个_handleCommentSubmit函数吗？接下来我们要进行扩充。首先我们将新提交的comment（即函数参数），添加一个时间戳作为id。接下来，<br>我们拿到旧的state.comments之后，就要将新的comment（包含id）加入到state.comments当中。</p>
+<p>初版做法是：</p>
+<pre><code>_handleCommentSubmit(comment) {
+    let {comments} = this.state;
+    let newComment = comment;
+
+    newComment.id = Date.now();
+
+    let newComments = comments.concat([newComment]);
+
+    ...
+    // setState + ajax stuffs
+}
+</code></pre><p>在使用展开符后，我们可以重构为：</p>
+<pre><code>_handleCommentSubmit(comment) {
+    let {comments} = this.state;
+    let newComment = {...comment, id: Date.now()};
+    let newComments = [...comments, newComment];
+    ...
+    // setState + ajax stuffs
+}
+</code></pre><p>当然，展开符还有很多其他benefits，比如，平时我们可以使用Math.max方法对数组求出最大值：</p>
+<pre><code>var arrayOfValue = [33, 2, 9];
+var maxValueFromArray = Math.max.apply(null, arrayOfValue)
+</code></pre><p>这个思路利用了apply接受一个数组作为函数参数的特性。<br>使用展开符，我们就可以：</p>
+<pre><code>var arrayOfValue = [33, 2, 9];
+var maxValueFromArray = Math.max(...arrayOfValue);
+</code></pre><p>同理，我们可以这样扩充一个数组：</p>
+<pre><code>let values = [2, 3, 4];
+let verbose = [1, ...values, 5];
+</code></pre><p>当然，以上都是对数组的展开。对对象属性的展开符的使用，也已经到了Stage3阶段。今后，我们可以这样写代码：</p>
+<pre><code>let warriors = {Steph: 95, Klay: 82, Draymond: 79};
+let newWarriors = {
+    ...warriors,
+    Kevin: 97
+}
+</code></pre><p>而不必再使用Object.assign进行对象的扩展。</p>
+<h2 id="箭头函数Arrow-Function"><a href="#箭头函数Arrow-Function" class="headerlink" title="箭头函数Arrow Function"></a>箭头函数Arrow Function</h2><p>箭头函数带来的好处无疑是对this的绑定。<br>现在再回到我们的_handleCommentSubmit函数，做完了初始化工作，我们需要将新的comment通过ajax，异步发送给后端。在成功的回调函数中，进行setState处理：</p>
+<pre><code>$.ajax({
+    url: this.props.url,
+    data: comment,
+    success: function(resJson) {
+        this.setState({comments: resJson})
+    }.bind(this)
+})
+</code></pre><p>有经验的同学注意到了我使用bind更改this指向的处理。在ES6箭头函数下，我们可以直接：</p>
+<pre><code>$.ajax({
+    url: this.props.url,
+    data: comment,
+    success: (resJson) =&gt; {
+        this.setState({comments: resJson})
+    }
+})
+</code></pre><p>我们再展开看看箭头函数的几种用法：<br>1）匿名函数，单参数情况，比如实现一个数组的各项平方：</p>
+<pre><code>let squares = [1, 2, 3].map(value =&gt; value * value);
+</code></pre><p>2) 匿名函数，多参数情况，比如实现一个数组的各项累加：</p>
+<pre><code>let sum = [9, 8, 7].reduce((prev, value) =&gt; prev + value, 0)
+</code></pre><p>这时候，需要把参数放在括号之中。</p>
+<p>3) 非匿名函数，无返回值情况：</p>
+<pre><code>const alertUser = (message) =&gt; {
+    alert(message)
+}
+</code></pre><p>这时候，函数体用花括号围起来。</p>
+<p>4）更复杂的情况，比如上面我们用到过的：</p>
+<pre><code>const MyComponent = ({children, style}) =&gt; (
+    &lt;div style={style}&gt;{children}&lt;/div&gt;
+)
+</code></pre><h2 id="Promises"><a href="#Promises" class="headerlink" title="Promises"></a>Promises</h2><p>上面的代码我们使用了jquery的ajax方法发送异步请求，这可能在某些情况下出现“回调地狱”的情况。为此，我们使用基于Promise的fetch方法，进行重构：</p>
+<pre><code>_handleCommentSubmit(comment) {
+    // ...
+    fetch(this.props.url, {
+        method: &apos;POST&apos;,
+        body: Json.stringify(comment)
+    })
+        .then((res)=&gt;res.json())
+        .then((resJson)=&gt;{
+            this.setState({comments: resJson})
+        })
+        .catch((ex)=&gt;{
+            console.error(this.props.url, ex)
+        })
+}
+</code></pre><p>当然，我们可以把上述代码做的更抽象：</p>
+<pre><code>const fetchJson = (path, options) =&gt; {
+    fetch(`${DOMAIN}${path}`, options)
+        .then((res)=&gt;res.json())
+}
+</code></pre><p>我们在拉取评论时，就可以：</p>
+<pre><code>const fetchComments = () =&gt; fetchJson(&apos;api/comments&apos;)
+</code></pre><p>基于promises的fetch，让异步请求变的灵活可靠。</p>
+<p>同时，我再安利一个基于promises的sleep函数：</p>
+<pre><code>const sleep = (delay = 0) =&gt; {
+    new Promise((resolve)=&gt;{
+        setTimeout(resolve, delay)
+    })
+}
+
+sleep(3000)
+    .then(()=&gt;getUniqueCommentAuthors())
+    .then((uniqueAuthors)=&gt;{this.state({uniqueAuthors})})
+</code></pre><p>回到我们的Project中，在后端nodeJS实现里，我们把所有的评论存在data/comments.json文件当中。<br>在渲染视图时，就不可避免地要进行对data/comments.json文件读取，这个过程也应该是异步完成的：</p>
+<pre><code>const readFile = (filePath) =&gt; (
+    new Promise((resolve, reject)=&gt;{
+        fs.readFile(filePath, (err, data)=&gt;{
+            if (err) {reject(err)}
+            resolve(data)
+        })
+    })
+)
+
+readFile(&apos;data/comments.json&apos;)
+    .then((data)=&gt;console.log(&apos;Here is the data&apos;, data))
+    .catch((ex)=&gt;console.log(&apos;Arg!&apos;, ex))
+</code></pre><h2 id="Async-Functions"><a href="#Async-Functions" class="headerlink" title="Async Functions"></a>Async Functions</h2><p>当然，Promises实现也有缺点。关于Promises和Async的对比，具体可以看我的一篇文章：<a href=""></a></p>
+<p>更先进的方式，就是使用Async，回到我们的_handleCommentSubmit方法，我们可以重构为：</p>
+<pre><code>async _handleCommentSubmit(comment) {
+    try {
+        let res = await fetch(this.props.url, {
+            method: &apos;POST&apos;,
+            body: JSON.stringify(comment)
+        });
+        newComments = await res.json();
+    }
+    catch (ex) {
+        console.error(this.props.url, ex);
+        newComments = comments;
+    }
+
+    this.setState({comments: newComments});
+}
+</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇演讲生动形象地阐释了React是怎样与ES next融合天衣无缝的。不论是React也好，还是ES也好，其实笔者认为说到底，都是为了更大限度地解放生产力。</p>
+<p>欢迎读者与我交流，有任何问题可以留言。今后几天，将有更多新鲜的react conf视频翻译奉献给大家。</p>
+<p>PS: 作者<a href="https://github.com/HOUCe" target="_blank" rel="external">Github仓库</a>，欢迎通过代码各种形式交流。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/04/14/js/react-conf-es6/" data-id="cj1bn7dst000odowh89icm3xe" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/04/14/js/react-conf-es6/" data-title="React大会上我们能学到什么？React + ES next = ♥" data-url="https://exp-team.github.io/blog/2017/04/14/js/react-conf-es6/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/04/14/js/react-best-pratice/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          通过实例，学习编写React组件的最佳实践
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/04/10/js/node_crawler/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">nodeJS实现基于Promise的爬虫 定时发送简书作者信息到指定邮件</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 18px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/04/20/js/twitter/">解析Twitter前端架构 学习复杂场景数据设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/20/js/uber-clone-performance/">做出Uber移动网页版还不够 极致性能打造才见真章</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/20/js/shuffle-array/">关于数组乱序的深挖——“感觉一直在写毒代码”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/14/js/async/">ES6 Async/Await 完爆Promise的6个原因</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/04/14/js/react-best-pratice/">通过实例，学习编写React组件的最佳实践</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
