@@ -252,7 +252,9 @@ Our component is a function, which takes its props as its argument. We can expan
 真正写过React项目的同学一定会明白，JSX中可能会存在大量的条件判别，以达到根据不同的情况渲染不同组件形态的效果。
 就像下图这样：
 
-    图片
+
+![截图1](http://upload-images.jianshu.io/upload_images/4363003-b75e43cb28cd54db.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 
 然后，这样的结果是不理想的。我们丢失了代码的可读性，也使得代码组织显得混乱异常。多层次的嵌套也是应该避免的。
 
@@ -260,24 +262,16 @@ Our component is a function, which takes its props as its argument. We can expan
 是不是有点怀念if...else？
 我们可以使用大括号内包含立即执行函数IIFE，来达到使用if...else的目的：
 
-    图片
+
+![截图2](http://upload-images.jianshu.io/upload_images/4363003-1f091fcee9ad6376.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 
 当然，大量使用立即执行函数会造成性能上的损失。所以，考虑代码可读性上的权衡，还是有必要好好斟酌的。
 
 
 ## 总结
-原文的总结部分其实没什么营养。我决定选取原文下的一些有道理的评论奉献给大家吧。
-相信下面的很多评论也能让你收获不少：
+React最佳实践，想必每个团队都有自己的一套“心得”，欢迎大家与我分享。
 
->Instead of styled-components, I think css-modules is the best way to write a react component style. It totally avoid css pollution on pages. Besides, some react ui libraries have already used it in production: react-toolbox and light-ui.
-
->For conditionals in JSX you could use a “do expression”. It is a new proposal in ES7 and babel can transform it.
-
->have you checked out cxs for your css in js concerns? it’s fantastic.
-
->what do you feel about the approach of moving all that logic from the IIFE to a helper method? Something like {this.renderFooter()} and then putting all that logic in there as regular javascript?
-
->Our approach is a bit different from others in that we use MobX for state management, which encourages direct modification of data, as opposed to something like Redux where you would dispatch an action there.
-However, I’ve realized that since MobX is still an alternative choice and so direct modification of props isn’t really a best practice for React in general, so I’m going to revise the article to phase that out.
+Happy Coding!
 
 PS: 作者[Github仓库](https://github.com/HOUCe)，欢迎通过代码各种形式交流。

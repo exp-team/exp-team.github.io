@@ -295,6 +295,6 @@ Ben Ilegbodu是“为数不多的”参会有色程序员，黑人程序员如�
 
 欢迎读者与我交流，有任何问题可以留言。今后几天，将有更多新鲜的react conf视频翻译奉献给大家。
 
-
+Happy Coding!
 
 PS: 作者[Github仓库](https://github.com/HOUCe)，欢迎通过代码各种形式交流。

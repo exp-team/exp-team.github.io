@@ -111,14 +111,19 @@ author: 侯策
 
 
 ## 总结
+
 这篇文章翻译自A.Sharif的最新文章：[Safely Accessing Deeply Nested Values In JavaScript](https://medium.com/javascript-inside/safely-accessing-deeply-nested-values-in-javascript-99bf72a0855a)，其中后半部分未做翻译。
-后半部分其实分析了 Ramda＋[Folktale](http://folktalejs.org/)的实现，以及Ramda＋[Lenses](https://medium.com/@dtipson/functional-lenses-d1aba9e52254)的实现。Folktale和Lenses是非常函数式Functional Programming的思想，理解起来相对晦涩且比较小众。有兴趣的读者可以点击原文去自行了解。
+后半部分其实分析了 Ramda＋[Folktale](http://folktalejs.org/)的实现，以及Ramda＋[Lenses](https://medium.com/@dtipson/functional-lenses-d1aba9e52254)的实现。
+
+Folktale和Lenses是非常函数式Functional Programming的思想，理解起来相对晦涩且比较小众。有兴趣的读者可以点击原文去自行了解。
+
+Happy Coding!
 
 如果你对函数式编程并不感冒，大可只学习第一部分的实现。对于函数式编程有兴趣的同学，希望这篇文章能够抛砖引玉，欢迎与我交流。
 
 
 
-
+PS: 作者[Github仓库](https://github.com/HOUCe)，欢迎通过代码各种形式交流。
 
 
 

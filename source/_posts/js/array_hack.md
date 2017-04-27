@@ -84,5 +84,6 @@ I always wonder why the Array constructor doesn’t have a designated method to 
 ## 总结
 今天介绍了几个利用ES6新特性对数组实现的一些hack方法，简单有效且优雅得体。在ES6引领前端开发的今天，希望对大家能有所启发。也欢迎留言，与我讨论。
 
+Happy Coding!
 
 PS: 作者[Github仓库](https://github.com/HOUCe)，欢迎通过代码各种形式交流。

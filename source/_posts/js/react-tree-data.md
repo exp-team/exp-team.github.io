@@ -6,10 +6,15 @@ date: 2017-04-05
 author: 侯策
 ---
 
-本文介绍一个简单的react demo，并通过此实例，剖析react的经典用法。并演示如何使用react思想，处理复杂的数据结构。
+本文介绍一个简单的react demo，通过此实例，剖析react的经典用法。并演示如何使用react思想，处理复杂的数据结构。
+
+项目地址建议参考我的[Github仓库。](https://github.com/HOUCe/react-handle-tree-data)
 
 ## 项目简介
 这个项目通过树形可操纵列表，展示了美国典型的“三权分立”政治体制，截图如下：
+
+
+![三权分立展示](http://upload-images.jianshu.io/upload_images/4363003-5f0b97d7ffd6e270.gif?imageMogr2/auto-orient/strip)
 
 
 如果实现这样一个view，其实并不难。我们使用原生的javascript或者jquery都能简单的实现。关键在于，这里的树形可操纵列表是可以实现定制化的。比如，今天我们剖析了“三权分立”政治体制，明天我们想实现一个公司管理层级结构，后天我们想表述一个文件系统的嵌套关系。通过这个项目，我们只需要更改数据表（配置表），便可以一键生成我们想要的结果。
@@ -18,35 +23,35 @@ author: 侯策
 ## 数据设计
 关于配置表，我们使用一个js对象实现。比如，“三权分立”的tree如下：
 
-var tree = {
-    title: "American Government System",
-    childNodes: [
-        {title: "Legislative", childNodes: [
-            {title: "Congress", childNodes: [
-                {title: "Agencies"}
-            ]}
-        ]},
-        {title: "Executive", childNodes: [
-            {title: "President", childNodes: [
-                {title: "Cabinet"},
-                {title: "Exec Office Of The President"},
-                {title: "Vice-president"},
-                {title: "Independent Agencies", childNodes: [
-                    {title: "Agriculture"},
-                    {title: "Commerce"},
-                    {title: "Defense"},
-                    {title: "Education"},
-                    {title: "......"}
+    var tree = {
+        title: "American Government System",
+        childNodes: [
+            {title: "Legislative", childNodes: [
+                {title: "Congress", childNodes: [
+                    {title: "Agencies"}
+                ]}
+            ]},
+            {title: "Executive", childNodes: [
+                {title: "President", childNodes: [
+                    {title: "Cabinet"},
+                    {title: "Exec Office Of The President"},
+                    {title: "Vice-president"},
+                    {title: "Independent Agencies", childNodes: [
+                        {title: "Agriculture"},
+                        {title: "Commerce"},
+                        {title: "Defense"},
+                        {title: "Education"},
+                        {title: "......"}
+                    ]}
+                ]}
+            ]},
+            {title: "Judicial", childNodes: [
+                {title: "Supreme Court", childNodes: [
+                    {title: "Lower Courts"}
                 ]}
             ]}
-        ]},
-        {title: "Judicial", childNodes: [
-            {title: "Supreme Court", childNodes: [
-                {title: "Lower Courts"}
-            ]}
-        ]}
-    ]
-};
+        ]
+    };
 
 这样的一个数据结构中，title表示当前节点展示名称，与他同级的是一个childNodes数组。
 
@@ -108,4 +113,6 @@ togglable-down/togglable-up根据状态，选择其一。
 可谓，麻雀虽小，五脏具全。
 
 Happy Coding!
+
+PS: 作者[Github仓库](https://github.com/HOUCe)，欢迎通过代码各种形式交流。
 
