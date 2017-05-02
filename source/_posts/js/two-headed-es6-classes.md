@@ -10,7 +10,9 @@ author: 侯策
 
 本文展现了一个完全在控制台就能模拟体验的实例，通过一步步优化结构，实现了生产并操控100000个对象的场景。
 
-内容借鉴了Owen Densmore最新文章：[Two Headed ES6 Classes!](https://medium.com/the-node-js-collection/what-does-const-stand-for-in-es6-f7ab3d9e06fc)，喜欢看英文原版的同学可以直接戳链接。中文翻译版并非直译，进行了较大幅度的讲解和增删。
+内容借鉴了Owen Densmore最新文章：[Two Headed ES6 Classes!](https://medium.com/@backspaces/two-headed-es6-classes-fe369c50b24)，喜欢看英文原版的同学可以直接戳链接。中文翻译版并非直译，进行了较大幅度的讲解和增删。
+
+最后，文章所有用到的代码我都已经整理托管到[Github](https://github.com/HOUCe/Two-Headed-Classes)当中，欢迎大家围观讨论。
 
 ## 场景和初级感知
 具体来说，我们需要一个构造函数或者类似“生产工厂”factory模式，实例化100000个以上实例。
