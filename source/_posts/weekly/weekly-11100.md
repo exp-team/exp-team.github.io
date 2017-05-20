@@ -7,6 +7,8 @@ author: 颜海镜
 ---
 5.1-5.5，你没学好，不只是败给了时间
 
+<!-- more -->
+
 ## 本期推荐
 ### [HTTP,HTTP2.0,SPDY,HTTPS看这篇就够了](http://m.sanwen8.cn/p/3edfj7S.html)
 
@@ -14,7 +16,6 @@ author: 颜海镜
 
 ### [我是这样学习前端的](https://github.com/icepy/we-writing/issues/39)
 
-<!-- more -->
 
 ## Web
 ### [React Conf 2017 干货总结1: React + ES next = ♥](http://www.jianshu.com/p/83c86dd0802d)

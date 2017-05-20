@@ -2,10 +2,12 @@
 title: expfe技术周刊第11101期
 categories: weekly
 tags: weekly
-date: 2017-5-5
+date: 2017-5-12
 author: 颜海镜
 ---
 5.8-5.12，你的英语水平制约你的学习了吗？
+
+<!-- more -->
 
 ## 本期推荐
 ### [程序员拿什么来学英语](http://www.jianshu.com/p/5c3f19c78f25)
@@ -13,8 +15,6 @@ author: 颜海镜
 ### [老生常谈-从输入url到页面展示到底发生了什么](http://www.cnblogs.com/xianyulaodi/p/6547807.html)
 
 ### [在 2017 年学习 React + Redux 的一些建议（上篇）](https://github.com/iuap-design/blog/issues/178)
-
-<!-- more -->
 
 ### CSS
 ### [CSS 变量教程](http://www.ruanyifeng.com/blog/2017/05/css-variables.html)
