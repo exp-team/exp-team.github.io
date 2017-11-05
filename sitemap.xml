@@ -2,471 +2,639 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/04/20/js/uber-clone-performance/</loc>
+    <loc>https://exp-team.github.io/blog/2017/11/04/js/exp-touch/</loc>
     
-    <lastmod>2017-04-10T04:57:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/about/index.html</loc>
-    
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    <lastmod>2017-11-05T02:52:43.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/03/24/weekly/weekly-11010/</loc>
+    <loc>https://exp-team.github.io/blog/2017/11/04/js/react-worker/</loc>
     
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/04/08/weekly/weekly-11011/</loc>
-    
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    <lastmod>2017-11-05T02:50:04.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/04/20/js/shuffle-array/</loc>
+    <loc>https://exp-team.github.io/blog/2017/11/04/js/react-component/</loc>
     
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/03/22/js/node_event/</loc>
-    
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    <lastmod>2017-11-05T02:49:24.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/04/05/js/react-tree-data/</loc>
+    <loc>https://exp-team.github.io/blog/2017/11/04/js/react-this/</loc>
     
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/04/20/js/twitter/</loc>
-    
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    <lastmod>2017-11-05T02:48:25.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/04/14/js/react-conf-es6/</loc>
+    <loc>https://exp-team.github.io/blog/2017/11/04/js/freeze/</loc>
     
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/04/14/js/react-best-pratice/</loc>
-    
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    <lastmod>2017-11-05T02:47:30.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/04/10/js/node_crawler/</loc>
+    <loc>https://exp-team.github.io/blog/2017/11/04/js/ai/</loc>
     
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/04/02/js/match-lovers/</loc>
-    
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    <lastmod>2017-11-05T02:46:30.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/03/30/js/news-early/</loc>
+    <loc>https://exp-team.github.io/blog/2017/11/04/js/node-cache/</loc>
     
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/03/25/js/immutable/</loc>
-    
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    <lastmod>2017-11-05T02:45:00.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/04/04/js/const/</loc>
+    <loc>https://exp-team.github.io/blog/2017/11/04/js/next/</loc>
     
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/04/04/js/array_hack/</loc>
-    
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    <lastmod>2017-11-05T02:44:12.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/04/14/js/async/</loc>
+    <loc>https://exp-team.github.io/blog/2017/11/04/js/iterator/</loc>
     
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/04/04/js/access/</loc>
-    
-    <lastmod>2017-04-10T04:52:33.000Z</lastmod>
+    <lastmod>2017-11-05T02:43:30.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/03/17/weekly/weekly-11001/</loc>
+    <loc>https://exp-team.github.io/blog/2017/11/04/js/setState-promise/</loc>
     
-    <lastmod>2017-03-18T06:32:46.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/03/14/web/animation-runningman/</loc>
-    
-    <lastmod>2017-03-14T06:48:05.000Z</lastmod>
+    <lastmod>2017-11-05T02:42:46.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/03/10/weekly/weekly-11000/</loc>
+    <loc>https://exp-team.github.io/blog/2017/11/04/js/react-modal/</loc>
     
-    <lastmod>2017-03-11T16:06:13.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/03/09/js/reduce/</loc>
-    
-    <lastmod>2017-03-09T12:25:32.000Z</lastmod>
+    <lastmod>2017-11-05T02:42:04.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/03/06/js/inNetwork/</loc>
+    <loc>https://exp-team.github.io/blog/2017/11/04/js/render-array/</loc>
     
-    <lastmod>2017-03-06T11:14:08.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/03/04/weekly/weekly-10111/</loc>
-    
-    <lastmod>2017-03-06T10:31:09.000Z</lastmod>
+    <lastmod>2017-11-05T02:40:01.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2017/02/24/weekly/weekly-10110/</loc>
+    <loc>https://exp-team.github.io/blog/2017/05/20/weekly/weekly-11110/</loc>
     
-    <lastmod>2017-03-06T10:31:09.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/02/25/js/infinite-scroll/</loc>
-    
-    <lastmod>2017-03-06T10:31:09.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/02/20/js/bind/</loc>
-    
-    <lastmod>2017-02-22T13:52:41.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/</loc>
-    
-    <lastmod>2017-02-20T00:47:13.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/01/12/program/BS4/</loc>
-    
-    <lastmod>2017-02-19T12:29:49.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/01/21/other/wujiang-2016/</loc>
-    
-    <lastmod>2017-02-19T12:29:49.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/</loc>
-    
-    <lastmod>2017-02-19T12:29:49.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/11/26/program/react-redux-1/</loc>
-    
-    <lastmod>2017-01-17T05:04:05.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/01/12/js/babel-class2/</loc>
-    
-    <lastmod>2017-01-16T07:13:59.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/01/12/program/babel-class/</loc>
-    
-    <lastmod>2017-01-15T12:55:11.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/01/13/tool/using-pac/</loc>
-    
-    <lastmod>2017-01-15T12:55:11.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/</loc>
-    
-    <lastmod>2017-01-13T12:23:08.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2017/01/07/weekly/weekly-10011/</loc>
-    
-    <lastmod>2017-01-13T10:11:31.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/09/10/program/exp-wap-step/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/11/06/weekly/weekly-1011/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/11/tool/ci-tools/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/21/js/event/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/19/weekly/weekly-11/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/11/12/weekly/weekly-1100/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/09/11/weekly/weekly-110/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/20/java/how-to-install-java-on-win/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/11/26/weekly/weekly-1101/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/07/29/weekly/weekly-0/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-11-05T02:36:55.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://exp-team.github.io/blog/2016/12/04/weekly/weekly-1110/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-11-05T02:36:55.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/12/10/weekly/weekly-1111/</loc>
+    <loc>https://exp-team.github.io/blog/2017/05/12/weekly/weekly-11101/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/09/24/weekly/weekly-111/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-11-05T02:36:55.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/08/20/tool/chrome-install/</loc>
+    <loc>https://exp-team.github.io/blog/2017/05/05/weekly/weekly-11100/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/09/02/program/about-coupling/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-11-05T02:36:55.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/10/19/web/study-webp/</loc>
+    <loc>https://exp-team.github.io/blog/2017/06/27/js/decomposing_React_components/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/10/tool/xshell-commond/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-06-27T07:14:03.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/08/12/weekly/weekly-10/</loc>
+    <loc>https://exp-team.github.io/blog/2017/06/18/js/react_bind_this/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/08/07/weekly/weekly-1/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-06-18T07:13:22.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/08/27/weekly/weekly-100/</loc>
+    <loc>https://exp-team.github.io/blog/2017/06/09/js/freeze-obj/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/10/13/weekly/weekly-1000/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-06-06T08:34:06.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/12/17/weekly/weekly-10000/</loc>
+    <loc>https://exp-team.github.io/blog/2017/06/04/js/react-ref/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://exp-team.github.io/blog/2016/12/24/weekly/weekly-10001/</loc>
-    
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-06-01T09:31:51.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/10/22/weekly/weekly-1001/</loc>
+    <loc>https://exp-team.github.io/blog/2017/03/09/js/reduce2/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-05-29T09:34:35.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/12/31/weekly/weekly-10010/</loc>
+    <loc>https://exp-team.github.io/blog/2017/05/14/js/Converting%20an%20Array%20of%20Objects%20to%20an%20Object/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-05-11T06:40:58.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/04/js/redux%EF%BC%8Dtips/</loc>
+    
+    <lastmod>2017-05-02T08:18:45.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/04/js/two-headed-es6-classes/</loc>
+    
+    <lastmod>2017-05-02T06:17:34.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/20/js/shuffle-array/</loc>
+    
+    <lastmod>2017-04-27T11:43:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/04/js/access/</loc>
+    
+    <lastmod>2017-04-27T11:43:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/14/js/react-best-pratice/</loc>
+    
+    <lastmod>2017-04-27T11:43:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/15/js/some-of-module/</loc>
+    
+    <lastmod>2017-04-27T11:43:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/02/js/match-lovers/</loc>
+    
+    <lastmod>2017-04-27T11:43:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/14/js/react-conf-es6/</loc>
+    
+    <lastmod>2017-04-27T11:43:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/20/js/twitter/</loc>
+    
+    <lastmod>2017-04-27T11:43:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/14/js/async/</loc>
+    
+    <lastmod>2017-04-27T11:43:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/04/js/array_hack/</loc>
+    
+    <lastmod>2017-04-27T11:43:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/05/js/react-tree-data/</loc>
+    
+    <lastmod>2017-04-27T11:43:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/20/js/uber-clone-performance/</loc>
+    
+    <lastmod>2017-04-27T11:43:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/30/js/news-early/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/09/js/reduce/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/02/20/js/bind/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/10/js/node_crawler/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/21/js/event/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/22/js/node_event/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://exp-team.github.io/blog/2016/07/28/hexo/hello-world/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/01/12/js/babel-class2/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/04/js/const/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/25/js/immutable/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://exp-team.github.io/blog/2016/08/21/linux/how-to-install-linux-on-vm/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://exp-team.github.io/blog/2016/10/31/weekly/weekly-1010/</loc>
+    <loc>https://exp-team.github.io/blog/2017/01/21/other/wujiang-2016/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/01/12/program/BS4/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/09/02/program/about-coupling/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/01/12/program/babel-class/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://exp-team.github.io/blog/2016/09/04/program/event/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/09/10/program/exp-wap-step/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/20/tool/chrome-install/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/11/26/program/react-redux-1/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/01/13/tool/using-pac/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/10/tool/xshell-commond/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/11/tool/ci-tools/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/10/19/web/study-webp/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/14/web/animation-runningman/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/07/29/weekly/weekly-0/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/07/weekly/weekly-1/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/12/weekly/weekly-10/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/10/13/weekly/weekly-1000/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/27/weekly/weekly-100/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/12/17/weekly/weekly-10000/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/10/22/weekly/weekly-1001/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/12/24/weekly/weekly-10001/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/12/31/weekly/weekly-10010/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://exp-team.github.io/blog/2016/09/04/weekly/weekly-101/</loc>
     
-    <lastmod>2017-01-13T08:09:51.000Z</lastmod>
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/10/31/weekly/weekly-1010/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/01/07/weekly/weekly-10011/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/01/13/weekly/weekly-10100/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/11/06/weekly/weekly-1011/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/01/21/weekly/weekly-10101/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/02/24/weekly/weekly-10110/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/19/weekly/weekly-11/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/04/weekly/weekly-10111/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/11/12/weekly/weekly-1100/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/10/weekly/weekly-11000/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/11/26/weekly/weekly-1101/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/09/11/weekly/weekly-110/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/24/weekly/weekly-11010/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/06/js/inNetwork/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/03/17/weekly/weekly-11001/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/04/08/weekly/weekly-11011/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/09/24/weekly/weekly-111/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/12/10/weekly/weekly-1111/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/02/20/js/es5-shim-bind/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2017/02/25/js/infinite-scroll/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/blog/2016/08/20/java/how-to-install-java-on-win/</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://exp-team.github.io/about/index.html</loc>
+    
+    <lastmod>2017-04-27T11:42:14.000Z</lastmod>
     
   </url>
   

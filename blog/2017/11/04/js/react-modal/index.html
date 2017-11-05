@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>React 模态框秘密和“轮子”渐进设计 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="今天上午组内小朋友们谈到 React 实践，提到 React 模态框（弹窗）的使用。我发现很多一些 React 开发者对于 React 模态框的具体设计思路和实现存在一些疑惑。因而特写此文，分享我对模态框这个“重要且典">
+<meta name="keywords" content="js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React 模态框秘密和“轮子”渐进设计">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/11/04/js/react-modal/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="今天上午组内小朋友们谈到 React 实践，提到 React 模态框（弹窗）的使用。我发现很多一些 React 开发者对于 React 模态框的具体设计思路和实现存在一些疑惑。因而特写此文，分享我对模态框这个“重要且典">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-bdbf145a382c6272.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-48669842b6993eef.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-97c2399ecd828fb4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-8039ace2b5b26aaa.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-4643613c42286b86.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-11-05T02:42:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="React 模态框秘密和“轮子”渐进设计">
+<meta name="twitter:description" content="今天上午组内小朋友们谈到 React 实践，提到 React 模态框（弹窗）的使用。我发现很多一些 React 开发者对于 React 模态框的具体设计思路和实现存在一些疑惑。因而特写此文，分享我对模态框这个“重要且典">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/4363003-bdbf145a382c6272.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/react-modal" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/11/04/js/react-modal/" class="article-date">
+  <time datetime="2017-11-03T16:00:00.000Z" itemprop="datePublished">2017-11-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      React 模态框秘密和“轮子”渐进设计
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>今天上午组内小朋友们谈到 React 实践，提到 React 模态框（弹窗）的使用。我发现很多一些 React 开发者对于 React 模态框的具体设计思路和实现存在一些疑惑。因而特写此文，分享我对<strong>模态框这个“重要且典型”的前端交互，在 React 框架里实现的一些想法。</strong>准备时间短促且匆忙，难免有遗漏之处，希望大神给予斧正。</p>
+<p>这篇文章“进阶式”渐进地，由浅入深分析三种实现。从最初的简单粗暴到接近 <a href="https://github.com/reactjs/react-modal" target="_blank" rel="external">react-modal</a> 库设计思想，一步步打磨分析，适合初学者阅读思考。</p>
+<h2 id="原始级实现-——-暴力美学"><a href="#原始级实现-——-暴力美学" class="headerlink" title="原始级实现 —— 暴力美学"></a>原始级实现 —— 暴力美学</h2><p>世界上大部分网站都离不开模态框交互。事实上，模态框就是我们俗称的“弹窗”，只不过这个弹窗相比简单的：</p>
+<pre><code>alert(&apos;我是一个简单、原生的 alert～&apos;);
+</code></pre><p>多了更多的信息承载和交互行为。同时为了更佳美化和吸引眼球，模态框往往伴随着深色透明的遮罩。比如下图：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-bdbf145a382c6272.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="模态框举例"></p>
+<p>想想常见的用户登录框、错误信息提示等等，都是非常典型的模态框实现。</p>
+<p>在传统的 jQuery 操作 DOM 类库的技术栈下，我们可以“肆无忌惮”地选择 DOM 节点，完成 append, remove 等操作，实现模态框并不复杂。可是在 React 和 Redux 世界里，我们该如何实现？</p>
+<p>我们先来看一下场景和初版设计思路：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-48669842b6993eef.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="场景和初版设计思路"></p>
+<p>如图，箭头标记的组件需要触发模态框的出现。<br>图中组件树对应基本页面代码如下：</p>
+<pre><code>export default class App extends Component {
+    render() {
+        &lt;div className=&quot;app&quot;&gt;
+            &lt;div className=&quot;left&quot;&gt;
+                &lt;h1&gt;Hello left&lt;/h1&gt;
+                // ...
+            &lt;/div&gt;
+
+            &lt;div className=&quot;right&quot;&gt;
+                &lt;h1&gt;Hello right&lt;/h1&gt;
+                // ...
+                &lt;div&gt;
+                    &lt;BadModal&gt;
+                        // 模态框内容
+                        &lt;h1&gt; Modal title &lt;/h1&gt;
+                        &lt;p&gt; Modal content&lt;/p&gt;
+                    &lt;/BadModal&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    }
+}
+</code></pre><p>细心的读者会发现，作为 amazing 的程序员，尽管这是最初版本的实现，但是还是思考一些最基本的“复用”问题。</p>
+<p>我们设计完成的模态框组件 <badmodal>，因为每个模态框里内容和交互不尽相同，所以在 <badmodal> 组件内，我们渲染 child component，这个 child component 即业务对应的模态框内容，它将会由业务逻辑开发完成，实现模态框内容、交互的复用。如下代码：</badmodal></badmodal></p>
+<pre><code>class BadModal extends Comment {
+    render() {
+        return (
+            &lt;div className=&quot;modal&quot;&gt;
+                { this.props.children }
+            &lt;/div&gt;
+        )
+    }
+}
+</code></pre><p>至此，我们已经实现了最基本的模态框。可是为什么说这是最原始、简陋的方法呢？细想一下，似乎不完美的地方还很多。翻开我们的样式表：</p>
+<pre><code>body .modal {
+    position: fixed;
+    // ...
+}
+.left {
+    z-index: 3
+}
+.right {
+    z-index: 1
+}
+</code></pre><p>你会发现恼人的 z-index 问题，我们模态框是 .right 节点的子孙节点，而 .right 的 z-index 小于 .left 的 z-index，这样造成的直接问题就是模态框最终不能脱离页面整体而“突出显示”！</p>
+<p><strong>细想一下，这个问题的根本就出现在我们的组件设计图中。</strong><br>仔细观察上图，因为很深层次的子孙组件触发模态框，而使得该组件内的模态框组件层级较深。如果你对 z-index 比较规则有所了解的话，这样的情况很难完成模态框凌驾于页面整体而出现的，遮罩也无法覆盖整个页面。</p>
+<p>想想我们平时使用的 jQuery 是怎么做的吧：</p>
+<pre><code>$(&apos;body&apos;).append(&apos;&lt;div class=&quot;overlay&quot;&gt;&lt;/div&gt;&apos;);
+</code></pre><p>一般情况，模态框和遮罩总是作为在 body 下的第一层子节点出现。由此，引出了我们的第二种进阶思路。请读者继续阅读。</p>
+<h2 id="实现方案二-——-乾坤大挪移"><a href="#实现方案二-——-乾坤大挪移" class="headerlink" title="实现方案二 —— 乾坤大挪移"></a>实现方案二 —— 乾坤大挪移</h2><p>解决方法很简单，我们可以很自然地想到：只需要<strong>对 <modal> 组件出现的位置进行移动。可是这就需要 <modal> 组件和触发模态框出现的深层次组件进行某种意义上的通信。</modal></modal></strong></p>
+<p>传统的 React 组件间通信无外乎 props 和基于 props 的回调实现（不考虑 context 的黑魔法）。可是这样的做法太过复杂，也难以实现复用，更不利于维护。</p>
+<p>至于我这里采用的做法，还要从调整后的页面组件树设计出发：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-97c2399ecd828fb4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>如图，我们在 document.body 下加入了 <modal> 组件，并列于 Root Component。同时，至关重要的一步设计是，<strong>我们在触发模态框的组件下，加入了一个 Fake Modal 组件。</strong></modal></p>
+<p>这个神秘的 Fake Modal 组件做了什么呢？<br><strong>事实上，他并不渲染任何结果，而是借助其生命周期函数，完成在 document.body 下新建并插入 <modal> 组件的使命。</modal></strong></p>
+<p>借助代码进行理解：</p>
+<pre><code>class Modal extends Comment {
+    componentDidMount() {
+        this.modalTarget = document.createElement(&apos;div&apos;);
+        this.modalTarget.className = &apos;modal&apos;;
+        document.body.appendChild(this.modalTarget);
+        this.renderModal();
+    }
+    componentWillUpdate() {
+        this.renderModal();
+    }
+    componentWillUnmount() {
+        ReactDom.unmountComponentAtNode(this.modalTarget);
+        document.body.removeChild(this.modalTarget)l
+    }
+    renderModal() {
+        ReactDom.render(
+            &lt;div&gt;{ this.props.children }&lt;/div&gt;,
+            this.modalTarget
+        );
+    }
+    render() {
+        return &lt;noscript /&gt;
+    }
+}
+</code></pre><p>具体进行分析在真正的 render 方法中，我们不渲染任何实质的内容，而是：</p>
+<pre><code>return &lt;noscript /&gt;;
+</code></pre><p>同时，借助生命周期函数 componentDidMount，我们使用原生 JavaScript 实现在 body 下的模态框创建：</p>
+<pre><code>this.modalTarget = document.createElement(&apos;div&apos;);
+this.modalTarget.className = &apos;modal&apos;;
+document.body.appendChild(this.modalTarget);
+this.renderModal();
+</code></pre><p>并最终调用 renderModal 方法完成插入：</p>
+<pre><code>ReactDom.render(
+    &lt;div&gt;{ this.props.children }&lt;/div&gt;,
+    this.modalTarget
+);
+</code></pre><h2 id="实现方案三-——-搭配-Redux"><a href="#实现方案三-——-搭配-Redux" class="headerlink" title="实现方案三 —— 搭配 Redux"></a>实现方案三 —— 搭配 Redux</h2><p>相信很多 React 开发者都会使用 Redux 来做数据管理。仔细看上图的结构中，我们难以实现对 Redux 的友好兼容。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-8039ace2b5b26aaa.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<p>图片</p>
+<p>比如说，如果在 <modal> 组件的子组件 child component 中，需要使用 Redux store 里的数据，那么因为 <provider> 实质上是一个“高阶组件”且不在 <modal> 组件的组件链中，因为 child component 无法感知 Redux store 的存在。</modal></provider></modal></p>
+<p>为了解决这个问题，我们继续改进组件树结构为：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-4643613c42286b86.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<p>图片</p>
+<p>为此，我们引入应用的 store，以及 react-redux 包提供的 <provider> 组件：</provider></p>
+<pre><code>import { store } from &apos;../index&apos;;
+import { Provider } from &apos;react-redux&apos;;
+</code></pre><p>同时改动先前的 renderModal 方法，加入对 <provider> 的支持：</provider></p>
+<pre><code>renderModal() {
+    ReactDom.render(
+        &lt;Provider store={ store }&gt;
+            &lt;div&gt;{ this.props.children }&lt;/div&gt;
+        &lt;Provider&gt;,
+        this.modalTarget
+    );
+}
+</code></pre><h2 id="著名的-react-modal-探秘和-React16-版本惊喜"><a href="#著名的-react-modal-探秘和-React16-版本惊喜" class="headerlink" title="著名的 react-modal 探秘和 React16 版本惊喜"></a>著名的 react-modal 探秘和 React16 版本惊喜</h2><p>在 React 开发中，我想很多工程师对 <a href="https://github.com/reactjs/react-modal" target="_blank" rel="external">react-modal</a> 非常熟悉。我们往往依赖它，完成模态框的使用。</p>
+<p>这个库设计良好，请封装完善。如果你好奇它是如何实现的，源码又是如何组织？那么我可以告诉你，你已经了解了他的设计哲学。事实上，文章介绍的思路就是它的奥秘。</p>
+<p>了解了这些，你也可以动手实现“一个轮子”，或者扩充本文源码，实现更多的功能。比如样式的自定义、弹出前后的回调等等。相信一定会有很多收获。</p>
+<p>同时，React 最新版本 0.16 已经横空出世，它带来的很多新特性之一就与本文密切相关。那就是 —— Portal，Portal 我们把它翻译为“传送门、任意门”。Portals 允许将组件渲染到父节点之外的 DOM 节点中。它的基本使用如下代码示例：</p>
+<pre><code>render() {
+    return ReactDOM.createPortal(
+                this.props.children,
+                anyDomNode,
+            );
+}
+</code></pre><p>这里 React 并不会在当前结构中渲染组件，而是向 anyDomNode 中渲染 this.props.children，这里的 anyDomNode 是任何有效的DOM节点，无论它处于哪个层级位置。</p>
+<p>了解了这些，我们当然能够使用此特性，简化上文逻辑。翻开 react-modal 最新提交的源码，便能够发现对这一新特性的支持，react-modal/src/components/Modal.js 文件中：</p>
+<pre><code>const isReact16 = ReactDOM.createPortal !== undefined;
+const createPortal = isReact16
+  ? ReactDOM.createPortal
+  : ReactDOM.unstable_renderSubtreeIntoContainer;
+</code></pre><p>这里对 React 版本进行判断，并设置 isReact16 标识位表示是否支持 createPortal 的方法（个人认为这个标识位的命名非常不合适…）</p>
+<p>最终在 render 方法内：</p>
+<pre><code>render() {
+    if (!canUseDOM || !isReact16) {
+        return null;
+    }
+
+    if (!this.node &amp;&amp; isReact16) {
+        this.node = document.createElement(&quot;div&quot;);
+    }
+
+    return createPortal(
+        &lt;ModalPortal
+            ref={this.portalRef}
+            defaultStyles={Modal.defaultStyles}
+            {...this.props}
+        /&gt;,
+        this.node
+    );
+}
+</code></pre><p>非常明显地看到，对于不支持 createPortal 的情况采用与我们类似的 return null; 否则愉快地使用 createPortal 方法。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文介绍内容虽然基础，但是很好地贯穿了 React 思想以及实现一个“模态框轮子”的演进思路。同时介绍了 React 新版本的一项特性。</p>
+<p>我的其他几篇关于React技术栈的文章：</p>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/28525821" target="_blank" rel="external">React Redux 中间件思想遇见 Web Worker 的灵感（附demo）</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/29732224" target="_blank" rel="external">了解 Twitter 前端架构 学习复杂场景数据设计</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/29711902" target="_blank" rel="external">React 探秘 - React Component 和 Element（文末附彩蛋demo和源码）</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/28905707" target="_blank" rel="external">从setState promise化的探讨 体会React团队设计思想</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/27825741" target="_blank" rel="external">通过实例，学习编写 React 组件的“最佳实践”</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/27727292" target="_blank" rel="external">React 组件设计和分解思考</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/28905707/edit" target="_blank" rel="external">从 React 绑定 this，看 JS 语言发展和框架设计</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/28004982" target="_blank" rel="external">React 服务端渲染如此轻松 从零开始构建前后端应用</a></li>
+<li><a href="http://link.zhihu.com/?target=http%3A//www.jianshu.com/p/49029b49f2b4" target="_blank" rel="external">做出Uber移动网页版还不够 极致性能打造才见真章**</a></li>
+<li><a href="http://link.zhihu.com/?target=http%3A//www.jianshu.com/p/cde3cf7e2760" target="_blank" rel="external">React+Redux打造“NEWS EARLY”单页应用 一个项目理解最前沿技术栈真谛**</a></li>
+</ul>
+<p>Happy Coding!<br>PS: 作者 <a href="http://link.zhihu.com/?target=https%3A//github.com/HOUCe" target="_blank" rel="external">Github仓库**</a> 和 <a href="https://www.zhihu.com/people/lucas-hc/answers" target="_blank" rel="external">知乎问答链接</a> 欢迎各种形式交流。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/11/04/js/react-modal/" data-id="cj9m6cu3t002lo9fyy9d7ucsb" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/11/04/js/react-modal/" data-title="React 模态框秘密和“轮子”渐进设计" data-url="https://exp-team.github.io/blog/2017/11/04/js/react-modal/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/11/04/js/react-component/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          React 组件设计和分解思考
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/11/04/js/react-worker/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">React Redux 中间件思想遇见 Web Worker 的灵感（附demo）</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 20px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 18px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/react-this/">从 React 绑定 this，看 JS 语言发展和框架设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/next/">React 服务端渲染如此轻松 从零开始构建前后端应用</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/iterator/">从贺老微博引出的“遍历器（Iterators）加速那些奥秘”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/node-cache/">教你编写 Node.js 中间件，实现服务端缓存（附demo源码）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/setState-promise/">从 setState promise 化的探讨 体会 React 团队设计思想</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

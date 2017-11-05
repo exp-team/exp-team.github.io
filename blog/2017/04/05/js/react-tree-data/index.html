@@ -5,16 +5,20 @@
   
   <title>一个有趣的react demo 教你如何处理树形结构 | exp team</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="本文介绍一个简单的react demo，并通过此实例，剖析react的经典用法。并演示如何使用react思想，处理复杂的数据结构。">
+  <meta name="description" content="本文介绍一个简单的react demo，通过此实例，剖析react的经典用法。并演示如何使用react思想，处理复杂的数据结构。 项目地址建议参考我的">
+<meta name="keywords" content="js">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一个有趣的react demo 教你如何处理树形结构">
 <meta property="og:url" content="https://exp-team.github.io/blog/2017/04/05/js/react-tree-data/index.html">
 <meta property="og:site_name" content="exp team">
-<meta property="og:description" content="本文介绍一个简单的react demo，并通过此实例，剖析react的经典用法。并演示如何使用react思想，处理复杂的数据结构。">
-<meta property="og:updated_time" content="2017-04-10T04:52:33.000Z">
+<meta property="og:description" content="本文介绍一个简单的react demo，通过此实例，剖析react的经典用法。并演示如何使用react思想，处理复杂的数据结构。 项目地址建议参考我的">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-5f0b97d7ffd6e270.gif?imageMogr2/auto-orient/strip">
+<meta property="og:updated_time" content="2017-04-27T11:43:16.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="一个有趣的react demo 教你如何处理树形结构">
-<meta name="twitter:description" content="本文介绍一个简单的react demo，并通过此实例，剖析react的经典用法。并演示如何使用react思想，处理复杂的数据结构。">
+<meta name="twitter:description" content="本文介绍一个简单的react demo，通过此实例，剖析react的经典用法。并演示如何使用react思想，处理复杂的数据结构。 项目地址建议参考我的">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/4363003-5f0b97d7ffd6e270.gif?imageMogr2/auto-orient/strip">
   
     <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
   
@@ -75,7 +79,7 @@ var _hmt = _hmt || [];
         <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
       </nav>
       <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
       </div>
     </div>
   </div>
@@ -107,12 +111,42 @@ var _hmt = _hmt || [];
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>本文介绍一个简单的react demo，并通过此实例，剖析react的经典用法。并演示如何使用react思想，处理复杂的数据结构。</p>
+        <p>本文介绍一个简单的react demo，通过此实例，剖析react的经典用法。并演示如何使用react思想，处理复杂的数据结构。</p>
+<p>项目地址建议参考我的<a href="https://github.com/HOUCe/react-handle-tree-data" target="_blank" rel="external">Github仓库。</a></p>
 <h2 id="项目简介"><a href="#项目简介" class="headerlink" title="项目简介"></a>项目简介</h2><p>这个项目通过树形可操纵列表，展示了美国典型的“三权分立”政治体制，截图如下：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-5f0b97d7ffd6e270.gif?imageMogr2/auto-orient/strip" alt="三权分立展示"></p>
 <p>如果实现这样一个view，其实并不难。我们使用原生的javascript或者jquery都能简单的实现。关键在于，这里的树形可操纵列表是可以实现定制化的。比如，今天我们剖析了“三权分立”政治体制，明天我们想实现一个公司管理层级结构，后天我们想表述一个文件系统的嵌套关系。通过这个项目，我们只需要更改数据表（配置表），便可以一键生成我们想要的结果。</p>
 <h2 id="数据设计"><a href="#数据设计" class="headerlink" title="数据设计"></a>数据设计</h2><p>关于配置表，我们使用一个js对象实现。比如，“三权分立”的tree如下：</p>
-<p>var tree = {<br>    title: “American Government System”,<br>    childNodes: [<br>        {title: “Legislative”, childNodes: [<br>            {title: “Congress”, childNodes: [<br>                {title: “Agencies”}<br>            ]}<br>        ]},<br>        {title: “Executive”, childNodes: [<br>            {title: “President”, childNodes: [<br>                {title: “Cabinet”},<br>                {title: “Exec Office Of The President”},<br>                {title: “Vice-president”},<br>                {title: “Independent Agencies”, childNodes: [<br>                    {title: “Agriculture”},<br>                    {title: “Commerce”},<br>                    {title: “Defense”},<br>                    {title: “Education”},<br>                    {title: “……”}<br>                ]}<br>            ]}<br>        ]},<br>        {title: “Judicial”, childNodes: [<br>            {title: “Supreme Court”, childNodes: [<br>                {title: “Lower Courts”}<br>            ]}<br>        ]}<br>    ]<br>};</p>
-<p>这样的一个数据结构中，title表示当前节点展示名称，与他同级的是一个childNodes数组。</p>
+<pre><code>var tree = {
+    title: &quot;American Government System&quot;,
+    childNodes: [
+        {title: &quot;Legislative&quot;, childNodes: [
+            {title: &quot;Congress&quot;, childNodes: [
+                {title: &quot;Agencies&quot;}
+            ]}
+        ]},
+        {title: &quot;Executive&quot;, childNodes: [
+            {title: &quot;President&quot;, childNodes: [
+                {title: &quot;Cabinet&quot;},
+                {title: &quot;Exec Office Of The President&quot;},
+                {title: &quot;Vice-president&quot;},
+                {title: &quot;Independent Agencies&quot;, childNodes: [
+                    {title: &quot;Agriculture&quot;},
+                    {title: &quot;Commerce&quot;},
+                    {title: &quot;Defense&quot;},
+                    {title: &quot;Education&quot;},
+                    {title: &quot;......&quot;}
+                ]}
+            ]}
+        ]},
+        {title: &quot;Judicial&quot;, childNodes: [
+            {title: &quot;Supreme Court&quot;, childNodes: [
+                {title: &quot;Lower Courts&quot;}
+            ]}
+        ]}
+    ]
+};
+</code></pre><p>这样的一个数据结构中，title表示当前节点展示名称，与他同级的是一个childNodes数组。</p>
 <p>这个数组的每一项又是一个类似“tree”结构的节点：这个节点包括了一个title表示当前节点展示名称，和一个childNodes数组。<br>如此递归，无穷匮也。。。</p>
 <h2 id="设计思路"><a href="#设计思路" class="headerlink" title="设计思路"></a>设计思路</h2><p>设计思想上，其实上文已经说的很清楚了，就是递归。同时需要react作为视图层框架，对每一个Node节点配置以state。<br>好吧，我们来看一下代码：</p>
 <pre><code>class Component1 extends React.Component {
@@ -151,11 +185,12 @@ var classNameFinal = className1 + &apos; &apos; + className2;
 <p>需要注意的是我们针对包含子节点的情况，进行了递归调用：<component1 node="{node}/">，能理解这一点至关重要。</component1></p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章虽然简短，但是涉及到了react思想的核心部分：组件间的通信和组件状态的选择切换。同时还涉及到了一些基本的算法，比如递归调用组件和数据结构的设计。<br>可谓，麻雀虽小，五脏具全。</p>
 <p>Happy Coding!</p>
+<p>PS: 作者<a href="https://github.com/HOUCe" target="_blank" rel="external">Github仓库</a>，欢迎通过代码各种形式交流。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://exp-team.github.io/blog/2017/04/05/js/react-tree-data/" data-id="cj1bn7dsv000udowhlq0zjq1e" class="article-share-link">分享</a>
+      <a data-url="https://exp-team.github.io/blog/2017/04/05/js/react-tree-data/" data-id="cj9m6cu40002ro9fy1cyo5pgh" class="article-share-link">分享</a>
       
         <!-- 多说评论框 start -->
 <div class="ds-thread" data-thread-key="blog/2017/04/05/js/react-tree-data/" data-title="一个有趣的react demo 教你如何处理树形结构" data-url="https://exp-team.github.io/blog/2017/04/05/js/react-tree-data/"></div>
@@ -181,9 +216,9 @@ var classNameFinal = className1 + &apos; &apos; + className2;
     </a>
   
   
-    <a href="/blog/2017/04/04/js/access/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/blog/2017/04/04/js/two-headed-es6-classes/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">万军丛中取敌将首级－如何优雅安全地在深层数据结构中取值</div>
+      <div class="article-nav-title">通过一个场景实例 了解前端处理大数据的无限可能</div>
     </a>
   
 </nav>
@@ -235,7 +270,7 @@ var duoshuoQuery = {short_name:"exp-team"};
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 18px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 20px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 18px;">weekly</a>
     </div>
   </div>
 
@@ -244,7 +279,7 @@ var duoshuoQuery = {short_name:"exp-team"};
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
     </div>
   </div>
 
@@ -257,23 +292,23 @@ var duoshuoQuery = {short_name:"exp-team"};
       <ul>
         
           <li>
-            <a href="/blog/2017/04/20/js/twitter/">解析Twitter前端架构 学习复杂场景数据设计</a>
+            <a href="/blog/2017/11/04/js/react-this/">从 React 绑定 this，看 JS 语言发展和框架设计</a>
           </li>
         
           <li>
-            <a href="/blog/2017/04/20/js/uber-clone-performance/">做出Uber移动网页版还不够 极致性能打造才见真章</a>
+            <a href="/blog/2017/11/04/js/next/">React 服务端渲染如此轻松 从零开始构建前后端应用</a>
           </li>
         
           <li>
-            <a href="/blog/2017/04/20/js/shuffle-array/">关于数组乱序的深挖——“感觉一直在写毒代码”</a>
+            <a href="/blog/2017/11/04/js/iterator/">从贺老微博引出的“遍历器（Iterators）加速那些奥秘”</a>
           </li>
         
           <li>
-            <a href="/blog/2017/04/14/js/async/">ES6 Async/Await 完爆Promise的6个原因</a>
+            <a href="/blog/2017/11/04/js/node-cache/">教你编写 Node.js 中间件，实现服务端缓存（附demo源码）</a>
           </li>
         
           <li>
-            <a href="/blog/2017/04/14/js/react-best-pratice/">通过实例，学习编写React组件的最佳实践</a>
+            <a href="/blog/2017/11/04/js/setState-promise/">从 setState promise 化的探讨 体会 React 团队设计思想</a>
           </li>
         
       </ul>

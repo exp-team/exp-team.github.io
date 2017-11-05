@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>通过一个场景实例 了解前端处理大数据的无限可能 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="随着前端的飞速发展，在浏览器端完成复杂的计算，支配并处理大量数据已经屡见不鲜。那么，如何在最小化内存消耗的前提下，高效优雅地完成复杂场景的处理，越来越考验开发者功力，也直接决定了程序的性能。">
+<meta name="keywords" content="js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过一个场景实例 了解前端处理大数据的无限可能">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/04/04/js/two-headed-es6-classes/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="随着前端的飞速发展，在浏览器端完成复杂的计算，支配并处理大量数据已经屡见不鲜。那么，如何在最小化内存消耗的前提下，高效优雅地完成复杂场景的处理，越来越考验开发者功力，也直接决定了程序的性能。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-58e9f38eb0790b9d.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-2fd5dd675bf80fc3.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-10615f58c727ea91.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-0402466c934dcc5b.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-a2e2a7d060df822d.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-05-02T06:17:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="通过一个场景实例 了解前端处理大数据的无限可能">
+<meta name="twitter:description" content="随着前端的飞速发展，在浏览器端完成复杂的计算，支配并处理大量数据已经屡见不鲜。那么，如何在最小化内存消耗的前提下，高效优雅地完成复杂场景的处理，越来越考验开发者功力，也直接决定了程序的性能。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/4363003-58e9f38eb0790b9d.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/two-headed-es6-classes" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/04/04/js/two-headed-es6-classes/" class="article-date">
+  <time datetime="2017-04-03T16:00:00.000Z" itemprop="datePublished">2017-04-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      通过一个场景实例 了解前端处理大数据的无限可能
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>随着前端的飞速发展，在浏览器端完成复杂的计算，支配并处理大量数据已经屡见不鲜。那么，如何在<strong>最小化内存消耗的前提</strong>下，高效优雅地完成复杂场景的处理，越来越考验开发者功力，也直接决定了程序的性能。</p>
+<p>本文展现了一个完全在控制台就能模拟体验的实例，通过一步步优化结构，实现了生产并操控100000个对象的场景。</p>
+<p>内容借鉴了Owen Densmore最新文章：<a href="https://medium.com/@backspaces/two-headed-es6-classes-fe369c50b24" target="_blank" rel="external">Two Headed ES6 Classes!</a>，喜欢看英文原版的同学可以直接戳链接。中文翻译版并非直译，进行了较大幅度的讲解和增删。</p>
+<p>最后，文章所有用到的代码我都已经整理托管到<a href="https://github.com/HOUCe/Two-Headed-Classes" target="_blank" rel="external">Github</a>当中，欢迎大家围观讨论。</p>
+<h2 id="场景和初级感知"><a href="#场景和初级感知" class="headerlink" title="场景和初级感知"></a>场景和初级感知</h2><p>具体来说，我们需要一个构造函数或者类似“生产工厂”factory模式，实例化100000个以上实例。</p>
+<p>先来感知一下具体实现，打开你的控制台，仔细观察并复制粘贴以下代码执行。<br>我们创建一个长度为100000的数组，数组的每一项元素都为0:</p>
+<pre><code>a = new Array(1e6).fill(0);
+</code></pre><p>在a的基础上，再生产一个长度为100000的数组，数组的每一项元素都为js object，拥有id属性，并且其属性值为其在元素中的index值；</p>
+<pre><code>b = a.map((val, ix) =&gt; ({id: ix}))
+</code></pre><p>在b的基础上，生产一个长度为100000的数组，类似于b，同时我们增加其它属性：</p>
+<pre><code>c = a.map((val, ix) =&gt; ({id: ix, shape: &apos;square&apos;, size: 10.5, color: &apos;green&apos;}))
+</code></pre><p><strong>语义上，我们可以更直观的理解：c就是包含了100000个绿色的、size为10.5的小方块。</strong></p>
+<p>如果你按照指示做了下来，控制台上会有以下内容：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-58e9f38eb0790b9d.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="控制台截图"></p>
+<p><strong>你也许会想，这么大的数据量，内存占用会是什么样的情况呢？</strong></p>
+<p>好，我来带你看看，点击控制台Profiles，选择Take Shapshot。在Window-&gt;Window目录下，选择占据内存最大的进行筛选，你会得到：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-2fd5dd675bf80fc3.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="内存占用情况"></p>
+<p>很明显，</p>
+<ul>
+<li>a数组：8MB</li>
+<li>b数组：40MB</li>
+<li>c数组：64MB</li>
+</ul>
+<p>也许在实际场景中，除了100000个绿色的、size为10.5的小方块，我们还需要很多不同的颜色，不同的size的形状。之前，这样“变态”的需求常见于游戏应用中。但是现在，复杂项目中类似场景，也许距离你并不遥远。</p>
+<h2 id="ES6-Classes处理需求"><a href="#ES6-Classes处理需求" class="headerlink" title="ES6 Classes处理需求"></a>ES6 Classes处理需求</h2><p>简单“热身”之后，我们了解了实际需求。接下来，我们考察一下 ES6 Classes处理的情况。请重新刷新浏览器tab，复制执行以下代码。<br>我们使用了ES6 Classes概念，并扩充了每个形状的坐标信息：</p>
+<pre><code>class Shape {
+    constructor (id, shape = &apos;square&apos;, size = 10.5, color = &apos;green&apos;) {
+        this.x = x; //  坐标x轴
+        this.y = y; //  坐标y轴
+        Object.assign(this, {id, shape, size, color})
+    }
+}
+
+a = new Array(1e6).fill(0);
+b = a.map((val, ix) =&gt; new Shape(ix));
+</code></pre><p>此时，我们再来看一下内存占用情况：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-10615f58c727ea91.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="内存占用截图"></p>
+<p>很明显，此时b数组由100000个形状组成，占据：80MB；也许这并不出乎意料，此时的b数组毕竟又多了两个属性。</p>
+<h2 id="优化设计：Two-Headed-Classes"><a href="#优化设计：Two-Headed-Classes" class="headerlink" title="优化设计：Two-Headed Classes"></a>优化设计：Two-Headed Classes</h2><p>我们先来分析一下上面的实现，熟悉原型链、原型概念的同学也许会明白，之前的方案产生的实例，顺着原型链上溯，具有三层：</p>
+<blockquote>
+<p><strong>第一层</strong>：[id, shape, size, color, x, y]; 这一层的hasOwnproperty为true;<br><strong>第二次</strong>：[Shape]; 这一层 instance.<strong>proto</strong> === Constructor.prototype;<br><strong>第三层</strong>：[Object]; 这一层的再顶层，就为null了</p>
+</blockquote>
+<p>这样的情况下，数据层只有一层，即为第一层。<br>但是，如果有大量的不同颜色，不同size，不同形状的情况下。单一数据层，是难以满足我们需求的。<br>我们需要，再添加一层数据层，构成Two-Headed Classes！同时，还需要对于者默认的属性，实现共享，以节省内存的占用。</p>
+<p><strong>那应该如何实现呢？</strong><br>我们可以使用Object.create方法，这样使得生产得到的实例的<strong>proto</strong>指向b数组的元素，然后在最顶层设计一个id属性。<br>也许这样说过于晦涩，那就直接参考代码吧，请注意，这是本篇文章最难以理解的地方，请务必仔细揣摩：</p>
+<pre><code>two = Object.create(b[0]); 
+// two.__proto__ === b[0]
+two.id = 1;
+</code></pre><p>这样子的话，对于每一个实例，我们有如下关系：</p>
+<blockquote>
+<p>第一层：[id]； 这一层的hasOwnproperty为true;<br>第二层：[id, shape, size, color, x, y];  这一层 instance.<strong>proto</strong> === Constructor.prototype;<br>第三层：[Shape];<br>第四层：[Object];这一层的再顶层，就为null了</p>
+</blockquote>
+<p>我们将Shape的一个实例作为一个新的object的原型，并复写了id属性，原有的id属性将作为默认id。</p>
+<p>当然，上边的代码只是“个案”，我们进行“生产化”：</p>
+<pre><code>proto = new Shape(0);
+function newTwoHeaded (ix) {
+    const obj = Object.create(proto);
+    obj.id = ix;
+    return obj
+}
+c = a.map((val, ix) =&gt; newTwoHeaded(ix));
+</code></pre><p>这么做多加入了一个数据层，那么有什么“收获”呢？我们来看一下b和c的内存占用情况吧：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-0402466c934dcc5b.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="内存占用截图"></p>
+<p>这表明：我们从80MB的b，优化得到了64MB的c!<br><strong>原因当然就在于虽然多加了一层，但是第二层变成了“共享”。 </strong></p>
+<p>当然，如果你基础知识雄厚的话，可能要问：那第二层诸如：shape, size, color这些属性变成共享的之后，存在互相干扰怎么破解呢？<br>好问题，我先不解答，先给大家看一下最后的final product：</p>
+<pre><code>class ShapeMaker {
+    constructor () {
+        Object.assign(this, ShapeMaker.defaults())
+    }
+    static defaults () {
+        return {
+            id: null,
+            x: 0,
+            y: 0,
+            shape: &apos;square&apos;,
+            size: 0.5,
+            color: &apos;red&apos;,
+            strokeColor: &apos;yellow&apos;,
+            hidden: false,
+            label: null,
+            labelOffset: [0, 0],
+            labelFont: &apos;10px sans-serif&apos;,
+            labelColor: &apos;black&apos;
+        }
+    }
+    newShape (id, x, y) {
+        const obj = Object.create(this);
+        return Object.assign(obj, {id, x, y})
+    }
+    setDefault (name, value) {
+        this[name] = value;
+    }
+    getDefault (name) {
+        return this[name]
+    }
+}
+</code></pre><p>在实例化的时候，我们便可以这样使用：</p>
+<pre><code>shapeProto = new ShapreMaker();
+d = a.map((val, ix) =&gt; shapeProto.newShape(ix, ix/10, -ix/10))
+</code></pre><p>就像上面所说的，初始化实例时，我们初始化了id, x, y这么三个参数。作为该实例的数据层。这个实例的原型上，也有类似的参数，来保证默认值。这些原型上的属性，对于实例数组中的每个实例，都是共享的。</p>
+<p>为了更好的对比，如果设计是这样子：</p>
+<pre><code>function fatShape (id, x, y) {
+    const a = new shapeMaker();
+    return Object.assign(a, {id, x, y})
+}
+e = a.map((val, ix) =&gt; fatShape(ix, ix/10, -ix/10))
+</code></pre><p>那么所有属性无法共享，而是各自拷贝了一份。在内存的占用上，将是我们给出方案的三倍之多！</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-a2e2a7d060df822d.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="内存占用截图"></p>
+<h2 id="阿喀琉斯之踵"><a href="#阿喀琉斯之踵" class="headerlink" title="阿喀琉斯之踵"></a>阿喀琉斯之踵</h2><p>阿喀琉斯，是凡人珀琉斯和美貌仙女忒提斯的宝贝儿子。忒提斯为了让儿子炼成“金钟罩”，在他刚出生时就将其倒提着浸进冥河，遗憾的是，乖儿被母亲捏住的脚后跟却不慎露在水外，全身留下了惟一一处“死穴”。后来，阿喀琉斯被帕里斯一箭射中了脚踝而死去。<br><strong>后人常以“阿喀琉斯之踵”譬喻这样一个道理：即使是再强大的英雄，他也有致命的死穴或软肋。</strong></p>
+<p>就像我们刚才提的到解决方案一样，也有一些“不足”。问题其实在之前我也已经抛出：“第二层诸如：shape, size, color这些属性变成共享的之后，存在互相干扰怎么破解呢？”</p>
+<p>这个问题的答案其实也隐藏在上面的代码中，很简单，就是我们在实例的自身属性上，进行复写，而避免更改原型上的属性造成污染。</p>
+<p>如果你看的云里雾里，不要紧，马上看一下我下面的代码说明：</p>
+<pre><code>d.every((item) =&gt; item.shape === &apos;square&apos;) // true
+</code></pre><p>打印为true，是因为d数组中的每个实例的shape属性，都在原型上，且初始值都为’square’;</p>
+<p>现在我们调用setDefault方法，实现对默认shape的改写。</p>
+<pre><code>shapeProto.setDefault(&apos;shape&apos;, &apos;circle&apos;);
+d.every((item) =&gt; item.shape === &apos;square&apos;); // false
+</code></pre><p>因为此时所有实例的shape都在原型上，并共享这个原型。更改之后，我们有：</p>
+<pre><code>d.every((item) =&gt; item.shape === &apos;circle&apos;); // true
+</code></pre><p>但是，我只想把第一个实例的shape设置为triangle，其他的不变，该怎么办呢？只需要在第一个实例上，增加一个shape属性，进行重写：</p>
+<pre><code>d[0].shape = &apos;triangle&apos;;
+d.every((item) =&gt; item.shape === &apos;circle&apos;); // false
+</code></pre><p>好吧，尝试完毕之后，我们在变回来。</p>
+<pre><code>d[0].shape = &apos;circle&apos;;
+</code></pre><p>这时候，自然有：</p>
+<pre><code>d.every((item) =&gt; item.shape === &apos;circle&apos;); // true
+</code></pre><p>同时，再折腾一下：</p>
+<pre><code>d[0].shape = &apos;triangle&apos;;
+d.every((item) =&gt; item.shape === &apos;triangle&apos;); // false
+</code></pre><p>相信下面的也不难理解了：</p>
+<pre><code>shapeProto.setDefault(&apos;shape&apos;, &apos;triangle&apos;);
+d.every((item) =&gt; item.shape === &apos;triangle&apos;); // true
+</code></pre><p><strong>这种模式其实比单纯使用ES6 Classes要灵活的多，同时也节省了内存。所有的静态属性都是共享的，但是共享的静态属性又都是可变的，可复写的。</strong></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章，我们在开头部分了解到了在大量数据的情况下，内存的占用是如何一步一步变的沉重。同时，我们提供了一种，在传统的Classes之上增加一个数据层的方法，有效地解决了这个问题。解决方案充分利用了Object.create等手段。</p>
+<p>当然，理解这些内容并不简单，需要读者有比较扎实的Javascript基础。在您阅读过程当中，有任何问题，欢迎与我讨论。</p>
+<p>Happy Coding!</p>
+<p>PS: 作者<a href="https://github.com/HOUCe" target="_blank" rel="external">Github仓库</a>，欢迎通过代码各种形式交流。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/04/04/js/two-headed-es6-classes/" data-id="cj9m6cu4q003oo9fy33587wel" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/04/04/js/two-headed-es6-classes/" data-title="通过一个场景实例 了解前端处理大数据的无限可能" data-url="https://exp-team.github.io/blog/2017/04/04/js/two-headed-es6-classes/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/04/05/js/react-tree-data/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          一个有趣的react demo 教你如何处理树形结构
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/04/04/js/access/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">万军丛中取敌将首级－如何优雅安全地在深层数据结构中取值</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 20px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 18px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/react-this/">从 React 绑定 this，看 JS 语言发展和框架设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/next/">React 服务端渲染如此轻松 从零开始构建前后端应用</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/iterator/">从贺老微博引出的“遍历器（Iterators）加速那些奥秘”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/node-cache/">教你编写 Node.js 中间件，实现服务端缓存（附demo源码）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/setState-promise/">从 setState promise 化的探讨 体会 React 团队设计思想</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

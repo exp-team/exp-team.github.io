@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>我们能从一场“数据设计的撕逼”中学到哪些精华 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="最近看了一篇Chris Burgin的">
+<meta name="keywords" content="js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="我们能从一场“数据设计的撕逼”中学到哪些精华">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/05/14/js/Converting an Array of Objects to an Object/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="最近看了一篇Chris Burgin的">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-05-11T06:40:58.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="我们能从一场“数据设计的撕逼”中学到哪些精华">
+<meta name="twitter:description" content="最近看了一篇Chris Burgin的">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/Converting an Array of Objects to an Object" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/05/14/js/Converting an Array of Objects to an Object/" class="article-date">
+  <time datetime="2017-05-13T16:00:00.000Z" itemprop="datePublished">2017-05-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      我们能从一场“数据设计的撕逼”中学到哪些精华
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近看了一篇Chris Burgin的<a href="https://medium.com/dailyjs/rewriting-javascript-converting-an-array-of-objects-to-an-object-ec579cafbfc7" target="_blank" rel="external">文章：Rewriting JavaScript: Converting an Array of Objects to an Object</a>，其中对比讨论了两种数据设计的不同点。并推广从“一个包含对象的数组”迁移到扁平化的“对象”存储结构。</p>
+<p>这不，遥相呼应的是，我也在YouTube上看到了一篇类似的视频：<a href="https://www.youtube.com/watch?v=aJxcVidE0I0" target="_blank" rel="external">[Redux] The Best Way to Store Data</a></p>
+<p>我们知道React＋Redux技术栈由于其设计思路，使得前端应用并管理复杂数据越来越重要。比如，读者朋友可以参考我之前分析过的Twitter前端数据架构<a href="http://www.jianshu.com/p/7a56ac1de2a8" target="_blank" rel="external">一文：解析Twitter前端架构 学习复杂场景数据设计。</a></p>
+<p>但是，上面提的数据设计方式到底是指的什么？当我们在说扁平化的设计时，到底在说什么？这样的设计真的“百利而无一害”吗？</p>
+<p>别急，下文我讲细细道来。</p>
+<h2 id="通过场景来看透设计"><a href="#通过场景来看透设计" class="headerlink" title="通过场景来看透设计"></a>通过场景来看透设计</h2><p>假设我们需要维护一个婚恋交友用户列表，包含了所有注册用户。每个用户有唯一id作为辨识，同时含有用户名和年龄信息。<br>一个很常见的做法是：</p>
+<pre><code>const userArray = [
+    {
+        id: 123,
+        name: &apos;LucasHC&apos;,
+        age: 18
+    },
+    {
+        id: 456,
+        name: &apos;maxiao&apos;,
+        age: 38
+    },
+    {
+        id: 789,
+        name: &apos;chengwen&apos;,
+        age: 22
+    },
+    {
+        id: 101,
+        name: &apos;yanhaijing&apos;,
+        age: 28
+    },
+    {
+        id: 102,
+        name: &apos;zhaowenlin&apos;,
+        age: 8
+    }
+]
+</code></pre><p>这样的储存设计方式非常的简单，也符合逻辑。</p>
+<p>但是，如果我们想选出id为101用户，那就必须要遍历这个数组。通常的做法包括但不限于：</p>
+<pre><code>let idToSelect = 101;
+let selectedUser;
+
+for (let user of userArray) {
+    if (user.id === idToSelect) {
+        selectedUser = user;
+        // ...
+        break;
+    }
+}
+</code></pre><p>我们使用了ES6当中的for…of方法。<br>当然除此之外，使用数组的filter方法、find方法等等都是可行的。比如：</p>
+<pre><code>const selectedUser = userArray.find(user =&gt; user.id === idToSelect)
+</code></pre><p>但是不可避免的就是需要遍历这个数组。<br>想象一下如果这个用户数组比较大，参加婚恋交友的用户很多，性能上先不说，这样的更新用户信息方式也是比较复杂的。</p>
+<p>值得注意的是，Chris Burgin的原文当中，观点还有</p>
+<blockquote>
+<p>This is fairly simple and will traverse the array and assign the correct person to selectedPerson. This presents many problems though, mainly it introduces mutation into your code. Scary!</p>
+</blockquote>
+<p>不过，据我理解，上述的操作方式如果非要这么理解所谓的“mutation”的话，Chris Burgin可能想表达user赋值给selectedUser属于引用赋值，确实会存在“共享”的问题。但是他提供的方法（见下文），也同样没有规避这样的问题。</p>
+<p>当然，不止我注意了这样的细节。原文下面的评论，也有很多读者留言表示：</p>
+<blockquote>
+<p>I don’t see a mutation here? </p>
+<p>I don’t understand how it mutates the array. Does this portion “let person of peopleArray” somehow change the array?</p>
+</blockquote>
+<p>看到这里，如果您有自己对于“mutation”的看法，也欢迎和我交流。</p>
+<h2 id="更好的方式"><a href="#更好的方式" class="headerlink" title="更好的方式"></a>更好的方式</h2><p>更理想的方式是把刚才的userArray数组转换为对象来存储。就像下面所做的这样：</p>
+<pre><code>const userObject = {
+    &quot;123&quot;: { id: 123, name: &quot;LucasHC&quot;, age: 18 },
+    &quot;456&quot;: { id: 456, name: &quot;maxiao&quot;, age: 38 },
+    &quot;789&quot;: { id: 789, name: &quot;chengwen&quot;, age: 22 },
+    &quot;101&quot;: { id: 101, name: &quot;yanhaijing&quot;, age: 28 },
+    &quot;102&quot;: { id: 102, name: &quot;zhaowenlin&quot;, age: 8 }
+}
+</code></pre><p>这种方式下，我们想要选出id为101用户的操作更简单了：</p>
+<pre><code>const idToSelect = &quot;101&quot;;
+const selectedUser = userObject[idToSelect];
+// ...
+</code></pre><p>只需要按照唯一id便可达到我们的目的。完全不再需要遍历一个数组！</p>
+<p>这种方式更加简洁清晰。按照Chris Burgin的说法，同样还可以“removes mutation”。当然，我对此持保留态度。</p>
+<h2 id="数据转换"><a href="#数据转换" class="headerlink" title="数据转换"></a>数据转换</h2><p>当然，在某些场景下就如上文所讲，数组转换为对象来存储数据是一种极好的方式。可是有时候我们并没有设计数据的主动权。比如从后端返回的数据就是</p>
+<pre><code>    const userArray = [
+    {
+        id: 123,
+        name: &apos;LucasHC&apos;,
+        age: 18
+    },
+    {
+        id: 456,
+        name: &apos;maxiao&apos;,
+        age: 38
+    },
+    {
+        id: 789,
+        name: &apos;chengwen&apos;,
+        age: 22
+    },
+    {
+        id: 101,
+        name: &apos;yanhaijing&apos;,
+        age: 28
+    },
+    {
+        id: 102,
+        name: &apos;zhaowenlin&apos;,
+        age: 8
+    }
+]
+</code></pre><p>这种形式。这就需要我们进行手动转换。其中一种JS原生转换方式为：</p>
+<pre><code>const arrayToObject = (array) =&gt;
+    array.reduce((obj, item) =&gt; { obj[item.id] = item; return obj }, {})
+
+const idToSelect = &quot;101&quot;;
+const userObject = arrayToObject(userArray);
+console.log(userObject[idToSelect]);
+</code></pre><p>关于reduce函数的用法，如果您还不熟悉，建议去补一补课。这个极具函数式风情的API绝对值得学习。</p>
+<p>当然我们可以将转换函数做的更加通用一些：</p>
+<pre><code>const arrayToObject = (array, keyField) =&gt;
+   array.reduce((obj, item) =&gt; { obj[item[keyField]] = item;return obj }, {})
+</code></pre><p>我们接受keyField参数作为提取因子。</p>
+<p>当然，我们还可以换一种姿势进行：</p>
+<pre><code>const arrayToObject = (arr, keyField) =&gt;
+    Object.assign({}, ...arr.map(item =&gt; ({[item[keyField]]: item})))
+</code></pre><p>这些都能完全达到我们的目的。</p>
+<h2 id="一些思考"><a href="#一些思考" class="headerlink" title="一些思考"></a>一些思考</h2><p>实现了我们所有想要的结果，但是我们还应该进行更进一步的思考。<br>关于两种方式的比较，我们思考这么一个问题：如果场景需求我们在遍历数据时保证顺序性，或者存储的数据有严格的顺序要求。这时候也许使用数组是一种更加可靠的方法。</p>
+<p>另外，我们实现了arrayToObject，但是有时候arrayToMap，使用Map结构来存取数据也许更加必要。ES6为我们提供了Map数据结构。它是一个”value-value”的对应。关于使用Object还是Map，这两种数据结构的比较，我给大家推荐<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Map#Objects_and_maps_compared" target="_blank" rel="external">这里，进行了解</a>，毕竟某种情况下，Map的取值相比Object还是有优势的。</p>
+<p>另外，关于arrayToMap的实现，也很简单：</p>
+<pre><code>const arrayToMap = (array, keyField) =&gt; new Map(
+    array.map((item) =&gt; [ item[keyField], item ])
+)
+</code></pre><p>最后，关于广受争议的”Mutation”之争，我也给出我的想法。Chris Burgin的前后两种实现，我认为是否存在Mutation.关键在于：取出元素之后，接下来会如何操作去更新userObject/userArray.<br>拿update data举例，如下：</p>
+<pre><code>const userObject = {
+    &quot;123&quot;: { id: 123, name: &quot;LucasHC&quot;, age: 18 },
+    &quot;456&quot;: { id: 456, name: &quot;maxiao&quot;, age: 38 },
+    &quot;789&quot;: { id: 789, name: &quot;chengwen&quot;, age: 22 },
+    &quot;101&quot;: { id: 101, name: &quot;yanhaijing&quot;, age: 28 },
+    &quot;102&quot;: { id: 102, name: &quot;zhaowenlin&quot;, age: 8 }
+}
+
+const idToSelect = &quot;101&quot;;
+const selectedUser = userObject[idToSelect];
+
+selectedUser.name = &quot;xulinfeng&quot;;
+
+
+const userObject2 = Object.assign({}, userObject, {
+    &quot;101&quot;: selectedUser
+});
+</code></pre><p>这种更改，我们得到更新后的userObject2同时，也更改了原有的userObject;</p>
+<p>但是为了演示，我们如果嵌套两层Object.assign，那么就不会有类似问题。</p>
+<pre><code>const userObject = {
+    &quot;123&quot;: { id: 123, name: &quot;LucasHC&quot;, age: 18 },
+    &quot;456&quot;: { id: 456, name: &quot;maxiao&quot;, age: 38 },
+    &quot;789&quot;: { id: 789, name: &quot;chengwen&quot;, age: 22 },
+    &quot;101&quot;: { id: 101, name: &quot;yanhaijing&quot;, age: 28 },
+    &quot;102&quot;: { id: 102, name: &quot;zhaowenlin&quot;, age: 8 }
+}
+
+const idToSelect = &quot;101&quot;;
+const selectedUser = userObject[idToSelect];
+
+const userObject2 = Object.assign({}, userObject, {
+    &quot;101&quot;: Object.assign({}, selectedUser, {name: &quot;xulinfeng&quot;})
+});
+</code></pre><p>当然，存在更优雅的方法，比如使用对象的解构去实现。</p>
+<p>最后，关于数据扁平化的设计上，大家可以关注<a href="https://github.com/paularmstrong/normalizr" target="_blank" rel="external">normalizr类库</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>我想，由Chris Burgin的文章，学习到的知识不少；更重要的是由此引出的思考。希望这篇文章对于大家在前端数据存储的设计上、Javascript语言特性上、甚至函数式编程思想上等都有不同程度的启发。<br>欢迎与我讨论。</p>
+<p>Happy Coding!</p>
+<p>PS: 作者<a href="https://github.com/HOUCe" target="_blank" rel="external">Github仓库</a>，欢迎通过代码各种形式交流。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/05/14/js/Converting an Array of Objects to an Object/" data-id="cj9m6cu0b0007o9fy1ojgljov" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/05/14/js/Converting an Array of Objects to an Object/" data-title="我们能从一场“数据设计的撕逼”中学到哪些精华" data-url="https://exp-team.github.io/blog/2017/05/14/js/Converting an Array of Objects to an Object/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/05/20/weekly/weekly-11110/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          expfe技术周刊第11110期
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/05/12/weekly/weekly-11101/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">expfe技术周刊第11101期</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 20px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 18px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/react-this/">从 React 绑定 this，看 JS 语言发展和框架设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/next/">React 服务端渲染如此轻松 从零开始构建前后端应用</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/iterator/">从贺老微博引出的“遍历器（Iterators）加速那些奥秘”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/node-cache/">教你编写 Node.js 中间件，实现服务端缓存（附demo源码）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/setState-promise/">从 setState promise 化的探讨 体会 React 团队设计思想</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

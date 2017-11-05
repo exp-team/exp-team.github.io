@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>React 服务端渲染如此轻松 从零开始构建前后端应用 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="参加或留意了最近举行的JSConf C">
+<meta name="keywords" content="js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React 服务端渲染如此轻松 从零开始构建前后端应用">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/11/04/js/next/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="参加或留意了最近举行的JSConf C">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-0caa6abef06e4c3a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-fec93cb7b90b4938.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-b1afa6031e077f67.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-e1310faf126ca61e.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-da9e671c438902f2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-463c88cdb1e175ed.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-14352128450bb0fb.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-811c8bca1607cca0.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-af29722f2a62216e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-11-05T02:44:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="React 服务端渲染如此轻松 从零开始构建前后端应用">
+<meta name="twitter:description" content="参加或留意了最近举行的JSConf C">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/4363003-0caa6abef06e4c3a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/next" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/11/04/js/next/" class="article-date">
+  <time datetime="2017-11-03T16:00:00.000Z" itemprop="datePublished">2017-11-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      React 服务端渲染如此轻松 从零开始构建前后端应用
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>参加或留意了最近举行的<a href="https://www.zhihu.com/question/62154473/answer/200045569" target="_blank" rel="external">JSConf CN 2017</a>的同学，想必对 Next.js 不再陌生， Next.js 的作者之一 Guillermo Rauch 到场进行了精彩的演讲。其实在更早些时候，由 Facebook 举办的 React Conf 2017，他就到场并有近40分钟的分享。但两次分享带来的 demo 都是 hacker news。我观察 Next.js 时间较长，看着它从1.x 版本一直到了今天的 3.x，终于决定写一篇入门级的新手指导文章。而这篇文章试图通过一个全新的例子，来让大家了解 Next.js 到底是如何与 React 配合，达到服务端渲染的。</p>
+<p>“React universal” 是社区上形容基于 React 构建 web 应用，并采用“服务端渲染”方式的一个词语。也许很多人对 “isomorphic” 这个单词更加熟悉，其实这两个词语想要表达的概念类似。今天这篇文章显然不是讨论这两个词语的，<strong>我们要尝试使用最新版 <a href="https://github.com/zeit/next.js" target="_blank" rel="external">Next.js</a>，构件一个简单的服务端渲染 React 应用。</strong>最终项目地址可以<a href="https://github.com/HOUCe/server-side-react-football" target="_blank" rel="external">点击这里查看。</a></p>
+<h2 id="为何要开发-Universal-应用？"><a href="#为何要开发-Universal-应用？" class="headerlink" title="为何要开发 Universal 应用？"></a>为何要开发 Universal 应用？</h2><p>React app 实现了虚拟 DOM，来实现对真实 DOM 的抽象。这样的设计迅速引领了前端开发浪潮。但是 “Every great thing comes with a price”，虚拟 DOM 同样带来了一些弊端，比如在前后端分离的开发模式下，SEO就成了问题；同样首屏加载时间变长，各种 loading 消磨人的耐心。就像下面截图所展现的那样：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-0caa6abef06e4c3a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="页面"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-fec93cb7b90b4938.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="查看网页源码"></p>
+<h2 id="使用-Next-js-实现-Universal"><a href="#使用-Next-js-实现-Universal" class="headerlink" title="使用 Next.js 实现 Universal"></a>使用 Next.js 实现 Universal</h2><p>Universal 应用架构可以简单粗暴先而片面的理解成应用将在客户端和服务端共同完成渲染。这样取代了完全由客户端渲染（前后端分离方式）模式。在 React 场景下，我们可以使用 React 自身的 renderToString 完成服务端初次渲染。但是如果我们每次手动来完成这些过程，手动实现服务端繁琐配置，难免令人头大心烦。</p>
+<p>Next.js 的出现，就是为你解决这种恼人的问题。我们先来认识一下它的几个原则和思想：</p>
+<ul>
+<li>不需要除 Next 之外，多余的配置和安装（比如 webpack，babel）；</li>
+<li>使用 <a href="https://github.com/threepointone/glamor" target="_blank" rel="external">Glamor</a> 处理样式；</li>
+<li>自动编译和打包；</li>
+<li>热更新；</li>
+<li>方便的静态资源管理；</li>
+<li>成熟灵活的路由配置，包括路由级别 prefetching；</li>
+</ul>
+<h2 id="Demo：英超联赛积分榜"><a href="#Demo：英超联赛积分榜" class="headerlink" title="Demo：英超联赛积分榜"></a>Demo：英超联赛积分榜</h2><p>其实关于更多的 Next.js 设计理念我不想再赘述了，读者都可以在其官网找到丰富的内容。下面，我将使用 Football Data API 来简单开发一个基于 Next.js 的应用，这个应用将展现英超联赛的实时积分榜。同时包含了简单的路由开发和页面跳转。</p>
+<h3 id="小试牛刀"><a href="#小试牛刀" class="headerlink" title="小试牛刀"></a>小试牛刀</h3><p>相信所有的开发者都厌恶超长时间的安装和各种依赖、插件配置。不要担心，Next.js 作为一个独立的 npm package 最大限度的替你完成了很多耗时且无趣的工作。我们首先需要进行安装：</p>
+<pre><code># Start a new project
+npm init
+# Install Next.js
+npm install next@beta react react-dom --save
+</code></pre><p>安装结束后，我们就可以开启脚本：</p>
+<pre><code>&quot;scripts&quot;: {
+   &quot;start&quot;: &quot;next&quot;
+ },
+</code></pre><p>接下来所需要做的很简单，就是在根目录下创建一个 pages 文件夹，并在其下新建一个 index.js 文件：</p>
+<pre><code>// ./pages/index.js
+
+// Import React
+import React from &apos;react&apos;
+
+// Export an anonymous arrow function
+// which returns the template
+export default () =&gt; (
+  &lt;h1&gt;This is just so easy!&lt;/h1&gt;
+)
+</code></pre><p>好了，现在就可以直接看到结果：</p>
+<pre><code># Start your app
+npm start
+</code></pre><p><img src="http://upload-images.jianshu.io/upload_images/4363003-b1afa6031e077f67.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="页面"></p>
+<p>验证一下它来自服务端渲染：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-e1310faf126ca61e.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="查看网页源码"></p>
+<p>就是这么简单清新。总结一下，<strong>安装这个框架会搭建一个基于 React、webpack 和 Babel 的构建过程。</strong>如果我们自己手段实现这一切的话，除了 NodeJS 的种种繁琐不说，webpack 配置，node_modules 依赖，babel插件等等就够折腾半天的了。</p>
+<h2 id="添加-Page-Head"><a href="#添加-Page-Head" class="headerlink" title="添加 Page Head"></a>添加 Page Head</h2><p>在 ./pages/index.js 文件内，我们可以添加页面 head 标签、meta 信息、样式资源等等：</p>
+<pre><code>// ./pages/index.js
+import React from &apos;react&apos;
+// Import the Head Component
+import Head from &apos;next/head&apos;
+
+export default () =&gt; (
+  &lt;div&gt;
+    &lt;Head&gt;
+        &lt;title&gt;League Table&lt;/title&gt;
+        &lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=1.0, width=device-width&quot; /&gt;
+        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://unpkg.com/purecss@0.6.1/build/pure-min.css&quot; /&gt;
+    &lt;/Head&gt;
+    &lt;h1&gt;This is just so easy!&lt;/h1&gt;
+  &lt;/div&gt;
+)
+</code></pre><p>这个 head 当然不是指真实的 DOM，千万别忘了 React 虚拟 DOM 的概念。其实这是 Next 提供的 Head 组件，不过最终一定还是被渲染成为真实的 head 标签。</p>
+<h2 id="发送-Ajax-请求"><a href="#发送-Ajax-请求" class="headerlink" title="发送 Ajax 请求"></a>发送 Ajax 请求</h2><p>Next 还提供了 getInitialProps() 组件生命周期钩子方法，使得框架能够在服务器上进行初始渲染，如果需要的话，还可以在客户端继续进行渲染。这个高级特性很小却功能强大。</p>
+<p>这个方法支持异步选项，并且是服务端/客户端同构的。我们可以使用 async/await 方式，处理异步请求。请看下面的示例：</p>
+<pre><code>import React from &apos;react&apos;
+import Head from &apos;next/head&apos;
+import axios from &apos;axios&apos;;
+
+export default class extends React.Component {
+    // Async operation with getInitialProps
+    static async getInitialProps () {
+        // res is assigned the response once the axios
+        // async get is completed
+        const res = await axios.get(&apos;http://api.football-data.org/v1/competitions/426/leagueTable&apos;);
+        // Return properties
+        return {data: res.data}
+      }
+ }
+</code></pre><p>我们使用了 axios 类库来发送 HTTP 请求。网络请求是异步的，因此我们需要在未来某个合适的时候（请求结果返回时）接收数据。这里使用先进的 async/await，以同步的方式处理，从而避免了回调嵌套和 promises 链。</p>
+<p>我们将异步获得的数据返回，它将自动挂载在 props 上（注意 getInitialProps 方法名，顾名思义），render 方法里便可以通过 this.props.data 获取：</p>
+<pre><code>import React from &apos;react&apos;
+import Head from &apos;next/head&apos;
+import axios from &apos;axios&apos;;
+
+export default class extends React.Component {
+  static async getInitialProps () {
+    const res = await axios.get(&apos;http://api.football-data.org/v1/competitions/426/leagueTable&apos;);
+    return {data: res.data}
+  }
+  render () {
+    return (
+      &lt;div&gt;
+        &lt;Head&gt;
+            ......
+        &lt;/Head&gt;
+        &lt;div className=&quot;pure-g&quot;&gt;
+            &lt;div className=&quot;pure-u-1-3&quot;&gt;&lt;/div&gt;
+            &lt;div className=&quot;pure-u-1-3&quot;&gt;
+              &lt;h1&gt;Barclays Premier League&lt;/h1&gt;
+              &lt;table className=&quot;pure-table&quot;&gt;
+                &lt;thead&gt;
+                  &lt;tr&gt;
+                    ......
+                  &lt;/tr&gt;
+                &lt;/thead&gt;
+                &lt;tbody&gt;
+                {this.props.data.standing.map((standing, i) =&gt; {
+                  const oddOrNot = i % 2 == 1 ? &quot;pure-table-odd&quot; : &quot;&quot;;
+                  return (
+                      &lt;tr key={i} className={oddOrNot}&gt;
+                        &lt;td&gt;{standing.position}&lt;/td&gt;
+                        &lt;td&gt;&lt;img className=&quot;pure-img logo&quot; src={standing.crestURI}/&gt;&lt;/td&gt;
+                        &lt;td&gt;{standing.points}&lt;/td&gt;
+                        &lt;td&gt;{standing.goals}&lt;/td&gt;
+                        &lt;td&gt;{standing.wins}&lt;/td&gt;
+                        &lt;td&gt;{standing.draws}&lt;/td&gt;
+                        &lt;td&gt;{standing.losses}&lt;/td&gt;
+                      &lt;/tr&gt;
+                    );
+                })}
+                &lt;/tbody&gt;
+              &lt;/table&gt;
+            &lt;/div&gt;
+            &lt;div className=&quot;pure-u-1-3&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+</code></pre><p>这样，再访问我们的页面，就有了：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-da9e671c438902f2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="页面"></p>
+<h2 id="路由和页面跳转"><a href="#路由和页面跳转" class="headerlink" title="路由和页面跳转"></a>路由和页面跳转</h2><p>也许你已经有所感知：我们已经有了最基本的一个路由。Next 不需要任何额外的路由配置信息，你只需要在 pages 文件夹下新建文件，每一个文件都将是一个独立的页面。事实上，Next.js 使用 <a href="https://zeit.co/blog/next#zero-setup.-use-the-filesystem-as-an-api" target="_blank" rel="external">filesystem作为API</a>，所以每个放到 pages 文件夹中的组件将会自动映射为一个基于服务器的路由。比如，磁盘上的 pages/detail.js 组件将会自动服务于 /about 这个 URL。</p>
+<p>让我们来新建一个 team 页面吧！新建 ./pages/details.js 文件：</p>
+<pre><code>// ./pages/details.js
+import React from &apos;react&apos;
+export default () =&gt; (
+  &lt;p&gt;Coming soon. . .!&lt;/p&gt;
+)
+</code></pre><p>我们使用 Next 已经准备好的组件 <link> 来进行页面跳转：</p>
+<pre><code>// ./pages/details.js
+import React from &apos;react&apos;
+
+// Import Link from next
+import Link from &apos;next/link&apos;
+
+export default () =&gt; (
+  &lt;div&gt;
+      &lt;p&gt;Coming soon. . .!&lt;/p&gt;
+      &lt;Link href=&quot;/&quot;&gt;&lt;a&gt;Go Home&lt;/a&gt;&lt;/Link&gt;
+  &lt;/div&gt;
+)
+</code></pre><p>这个页面不能总是 “Coming soon. . .!” 的信息，我们来进行完善以展示更多内容，通过页面 URL 的 query id 变量，我们来请求并展现当前相应队伍的信息：</p>
+<pre><code>import React from &apos;react&apos;
+import Head from &apos;next/head&apos;
+import Link from &apos;next/link&apos;
+import axios from &apos;axios&apos;;
+
+export default class extends React.Component {
+    static async getInitialProps ({query}) {
+        // Get id from query
+        const id = query.id;
+        if(!process.browser) {
+            // Still on the server so make a request
+            const res = await axios.get(&apos;http://api.football-data.org/v1/competitions/426/leagueTable&apos;)
+            return {
+                data: res.data,
+                // Filter and return data based on query
+                standing: res.data.standing.filter(s =&gt; s.position == id)
+            }
+        } else {
+            // Not on the server just navigating so use
+            // the cache
+            const bplData = JSON.parse(sessionStorage.getItem(&apos;bpl&apos;));
+            // Filter and return data based on query
+            return {standing: bplData.standing.filter(s =&gt; s.position == id)}
+        }
+    }
+
+    componentDidMount () {
+        // Cache data in localStorage if
+        // not already cached
+        if(!sessionStorage.getItem(&apos;bpl&apos;)) sessionStorage.setItem(&apos;bpl&apos;, JSON.stringify(this.props.data))
+    }
+
+    // . . . render method truncated
+ }
+</code></pre><p>这个页面根据 query 变量，动态展现出球队信息。具体来看，getInitialProps 方法获取 URL query id，根据 id 筛选出（filter 方法）展示信息。有意思的是，因为一直球队的信息比较稳定，所以在客户端使用了 sessionStorage 进行存储。</p>
+<p>完整的 render 方法：</p>
+<pre><code>// . . . truncated
+
+export default class extends React.Component {
+    // . . . truncated
+    render() {
+
+        const detailStyle = {
+            ul: {
+                marginTop: &apos;100px&apos;
+            }
+        }
+
+        return  (
+             &lt;div&gt;
+                &lt;Head&gt;
+                    &lt;title&gt;League Table&lt;/title&gt;
+                    &lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=1.0, width=device-width&quot; /&gt;
+                    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://unpkg.com/purecss@0.6.1/build/pure-min.css&quot; /&gt;
+                &lt;/Head&gt;
+
+                &lt;div className=&quot;pure-g&quot;&gt;
+                    &lt;div className=&quot;pure-u-8-24&quot;&gt;&lt;/div&gt;
+                    &lt;div className=&quot;pure-u-4-24&quot;&gt;
+                        &lt;h2&gt;{this.props.standing[0].teamName}&lt;/h2&gt;
+                        &lt;img src={this.props.standing[0].crestURI} className=&quot;pure-img&quot;/&gt;
+                        &lt;h3&gt;Points: {this.props.standing[0].points}&lt;/h3&gt;
+                    &lt;/div&gt;
+                    &lt;div className=&quot;pure-u-12-24&quot;&gt;
+                        &lt;ul style={detailStyle.ul}&gt;
+                            &lt;li&gt;&lt;strong&gt;Goals&lt;/strong&gt;: {this.props.standing[0].goals}&lt;/li&gt;
+                            &lt;li&gt;&lt;strong&gt;Wins&lt;/strong&gt;: {this.props.standing[0].wins}&lt;/li&gt;
+                            &lt;li&gt;&lt;strong&gt;Losses&lt;/strong&gt;: {this.props.standing[0].losses}&lt;/li&gt;
+                            &lt;li&gt;&lt;strong&gt;Draws&lt;/strong&gt;: {this.props.standing[0].draws}&lt;/li&gt;
+                            &lt;li&gt;&lt;strong&gt;Goals Against&lt;/strong&gt;: {this.props.standing[0].goalsAgainst}&lt;/li&gt;
+                            &lt;li&gt;&lt;strong&gt;Goal Difference&lt;/strong&gt;: {this.props.standing[0].goalDifference}&lt;/li&gt;
+                            &lt;li&gt;&lt;strong&gt;Played&lt;/strong&gt;: {this.props.standing[0].playedGames}&lt;/li&gt;
+                        &lt;/ul&gt;
+                        &lt;Link href=&quot;/&quot;&gt;Home&lt;/Link&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+             &lt;/div&gt;
+            )
+    }
+}
+</code></pre><p>注意下面截图中，同一页面不同 query 值，分别展示了冠军🏆切尔西和曼联的信息。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-463c88cdb1e175ed.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="切尔西"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-14352128450bb0fb.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="曼联"></p>
+<p>别忘了我们的主页（排行榜页面）index.js 中，也要使用相应的 sessionStorage 逻辑。同时，在 render 方法里加入一条链接到详情页的 <link>：</p>
+<pre><code>&lt;td&gt;&lt;Link href={`/details?id=${standing.position}`}&gt;More...&lt;/Link&gt;&lt;/td&gt;
+</code></pre><h2 id="错误页面"><a href="#错误页面" class="headerlink" title="错误页面"></a>错误页面</h2><p>在 Next 中，我们同样可以通过  error.js 文件定义错误页面。在 ./pages 下新建 error.js：</p>
+<pre><code>// ./pages/_error.js
+import React from &apos;react&apos;
+
+export default class Error extends React.Component {
+  static getInitialProps ({ res, xhr }) {
+    const statusCode = res ? res.statusCode : (xhr ? xhr.status : null)
+    return { statusCode }
+  }
+
+  render () {
+    return (
+      &lt;p&gt;{
+        this.props.statusCode
+        ? `An error ${this.props.statusCode} occurred on server`
+        : &apos;An error occurred on client&apos;
+      }&lt;/p&gt;
+    )
+  }
+}
+</code></pre><p>当传统情况下页面404时，得到：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-811c8bca1607cca0.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="404页面"></p>
+<p>在我们设置 _ error.js 之后，便有：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-af29722f2a62216e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="自定义错误页面"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章实现了一个简易 demo，只是介绍了<strong>最基本</strong>的 Next.JS 搭建 React 同构应用的基本步骤。</p>
+<p>想想你是否厌烦了 webpack 恼人的配置？是否对于 Babel 各种插件云里雾里？<br><strong>使用 Next.js，简单、清新而又设计良好。这也是它在推出短短时间以来，便迅速走红的原因之一。</strong></p>
+<p>除此之外，Next 还有非常多的功能，非常多的先进理念可以应用。</p>
+<ul>
+<li>比如 <link> 搭配 prefetch，预先请求资源；</li>
+<li>再如动态加载组件（Next.js 支持 TC39 dynamic import proposal），从而减少首次 bundle size；</li>
+<li>虽然它替我们封装好了 Webpack、Babel 等工具，但是我们又能 customizing，根据需要自定义。</li>
+</ul>
+<p>最后，对于这些本文章没有演示到的功能是否有些手痒？感兴趣的读者可以关注本文 demo 的<a href="https://github.com/HOUCe/server-side-react-football" target="_blank" rel="external">Github项目地址</a>，自己手动尝试起来吧～</p>
+<p>本文意译了<a href="https://scotch.io/tutorials/react-universal-with-next-js-server-side-react" target="_blank" rel="external">Chris Nwamba的：React Universal with Next.js: Server-side React 一文，</a>并对原文进行了升级，兼容了最新的 Next 设计。</p>
+<p>我的其他关于 React 文章：</p>
+<ul>
+<li><a href="http://www.jianshu.com/p/49029b49f2b4" target="_blank" rel="external">做出Uber移动网页版还不够 极致性能打造才见真章</a></li>
+<li><a href="http://www.jianshu.com/p/7a56ac1de2a8" target="_blank" rel="external">解析Twitter前端架构 学习复杂场景数据设计</a></li>
+<li><a href="http://www.jianshu.com/p/83c86dd0802d" target="_blank" rel="external">React Conf 2017 干货总结1: React + ES next = ♥</a></li>
+<li><a href="http://www.jianshu.com/p/cde3cf7e2760" target="_blank" rel="external">React+Redux打造“NEWS EARLY”单页应用 一个项目理解最前沿技术栈真谛</a></li>
+<li><a href="http://www.jianshu.com/p/8e28be0e7ab1" target="_blank" rel="external">一个react+redux工程实例</a></li>
+</ul>
+<p>Happy Coding!</p>
+<p>PS:<br>作者<a href="https://github.com/HOUCe" target="_blank" rel="external">Github仓库</a> 和 <a href="https://www.zhihu.com/people/lucas-hc/answers" target="_blank" rel="external">知乎问答链接</a><br>欢迎各种形式交流。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/11/04/js/next/" data-id="cj9m6cu310020o9fybx5bxgbs" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/11/04/js/next/" data-title="React 服务端渲染如此轻松 从零开始构建前后端应用" data-url="https://exp-team.github.io/blog/2017/11/04/js/next/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/11/04/js/react-this/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          从 React 绑定 this，看 JS 语言发展和框架设计
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/11/04/js/iterator/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">从贺老微博引出的“遍历器（Iterators）加速那些奥秘”</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 20px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 18px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/react-this/">从 React 绑定 this，看 JS 语言发展和框架设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/next/">React 服务端渲染如此轻松 从零开始构建前后端应用</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/iterator/">从贺老微博引出的“遍历器（Iterators）加速那些奥秘”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/node-cache/">教你编写 Node.js 中间件，实现服务端缓存（附demo源码）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/setState-promise/">从 setState promise 化的探讨 体会 React 团队设计思想</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

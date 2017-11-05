@@ -6,12 +6,14 @@
   <title>万军丛中取敌将首级－如何优雅安全地在深层数据结构中取值 | exp team</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="古有赵子龙面对“冲锋之势，有进无退，陷阵之志，有死无生”的局面，能万军丛中取敌将首级。在我们的Javascript中，往往用对象（Object）来存储一个数据结构。如果这个结构非常复杂，那么想要安全优雅地取出一个值，也并非简单">
+<meta name="keywords" content="js">
 <meta property="og:type" content="article">
 <meta property="og:title" content="万军丛中取敌将首级－如何优雅安全地在深层数据结构中取值">
 <meta property="og:url" content="https://exp-team.github.io/blog/2017/04/04/js/access/index.html">
 <meta property="og:site_name" content="exp team">
 <meta property="og:description" content="古有赵子龙面对“冲锋之势，有进无退，陷阵之志，有死无生”的局面，能万军丛中取敌将首级。在我们的Javascript中，往往用对象（Object）来存储一个数据结构。如果这个结构非常复杂，那么想要安全优雅地取出一个值，也并非简单">
-<meta property="og:updated_time" content="2017-04-10T04:52:33.000Z">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-04-27T11:43:16.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="万军丛中取敌将首级－如何优雅安全地在深层数据结构中取值">
 <meta name="twitter:description" content="古有赵子龙面对“冲锋之势，有进无退，陷阵之志，有死无生”的局面，能万军丛中取敌将首级。在我们的Javascript中，往往用对象（Object）来存储一个数据结构。如果这个结构非常复杂，那么想要安全优雅地取出一个值，也并非简单">
@@ -75,7 +77,7 @@ var _hmt = _hmt || [];
         <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
       </nav>
       <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
       </div>
     </div>
   </div>
@@ -168,13 +170,16 @@ getUserComments({}) // null
 <pre><code>const getUserComments = R.pathOr([], [&apos;user&apos;, &apos;posts&apos;, 0, &apos;comments&apos;])
 getUserComments(props) // [ &apos;Good one!&apos;, &apos;Interesting...&apos; ]
 getUserComments({}) // []
-</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章翻译自A.Sharif的最新文章：<a href="https://medium.com/javascript-inside/safely-accessing-deeply-nested-values-in-javascript-99bf72a0855a" target="_blank" rel="external">Safely Accessing Deeply Nested Values In JavaScript</a>，其中后半部分未做翻译。<br>后半部分其实分析了 Ramda＋<a href="http://folktalejs.org/" target="_blank" rel="external">Folktale</a>的实现，以及Ramda＋<a href="https://medium.com/@dtipson/functional-lenses-d1aba9e52254" target="_blank" rel="external">Lenses</a>的实现。Folktale和Lenses是非常函数式Functional Programming的思想，理解起来相对晦涩且比较小众。有兴趣的读者可以点击原文去自行了解。</p>
+</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章翻译自A.Sharif的最新文章：<a href="https://medium.com/javascript-inside/safely-accessing-deeply-nested-values-in-javascript-99bf72a0855a" target="_blank" rel="external">Safely Accessing Deeply Nested Values In JavaScript</a>，其中后半部分未做翻译。<br>后半部分其实分析了 Ramda＋<a href="http://folktalejs.org/" target="_blank" rel="external">Folktale</a>的实现，以及Ramda＋<a href="https://medium.com/@dtipson/functional-lenses-d1aba9e52254" target="_blank" rel="external">Lenses</a>的实现。</p>
+<p>Folktale和Lenses是非常函数式Functional Programming的思想，理解起来相对晦涩且比较小众。有兴趣的读者可以点击原文去自行了解。</p>
+<p>Happy Coding!</p>
 <p>如果你对函数式编程并不感冒，大可只学习第一部分的实现。对于函数式编程有兴趣的同学，希望这篇文章能够抛砖引玉，欢迎与我交流。</p>
+<p>PS: 作者<a href="https://github.com/HOUCe" target="_blank" rel="external">Github仓库</a>，欢迎通过代码各种形式交流。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://exp-team.github.io/blog/2017/04/04/js/access/" data-id="cj1bn7dsc0000dowhba40gz18" class="article-share-link">分享</a>
+      <a data-url="https://exp-team.github.io/blog/2017/04/04/js/access/" data-id="cj9m6cu070006o9fy372kfbt5" class="article-share-link">分享</a>
       
         <!-- 多说评论框 start -->
 <div class="ds-thread" data-thread-key="blog/2017/04/04/js/access/" data-title="万军丛中取敌将首级－如何优雅安全地在深层数据结构中取值" data-url="https://exp-team.github.io/blog/2017/04/04/js/access/"></div>
@@ -190,19 +195,19 @@ getUserComments({}) // []
     
 <nav id="article-nav">
   
-    <a href="/blog/2017/04/05/js/react-tree-data/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/blog/2017/04/04/js/two-headed-es6-classes/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          一个有趣的react demo 教你如何处理树形结构
+          通过一个场景实例 了解前端处理大数据的无限可能
         
       </div>
     </a>
   
   
-    <a href="/blog/2017/04/04/js/const/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/blog/2017/04/04/js/redux－tips/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">从ES6 Const看Javascript语言的诡异与灵活</div>
+      <div class="article-nav-title">拒绝Redux文档“毒害” 一个项目告诉你Redux最新真正哲学</div>
     </a>
   
 </nav>
@@ -254,7 +259,7 @@ var duoshuoQuery = {short_name:"exp-team"};
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 18px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 20px;">weekly</a>
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 20px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 18px;">weekly</a>
     </div>
   </div>
 
@@ -263,7 +268,7 @@ var duoshuoQuery = {short_name:"exp-team"};
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
     </div>
   </div>
 
@@ -276,23 +281,23 @@ var duoshuoQuery = {short_name:"exp-team"};
       <ul>
         
           <li>
-            <a href="/blog/2017/04/20/js/twitter/">解析Twitter前端架构 学习复杂场景数据设计</a>
+            <a href="/blog/2017/11/04/js/react-this/">从 React 绑定 this，看 JS 语言发展和框架设计</a>
           </li>
         
           <li>
-            <a href="/blog/2017/04/20/js/uber-clone-performance/">做出Uber移动网页版还不够 极致性能打造才见真章</a>
+            <a href="/blog/2017/11/04/js/next/">React 服务端渲染如此轻松 从零开始构建前后端应用</a>
           </li>
         
           <li>
-            <a href="/blog/2017/04/20/js/shuffle-array/">关于数组乱序的深挖——“感觉一直在写毒代码”</a>
+            <a href="/blog/2017/11/04/js/iterator/">从贺老微博引出的“遍历器（Iterators）加速那些奥秘”</a>
           </li>
         
           <li>
-            <a href="/blog/2017/04/14/js/async/">ES6 Async/Await 完爆Promise的6个原因</a>
+            <a href="/blog/2017/11/04/js/node-cache/">教你编写 Node.js 中间件，实现服务端缓存（附demo源码）</a>
           </li>
         
           <li>
-            <a href="/blog/2017/04/14/js/react-best-pratice/">通过实例，学习编写React组件的最佳实践</a>
+            <a href="/blog/2017/11/04/js/setState-promise/">从 setState promise 化的探讨 体会 React 团队设计思想</a>
           </li>
         
       </ul>

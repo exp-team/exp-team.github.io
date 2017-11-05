@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>从贺老微博引出的“遍历器（Iterators）加速那些奥秘” | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="我关注的贺老—贺师俊前辈@johnhax 最近发表个这样一条微博：">
+<meta name="keywords" content="js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从贺老微博引出的“遍历器（Iterators）加速那些奥秘”">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/11/04/js/iterator/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="我关注的贺老—贺师俊前辈@johnhax 最近发表个这样一条微博：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-2178ac3c9b666439.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-cda48b6ba23d106b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-a7c35b576fc03f3c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-f59e194150f56b9f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-11-05T02:43:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从贺老微博引出的“遍历器（Iterators）加速那些奥秘”">
+<meta name="twitter:description" content="我关注的贺老—贺师俊前辈@johnhax 最近发表个这样一条微博：">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/4363003-2178ac3c9b666439.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/iterator" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/11/04/js/iterator/" class="article-date">
+  <time datetime="2017-11-03T16:00:00.000Z" itemprop="datePublished">2017-11-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      从贺老微博引出的“遍历器（Iterators）加速那些奥秘”
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>我关注的贺老—贺师俊前辈@johnhax 最近发表个这样一条微博：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-2178ac3c9b666439.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="原微博"></p>
+<p>虽然这条微博没有引起大范围的关注和讨论，但是作为新人，我陷入了思考。<strong>究竟 V8 引擎做了哪些魔法，达到了极大限度的优化呢？</strong></p>
+<p>这篇文章，将会深入浅出分析这些优化背后的奥秘。希望大神给予斧正和引导，同时对读者有所启发和帮助。</p>
+<h2 id="我们到底在讨论什么？"><a href="#我们到底在讨论什么？" class="headerlink" title="我们到底在讨论什么？"></a>我们到底在讨论什么？</h2><p><a href="https://www.ecma-international.org/ecma-262/6.0/" target="_blank" rel="external">ECMAScript 2015 语言标准规格</a>介绍了几种新的数据结构：比如 Maps 和 Sets（当然还有类似 WeakMaps 和 WeakSets等），而这几个新引入的数据结构有一个共性，那就是都可以根据同样新引入的<strong>遍历协议（iteration protocol）进行遍历</strong>。这就意味着你可以使用 for…of 循环或者扩展运算符进行操作。举一个 Sets 简单的例子：</p>
+<pre><code>const s = new Set([1, 2, 3, 4]);
+console.log(...s);
+// 1 2 3 4
+for (const x of s) console.log(x);
+// 1
+// 2
+// 3
+// 4
+</code></pre><p>同样对于 Maps：</p>
+<pre><code>const m = new Map([[1, &quot;1&quot;], [2, &quot;2&quot;], [3, &quot;3&quot;], [4, &quot;4&quot;]]);
+console.log(...m);
+// (2) [1, &quot;1&quot;] (2) [2, &quot;2&quot;] (2) [3, &quot;3&quot;] (2) [4, &quot;4&quot;]
+console.log(...m.keys());
+// 1 2 3 4
+console.log(...m.values());
+//  1 2 3 4
+for (const [x, y] of m) console.log(x, &quot;is&quot;, y);
+// 1 &quot;is&quot; &quot;1&quot;
+// 2 &quot;is&quot; &quot;2&quot;
+// 3 &quot;is&quot; &quot;3&quot;
+// 4 &quot;is&quot; &quot;4&quot;
+</code></pre><p>通过这两个简单的例子，展示了最基本的用法。感兴趣的读者可以参考 ECMA 规范：<a href="https://www.ecma-international.org/ecma-262/6.0/#sec-map-iterator-objects" target="_blank" rel="external"> Map Iterator Objects</a> 和 <a href="https://www.ecma-international.org/ecma-262/6.0/#sec-set-iterator-objects" target="_blank" rel="external">Set Iterator Objects</a>。</p>
+<p>然而不幸的是，这些可遍历的数据结构在 V8 引擎中并没有很好的进行优化。或者说，对于这些实现细节优化程度很差。包括 ECMAScript 成员 Brian Terlson 也曾在 Twitter 上抱怨，指出他使用 Sets 来实现一个正则引擎时遇到了恼人的性能问题。</p>
+<p>所以，现在是时间来对他们进行优化了！但在着手优化前，我们需要先彻底认清一个问题：<strong>这些数据结构处理慢的真实原因究竟是什么？性能瓶颈到底在哪里？</strong><br>为了弄清这个问题，我们就需要理解<strong>底层实现上，迭代器究竟是如何工作的？</strong></p>
+<h2 id="深入主题探索究竟"><a href="#深入主题探索究竟" class="headerlink" title="深入主题探索究竟"></a>深入主题探索究竟</h2><p>为此，我们先从一个简单的 for…of 循环说起。</p>
+<p>ES6 借鉴 C++、Java、C# 和 Python 语言，引入了 for…of 循环，作为遍历所有数据结构的统一方法。</p>
+<p>一个最简单的使用：</p>
+<pre><code>function sum(iterable) {
+  let x = 0;
+  for (const y of iterable) x += y;
+  return x;
+}
+</code></pre><p>将这段代码使用 Babel 进行编译，我们得到：</p>
+<pre><code>function sum(iterable) {
+  var x = 0;
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = iterable[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var y = _step.value;
+      x += y;
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion &amp;&amp; _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
+
+  return x;
+}
+</code></pre><p>需要告诉大家的一个事实是：目前现代 JavaScript 引擎在本质上和 Babel 对 for…of 的去语法糖化处理是相同的，仅仅是在具体一些细节上有差别。</p>
+<p>这个事实出处：</p>
+<blockquote>
+<p>All modern JavaScript engines essentially perform the same desugaring that Babel does here to implement for-of (details vary)</p>
+</blockquote>
+<p>上文引自 V8 核心成员，谷歌工程师 Benedikt Meurer。</p>
+<p>可是上面经过 Babel 编译后的代码不太好阅读。别急，我删去了烦人的异常处理，只保留了最核心的逻辑供大家参考，以便研究：</p>
+<pre><code>function sum(iterable) {
+  var x = 0;
+  var iterator = iterable[Symbol.iterator]();
+  for (;;) {
+    var iterResult = iterator.next();
+    if (iterResult.done) break;
+    x += iterResult.value;
+  }
+  return x;
+}
+</code></pre><p>理解这段代码需要的预备知识需要清楚 for…of 和  Symbol.iterator 方法关系：</p>
+<blockquote>
+<p>一个数据结构只要部署了 Symbol.iterator 属性，就被视为具有 iterator 接口，就可以用 for…of 循环遍历它的成员。也就是说，for…of 循环内部调用的是数据结构的 Symbol.iterator 方法。</p>
+</blockquote>
+<p>for…of 循环可以使用的范围包括数组、Set 和 Map 结构、某些类似数组的对象（比如 arguments 对象、DOM NodeList 对象）、Generator 对象，以及字符串。</p>
+<p>我们仔细观察上段段代码，便可以发现迭代器性能优化的关键是：<strong>保证在循环中多次重复调用的 iterator.next() 能得到最大限度的优化</strong>，同时，最理想的情况是完全避免对 iterResult 的内存分配。能够达到这种目的的几个手段便是使用类似  store-load propagation， escape analysis 和 scalar replacement of aggregates 先进的编译处理技术。</p>
+<p>同时，优化后的编译还需要完全消除迭代器本身 —— iterable[Symbol.iterator] 的调用分配，而直接在迭代器 backing-store 上直接操作。</p>
+<p>事实上，在数组和字符串迭代器的优化过程中，就是使用了这样的技术和理念。具体的实施文档可以<a href="https://docs.google.com/document/d/13z1fvRVpe_oEroplXEEX0a3WK94fhXorHjcOMsDmR-8" target="_blank" rel="external">参考这里。</a></p>
+<p><strong>那么具体到 Set 迭代器的性能问题，其实关键原因在与：其实现上混合了 JavaScript 和 C++ 环境。</strong>比如，我们看 %SetIteratorPrototype%.next() 的实现：</p>
+<pre><code>function SetIteratorNextJS() {
+  if (!IS_SET_ITERATOR(this)) {
+    throw %make_type_error(kIncompatibleMethodReceiver,
+                        &apos;Set Iterator.prototype.next&apos;, this);
+  }
+
+  var value_array = [UNDEFINED, UNDEFINED];
+  var result = %_CreateIterResultObject(value_array, false);
+  switch (%SetIteratorNext(this, value_array)) {
+    case 0:
+      result.value = UNDEFINED;
+      result.done = true;
+      break;
+    case ITERATOR_KIND_VALUES:
+      result.value = value_array[0];
+      break;
+    case ITERATOR_KIND_ENTRIES:
+      value_array[1] = value_array[0];
+      break;
+  }
+
+  return result;
+}
+</code></pre><p> 这段代码实际上按部就班做了这么几件事情：</p>
+<ul>
+<li>定义分配了 value_array 数组，初始化时为两项 undefined；</li>
+<li>定义分配了 result 对象，其格式为 {value: value_array, done: false}；</li>
+<li>调用 C++ %SetIteratorNext runtime 函数，将迭代器的 this 和 value_array 作为参数传递。</li>
+<li>根据 C++ %SetIteratorNext runtime 函数返回结果，将 result 正确赋值</li>
+</ul>
+<p>这就造成什么样的后果呢？遍历的每一步我们都在不断地分配两个对象：value_array 和 result。不管是 V8 的 TurboFan 还是 Crankshaft （V8的优化编译器） 我们都无法消除这样的操作。更糟糕的是，每一步遍历我们都要在 JavaScript 和 C++ 之间进行切换。下面的图，简要表示了一个简单的 SUM 函数在底层的运行流程：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-cda48b6ba23d106b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="set-iterator-next-js-20170714.png"></p>
+<p>在 V8 执行时，总处在两个状态（事实上更多）：执行 C++ 代码和执行 JavaScript 当中。这两个状态之间的转换开销巨大。从 JavaScript 到 C++，是依赖所谓的 CEntryStub 完成，CEntryStub 会触发 C++ 当中指定的 Runtime_Something 函数（本例中为 Runtime_SetIteratorNext）。所以，<strong>是否可以避免这种转换，以及避免 value_array 和 result 对象的分配又决定了性能的关键。</strong></p>
+<p>最新的 %SetIteratorPrototype%.next() 实现正是切中要害，做了这个“关键”的处理。我们想要执行的代码在调用之前就会变得 hot （热处理），TurboFan 进而最终得以热处理优化。借助所谓的 <a href="https://github.com/v8/v8/wiki/CodeStubAssembler-Builtins" target="_blank" rel="external">CodeStubAssembler</a>，<a href="https://chromium-review.googlesource.com/563626" target="_blank" rel="external">baseline implementation，</a>现在已经完全在 JavaScript 层面实现接入。这样我们仅仅只需要调用 C++ 来做垃圾回收（在可用内存耗尽时）以及异常处理的工作。</p>
+<h2 id="基于回调函数的遍历"><a href="#基于回调函数的遍历" class="headerlink" title="基于回调函数的遍历"></a>基于回调函数的遍历</h2><p>在遍历协议中，JavaScript 同样提供  Set.prototype.forEach 和 Map.prototype.forEach 方法，来接收一个回调函数。这些同样依赖于 C++ 的处理逻辑，这样不仅仅需要我们将 JavaScript 转换为 C++，还要处理回调函数转换为 Javascript，这样的工作模式如下图：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-a7c35b576fc03f3c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="set-iterator-foreach-20170714.png"></p>
+<p>所以，上面使用 <a href="https://github.com/v8/v8/wiki/CodeStubAssembler-Builtins" target="_blank" rel="external">CodeStubAssembler</a> 的方式只能处理简单的非回调函数场景。真正完全意义上的优化，包括 forEach 方法的 TurboFan 化还需要一些待开发的魔法。</p>
+<h2 id="优化提升-Benchmark"><a href="#优化提升-Benchmark" class="headerlink" title="优化提升 Benchmark"></a>优化提升 Benchmark</h2><p>我们使用下面的 benchmark 代码进行优化程度的评测：</p>
+<pre><code>const s = new Set;
+const m = new Map;
+for (let i = 0; i &lt; 1e7; ++i) {
+  m.set(i, i);
+  s.add(i);
+}
+
+function SetForOf() {
+  for (const x of s) {}
+}
+
+function SetForOfEntries() {
+  for (const x of s.entries()) {}
+}
+
+function SetForEach() {
+  s.forEach(function(key, key, set) {});
+}
+
+function MapForOf() {
+  for (const x of m) {}
+}
+
+function MapForOfKeys() {
+  for (const x of m.keys()) {}
+}
+
+function MapForOfValues() {
+  for (const x of m.values()) {}
+}
+
+function MapForEach() {
+  m.forEach(function(val, key, map) {});
+}
+
+const TESTS = [
+    SetForOf,
+    SetForOfEntries,
+    SetForEach,
+    MapForOf,
+    MapForOfKeys,
+    MapForOfValues,
+    MapForEach
+];
+
+// Warmup.
+for (const test of TESTS) {
+  for (let i = 0; i &lt; 10; ++i) test();
+}
+
+// Actual tests.
+for (const test of TESTS) {
+  console.time(test.name);
+  test();
+  console.timeEnd(test.name);
+}
+</code></pre><p>在 Chrome60 和 Chrome61 版本的对比中，得到下面图标结论：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-f59e194150f56b9f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="improvements-20170714.png"></p>
+<p>可见，虽然大幅提升，但是我们还是得到了一些不太理想的结果。尤其体现在 SetForOfEntries 和 MapForOf 上。但是这将会在更长远的计划上进行处理。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章只是在大面上介绍了遍历器性能所面临的瓶颈和现有的解决方案。通过贺老的微博，对一个问题进行探究，最终找到 V8 核心成员 Benedikt Meurer  的 <a href="http://benediktmeurer.de/2017/07/14/faster-collection-iterators/" target="_blank" rel="external">Faster Collection Iterators</a>一文，进行参考并翻译。想要完全透彻理解原文章中内容，还需要扎实的计算机基础、v8<br> 引擎工作方式以及编译原理方面的知识储备。</p>
+<p>因我才疏学浅，入行也不到两年，更不算计算机科班出身，拾人牙慧的同时难免理解有偏差和疏漏。更多 V8 引擎方面的知识，建议大家更多关注@justjavac，编译方面的知识关注 Vue 作者@尤雨溪 以及他在 JS Conf 上的演讲内容： <a href="http://2017.jsconf.cn/files/04-compile-time-optimizations-evan-you.pdf" target="_blank" rel="external">前端工程中的编译时优化。</a>毕竟，我们关注前端大 V、网红的根本并不是为了看热闹、看撕 b，而是希望在前辈身上学习到更多知识、得到更多启发。</p>
+<p>最后，随着 ECMAScript 的飞速发展，让每一名前端开发者可能都会感觉到处在不断地学习当中，甚至有些疲于奔命。但是在学习新的特性和语法之外，理解更深层的内容才是学习进阶的关键。</p>
+<blockquote>
+<p>我同样不知道什么是海，</p>
+<p>赤脚站在沙滩上，</p>
+<p>急切地等待着黎明的到来。</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/11/04/js/iterator/" data-id="cj9m6cu2t001uo9fy0c2w3mmw" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/11/04/js/iterator/" data-title="从贺老微博引出的“遍历器（Iterators）加速那些奥秘”" data-url="https://exp-team.github.io/blog/2017/11/04/js/iterator/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/11/04/js/next/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          React 服务端渲染如此轻松 从零开始构建前后端应用
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/11/04/js/node-cache/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">教你编写 Node.js 中间件，实现服务端缓存（附demo源码）</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 20px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 18px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/react-this/">从 React 绑定 this，看 JS 语言发展和框架设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/next/">React 服务端渲染如此轻松 从零开始构建前后端应用</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/iterator/">从贺老微博引出的“遍历器（Iterators）加速那些奥秘”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/node-cache/">教你编写 Node.js 中间件，实现服务端缓存（附demo源码）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/setState-promise/">从 setState promise 化的探讨 体会 React 团队设计思想</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

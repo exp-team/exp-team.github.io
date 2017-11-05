@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>通过React Ref细小知识点 谈谈前端工程师的进阶 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="熟悉React的同学可能对其中的Ref并不陌生。不知道您是否听说”最新的React版本(v15.5.4)已经对这个API进行了修改并更新”。如果您一直保持对React框架的跟进与学习，相信会很清楚，新版本中”ref改为">
+<meta name="keywords" content="js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过React Ref细小知识点 谈谈前端工程师的进阶">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/06/04/js/react-ref/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="熟悉React的同学可能对其中的Ref并不陌生。不知道您是否听说”最新的React版本(v15.5.4)已经对这个API进行了修改并更新”。如果您一直保持对React框架的跟进与学习，相信会很清楚，新版本中”ref改为">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-00ebd947dadb6beb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-b7d617b5b0016416.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-b31dafe4c9fe8d8e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-292bb281019f1405.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-df4edea15393570c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-db606be5928801bd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-ae8681234a038bf7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-9c40dbff15d1122a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-597c140d4d6d5613.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-06-01T09:31:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="通过React Ref细小知识点 谈谈前端工程师的进阶">
+<meta name="twitter:description" content="熟悉React的同学可能对其中的Ref并不陌生。不知道您是否听说”最新的React版本(v15.5.4)已经对这个API进行了修改并更新”。如果您一直保持对React框架的跟进与学习，相信会很清楚，新版本中”ref改为">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/4363003-00ebd947dadb6beb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/react-ref" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/06/04/js/react-ref/" class="article-date">
+  <time datetime="2017-06-03T16:00:00.000Z" itemprop="datePublished">2017-06-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      通过React Ref细小知识点 谈谈前端工程师的进阶
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>熟悉React的同学可能对其中的Ref并不陌生。不知道您是否听说”最新的React版本(v15.5.4)已经对这个API进行了修改并更新”。如果您一直保持对React框架的跟进与学习，相信会很清楚，<strong>新版本中”ref改为使用回调函数的方式去引用”。</strong></p>
+<p>这是一个非常细小但是微妙的改动。当我得知时，第一个念头就是<strong> “这样的改动意义在哪里？”</strong></p>
+<p>带着这个疑问，下班后我花了一晚上近2个小时时间去探究这一个微小改动，收获颇丰的同时，可谓”眼界大开”。</p>
+<p>这篇文章我会记录一步一步探究的过程，以及总结分析最终答案。同时，对react框架及其周边技术栈感兴趣的同学可以参阅斧正我其他文章：</p>
+<ul>
+<li><a href="http://www.jianshu.com/p/7a56ac1de2a8" target="_blank" rel="external">解析Twitter前端架构 学习复杂场景数据设计</a></li>
+<li><a href="http://www.jianshu.com/p/83c86dd0802d" target="_blank" rel="external">React Conf 2017 干货总结1: React + ES next = ♥</a></li>
+<li><a href="http://www.jianshu.com/p/cde3cf7e2760" target="_blank" rel="external">React+Redux打造“NEWS EARLY”单页应用 一个项目理解最前沿技术栈真谛</a></li>
+<li><a href="http://www.jianshu.com/p/8e28be0e7ab1" target="_blank" rel="external">一个react+redux工程实例</a></li>
+<li>……</li>
+</ul>
+<h2 id="古来青史谁不见-今见功名胜古人"><a href="#古来青史谁不见-今见功名胜古人" class="headerlink" title="古来青史谁不见,今见功名胜古人"></a>古来青史谁不见,今见功名胜古人</h2><p>在对Ref使用方式的改动分析前，我们先要对其有一个全面的了解和认识。当然，最直接最有效的方式就是去<a href="https://facebook.github.io/react/docs/refs-and-the-dom.html" target="_blank" rel="external">官网</a>学习。</p>
+<p>因为React本身更迭迅速，关于Ref的文档信息也经历过多次修正。官网上保持着最新版的输出，正所谓”古来青史谁不见,今见功名胜古人”。</p>
+<p>这里先总结一下基本概念。</p>
+<p><em>*</em> Refs诞生背景</p>
+<p>我们都知道React讲究的是<strong>单项数据流</strong>，也就是说父组件与其子组件之间的通信依靠props来实现。如果你想通过父组件去更改一个子组件，那么就要从父组件处传递一个新的props值，已达到让子组件re-render的目的。</p>
+<p>但是在一些情况下，这样严格略显教条的数据流或通信方式并不能满足我们需求。这时候，就是Ref派上用场的时候了。</p>
+<p>那么我们在具体哪些场景下会用到Ref呢？</p>
+<ul>
+<li>处理输入框聚焦，文本选择，或其他多媒体反馈信息时；</li>
+<li>触发需要的动画时；</li>
+<li>与第三方操作DOM的类库交互时。</li>
+</ul>
+<p><strong>其他情况下，为了避免破坏React的哲学思想，都是不被建议使用的。</strong> </p>
+<p>比如，一个弹框组件，我们不应该暴露类似 open(), close()这样的方法，以通过ref控制来调用。更合理的做法是通过一个类似 isOpen的prop去在组件之间传递协调。</p>
+<h3 id="Refs使用方法"><a href="#Refs使用方法" class="headerlink" title="Refs使用方法"></a>Refs使用方法</h3><p>正如先前所说，ref属性目前接收一个回掉函数。<strong>当相应组件mounten或者unmounted时，该回掉函数会被立即调用</strong></p>
+<p>比如，我们想让一个输入框组件在渲染后，自动聚焦，可以：</p>
+<p>上述内容是在组件内引用Ref, 同样，类似父子组件通过props通信，我们可以完成<strong>父组件通过Ref控制子组件行为</strong>:</p>
+<p>更多的用法和注意事项不再过多介绍，这并非此文主题，读者可以通过官网学到所有的内容。</p>
+<h2 id="问渠哪得清如许？为有源头活水来。"><a href="#问渠哪得清如许？为有源头活水来。" class="headerlink" title="问渠哪得清如许？为有源头活水来。"></a>问渠哪得清如许？为有源头活水来。</h2><p>老版本关于Ref的用法远没有这么复杂。Ref完全可以通过字符串来定义。同样的功能，我们可以这样实现：</p>
+<p>回到我们的探索之路，初期我是很难理解这样的变动有什么好处？并且更让我困惑的是，官方的一段说法：</p>
+<blockquote>
+<p>If you worked with React before, you might be familiar with an older API where the ref attribute is a string. <strong>We advise against it because string refs are considered legacy, and are likely to be removed in one of the future releases</strong>. Although string refs are not deprecated, they are considered legacy, and will likely be deprecated at some point in the future. Callback refs are preferred.</p>
+</blockquote>
+<p>官方认为之前的”字符串模式”是一种”反模式” ,在未来版本中很有可能会被废除。强烈向大家推荐了回掉函数式的用法。</p>
+<p>带着疑惑，我Google了此问题（原谅我搜商较低）：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-00ebd947dadb6beb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="搜索内容"></p>
+<p>不要吐槽我”连句英文都说不清楚”，因为我认为这样的关键字搜索方式更有利于找到有价值的内容。（您真当您跟搜索引擎对话呢？）</p>
+<p>不出所料，搜索结果很多且杂乱。<br>第一条结果属于React官网，下面便有Stack Overflow的相关信息。<br>第一条：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-b7d617b5b0016416.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="类似问题"></p>
+<p>此提问者还加了一句：</p>
+<blockquote>
+<p>NB: I’m looking for the “official” answer to the statement in the documentation, I’m not asking about personal preferences and so on.</p>
+</blockquote>
+<p>最高分的答案贡献了一下内容：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-b31dafe4c9fe8d8e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="问题答案"></p>
+<p><a href="https://stackoverflow.com/questions/30710076/react-saving-a-component-in-the-ref-callback" target="_blank" rel="external">此答案</a>列举了7条老版本用法的问题。其实我在工作当中，并不是用React技术栈，所有知识储备以理论为主。所以，其中的很多条我并不能完全赞同。</p>
+<p>并且答案也没有具体的代码示例，虽然没一条目英语层面上一清二白，但是具体在说什么某些条目上并没有完全理解。</p>
+<p>先存起来，后边慢慢消化尝试理解，继续寻找答案。 <strong>变换策略，我直接去React Github仓库寻找答案。</strong>果然，里面非常多详尽的干货。</p>
+<p>我在<a href="https://github.com/facebook/react/pull/8333" target="_blank" rel="external">第8333号Pull Requests中</a>，找到了Redux原作者，现在已经加入Facebook React团队的Dan Abramov的”官方回答”：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-292bb281019f1405.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Dan Abramov"></p>
+<p>解答内容为 （意译非直译）：</p>
+<ul>
+<li>老版本基于字符串的Ref会追踪其组件，因为不利于React的运行速度和性能保证；</li>
+<li>Ref在深层次的组件中，难以满足使用者对其的调用需求；</li>
+<li>老版本基于字符串的Ref并不像新版本采用回掉方式带来的可组合(Composable)益处。</li>
+</ul>
+<p>虽然是男神解惑，可是反应迟钝智商拙急的我还是很难彻底理解。</p>
+<p>难道就这样睡去吗？下班回家后已经持续研究了一个小时了，女朋友貌似在下一秒就要爆发。。。</p>
+<p><strong>我当然是不甘心的，追求答案在此刻优先级已经溢出！</strong></p>
+<p>紧接着，我翻到了Facebook React团队成员Sebastian Markbåge早在2014年的<a href="https://github.com/facebook/react/issues/1373" target="_blank" rel="external">对Ref的 “吐槽”</a>，此issues一共多达30多个comments, 延续到了2015年。并最终在2014年底，对Ref的改进写入了react-future，具体信息 <a href="https://github.com/reactjs/react-future/blob/master/01%20-%20Core/06%20-%20Refs.js" target="_blank" rel="external">点击这里可以追溯</a>，当时的代码注释信息写的非常清晰：</p>
+<blockquote>
+<p>This is a refs proposal that uses callbacks instead of strings. The callback can be easily statically typed and solves most use cases.<br>When a ref is attached, it gets passed the instance as the first argument.<br>When a ref is detached, the callback is invoked with null as the argument.</p>
+</blockquote>
+<p>接着，我找到了2015年9月react源码提交的<a href="https://github.com/facebook/react/commit/5ee8a93280987bf1547687f5d8665be89058f321#all_commit_comments" target="_blank" rel="external">commit信息</a>，最关键的内容提炼出来：</p>
+<blockquote>
+<p>Callback refs are preferred. We plan to deprecate string refs at some point in the future, but just haven’t gotten around to it yet.<br>String refs are very “magical” and is not idiomatic javascript, which is bad on principal. But there are also some practical reasons…<br>String refs could never be implemented in user space (callbacks can; just have the component call the callback). The ramifications of this are far-reaching. For instance, if you wanted to create a HOC (Higher Order Component) that transparently wraps another component, you could forward all the props… but you couldn’t forward a string ref. Or if you wanted a parent and a grandparent to both have a ref to a component, callback refs allow you to wrap the callback and pass it down, but string refs do not. The list goes on, but in the interest of time, I’ll truncate it here.</p>
+</blockquote>
+<p>建议读者先自己尝试去理解，下文中我会进行汉语总结。<br>同时我也看到了facebook react团队另外一名成员Jim的话：</p>
+<blockquote>
+<p>Basically, our team has had countless discussions on this topic and arrived at the consensus that string refs should be phased out in favor of callback refs.</p>
+</blockquote>
+<p>可见，关于Ref这个API设计调整的问题，源码团队也是经历了无数次讨论与争执。此时，我更加迫不及待地去挖掘体会更多信息。</p>
+<h2 id="卷地风来忽吹散，望湖楼下水如天"><a href="#卷地风来忽吹散，望湖楼下水如天" class="headerlink" title="卷地风来忽吹散，望湖楼下水如天"></a>卷地风来忽吹散，望湖楼下水如天</h2><p>说来有趣，最终让我把众多信息”融会贯通”的契机来自于<a href="https://twitter.com/dan_abramov" target="_blank" rel="external"><strong>Dan Abramov的一条Twitter：</strong>‏ </a></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-df4edea15393570c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Dan&#39;s Twitter"></p>
+<p>通过这条Twitter以及该Twitter下的评论和回复，尤其是附带的代码截图，我瞬间理解了之前的很多信息。</p>
+<p>先发给大家体会：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-db606be5928801bd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="代码1"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-ae8681234a038bf7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="代码2"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-9c40dbff15d1122a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="代码3"></p>
+<p>仔细揣摩，你能体会到什么呢？</p>
+<p>其实Dan Abramov私人还维护着一个React组件库：React DnD，这个组件库其实就是一个 <a href="https://facebook.github.io/react/docs/higher-order-components.html" target="_blank" rel="external">HOC（Higher-Order Components）</a>，浅显来说本质上，DnD对外暴露一个高阶组件，这个组件接收用户定义的组件，并通过”一系列魔法”，又返回用户传入的自定义的组件，此时这个组件可拖拽。</p>
+<p>用最简单的代码展示，类似：</p>
+<p>我们看代码1，dragSourceRef函数作为自定义（即需要实现拖拽的组件）组件的ref回掉函数，在React DnD组件库中，变获取了这个组件instance；</p>
+<p>如果还是字符串方式，在React DnD组件库中只能预先定义协商好的ref值，以方便该组件库进行”魔法处理”。<br>但是如果需要进行可拖拽化的组件很多时，ref值就面临冲突的问题。<br>当然，我们可以通过一个预留的数组，在组件库和业务代码里传递refs值。但是这样的实现显然是很丑陋的。</p>
+<p>参考 <a href="https://github.com/facebook/react/issues/8734" target="_blank" rel="external">facebook react 8734号issue</a>：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-597c140d4d6d5613.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="facebook react 8734号issue"></p>
+<p>这显然，已经是新Ref API变革带来的巨大好处。</p>
+<p>同时仔细揣摩上面代码2，3截图，便是对composable的有力说明。当然，通过老版本字符串方式可以实现同样的功能(有内存管理的瑕疵，具体见下文说明)，那么composable的优势，我认为可能只会体现在”先进的思想层面和灵活性层面”。</p>
+<h2 id="纸上得来终觉浅-绝知此事要躬行"><a href="#纸上得来终觉浅-绝知此事要躬行" class="headerlink" title="纸上得来终觉浅 绝知此事要躬行"></a>纸上得来终觉浅 绝知此事要躬行</h2><p>除了上述React 仓库commit、issue、pull requests之外，我又参考了更多信息。</p>
+<p>关于官方团队给出的优势，我认为很多条目是在向Functional Programming靠拢，更多意义上是一种思维模式的转变。</p>
+<p>比如说，我想实现”在三层嵌套（Grandparent-&gt;Parent-&gt;child）结构中，Grandparent组件操控child组件”，这样的场景需求新老两种版本都可以实现：<br>回掉方式：</p>
+<p>老版本字符串方式：</p>
+<p>但是仔细对比这两种方式，在老版本中的实现，先不说我们使用了</p>
+<pre><code>this.refs.myInput2.refs.myInput1.refs.myInput
+</code></pre><p>这么一长串才能拿到instance,更应该注意到为了拿到第三层的instance，我们被迫新增了两个只用于中间传递的refs。</p>
+<p>这还没有完，前文提到过内存管理。我们再来思考一下，当child unmount时，基于字符串的ref方式无法感知。注意这都是在内存层面，即反映在虚拟DOM的开销上。他并不是真正的DOM节点，自然不会有依赖于浏览器的垃圾回收机制。</p>
+<p>当程序中有大量类似场景时，大量unmount组件出现，就会有大量的无意义内存占用。</p>
+<p>如果使用新的Ref API方式，我们可以在track的组件unmount时得到通知。因为：</p>
+<blockquote>
+<p>The ref attribute takes a callback function, and <strong>the callback will be executed immediately after the component is mounted or unmounted.</strong></p>
+</blockquote>
+<p>注意<strong>the callback will be executed immediately after the component is mounted or unmounted.</strong>我们只需要在child组件中进行监测，unmount后将this.input = null，即可完成手动垃圾回收：</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/06/04/js/react-ref/" data-id="cj9m6cu3y002oo9fytf4fzxys" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/06/04/js/react-ref/" data-title="通过React Ref细小知识点 谈谈前端工程师的进阶" data-url="https://exp-team.github.io/blog/2017/06/04/js/react-ref/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/06/09/js/freeze-obj/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          JS冻结对象的《人间词话》 完美实现究竟有几层？
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/05/20/weekly/weekly-11110/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">expfe技术周刊第11110期</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 20px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 18px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/react-this/">从 React 绑定 this，看 JS 语言发展和框架设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/next/">React 服务端渲染如此轻松 从零开始构建前后端应用</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/iterator/">从贺老微博引出的“遍历器（Iterators）加速那些奥秘”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/node-cache/">教你编写 Node.js 中间件，实现服务端缓存（附demo源码）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/setState-promise/">从 setState promise 化的探讨 体会 React 团队设计思想</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

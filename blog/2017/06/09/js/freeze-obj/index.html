@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>JS冻结对象的《人间词话》 完美实现究竟有几层？ | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="王国维在《人间词话》里谈到了治学经验，他说：“古今之成大事业、大学问者，必经过三种之境界。” 巧合的是，最近受">
+<meta name="keywords" content="js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JS冻结对象的《人间词话》 完美实现究竟有几层？">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/06/09/js/freeze-obj/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="王国维在《人间词话》里谈到了治学经验，他说：“古今之成大事业、大学问者，必经过三种之境界。” 巧合的是，最近受">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-55750ea1c4e62989.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-06-06T08:34:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JS冻结对象的《人间词话》 完美实现究竟有几层？">
+<meta name="twitter:description" content="王国维在《人间词话》里谈到了治学经验，他说：“古今之成大事业、大学问者，必经过三种之境界。” 巧合的是，最近受">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/4363003-55750ea1c4e62989.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/freeze-obj" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/06/09/js/freeze-obj/" class="article-date">
+  <time datetime="2017-06-08T16:00:00.000Z" itemprop="datePublished">2017-06-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      JS冻结对象的《人间词话》 完美实现究竟有几层？
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>王国维在《人间词话》里谈到了治学经验，他说：“古今之成大事业、大学问者，必经过三种之境界。”</p>
+<p>巧合的是，最近受 <a href="http://gitbook.cn/" target="_blank" rel="external">git chat ／ git book</a> 邀请，做了一个分享。<br>其中谈到JS中冻结一个对象几种由浅入深的实践。想想也暗合国学大师所谓的三重境界。</p>
+<p>这篇文章由浅入深讨论JS中对象的一些锁定特性。但都是一些基础语法的实现，相信即便是前端小白也可以大体领会。不过需要读者预先了解JS中对象的特性，尤其是对象自身属性的描述符：configurable、writable…</p>
+<p>另外，如果您对JS中对象操作、不可变数据、函数式编程感兴趣，同样推荐我的其他一些相关文章：</p>
+<ul>
+<li><a href="http://www.jianshu.com/p/11fc75f28302" target="_blank" rel="external">如何优雅安全地在深层数据结构中取值</a></li>
+<li><a href="http://www.jianshu.com/p/89f1d4245b20" target="_blank" rel="external">从JS对象开始，谈一谈“不可变数据”和函数式编程</a></li>
+<li><a href="http://www.jianshu.com/p/7a56ac1de2a8" target="_blank" rel="external">解析Twitter前端架构 学习复杂场景数据设计</a></li>
+</ul>
+<p>等等。</p>
+<h2 id="昨夜西风凋碧树-独上高楼-望尽天涯路"><a href="#昨夜西风凋碧树-独上高楼-望尽天涯路" class="headerlink" title="昨夜西风凋碧树 独上高楼 望尽天涯路"></a>昨夜西风凋碧树 独上高楼 望尽天涯路</h2><p>第一种境界：“昨夜西风凋碧树，独上高楼，望尽天涯路。”<br>该词句出自晏殊的《蝶恋花》，原意是说，“我”上高楼眺望所见的更为萧飒的秋景，西风黄叶，山阔水长，案书何达？</p>
+<p>王国维此句中解成：做学问成大事业者，首先要有执着的追求，登高望远，瞰察路径，明确目标与方向，了解事物的概貌。</p>
+<p> <strong>我们就从最基本的场景说起，究竟为什么要冻结一个对象？</strong></p>
+<ul>
+<li><p>场景一：<br>我们造了一个轮子，对外暴露一个对象，开放出来给第三方使用。同时需要保证这个对外暴露的对象完全安全，不能被业务代码所改写覆盖或下钩子（hook）函数。</p>
+</li>
+<li><p>场景二：<br>如果你看过Vue 2.* 版本源码，你会发现冻结一个对象的操作频繁出现。</p>
+</li>
+</ul>
+<p><strong>我们先来看冻结对象的第一层实现 —— 扩展特性锁：</strong></p>
+<p>他包含了两个基本方法：</p>
+<ul>
+<li>Object.isExtensible</li>
+<li>Object.preventExtensions</li>
+</ul>
+<p>如果一个对象可以添加新的属性，则这个对象是可扩展的。扩展特性锁就是让这个对象变的不可扩展，也就是不能再有新的属性。</p>
+<h3 id="Object-isExtensible"><a href="#Object-isExtensible" class="headerlink" title="Object.isExtensible"></a>Object.isExtensible</h3><p>MDN上内容概述：</p>
+<pre><code>概述
+    Object.isExtensible() 方法判断一个对象是否是可扩展的（是否可以在它上面添加新的属性）。
+语法
+    Object.isExtensible(obj)
+参数
+    obj 需要检测的对象
+</code></pre><p>例如，我们正常使用对象字面量声明的对象都是可扩展的：</p>
+<pre><code>var person1 = {};
+person1.name = &quot;Lucas&quot;;
+console.log(person1);
+// {name: &quot;Lucas&quot;}
+</code></pre><p>同时：</p>
+<pre><code>Object.isExtensible(person1) === true; // true
+</code></pre><p>你可能要问了，那么使用Object.create方法声明的对象，并对该对象属性进行配置是什么情况呢？<br>我们知道，用上面对象字面量声明的对象相当于：</p>
+<pre><code>var person1 = Object.create({},{
+    &quot;name&quot;:{
+        value : &quot;Lucas&quot;,
+        configurable : true, //不可配置
+        enumerable : true , //可枚举
+        writable : true //可写
+    }
+});
+</code></pre><p>即便尝试将configurable设置为false:</p>
+<pre><code>var person1 = Object.create({},{
+    &quot;name&quot;:{
+        value : &quot;Lucas&quot;,
+        configurable : false, //不可配置
+        enumerable : true, //可枚举
+        writable : true //可写
+    }
+});
+</code></pre><p>仍然得到：</p>
+<pre><code>Object.isExtensible(person1) === true; // true
+</code></pre><h2 id="Object-preventExtensions"><a href="#Object-preventExtensions" class="headerlink" title="Object.preventExtensions"></a>Object.preventExtensions</h2><p>当然，我们还是有方法可以使得一个对象变的不可扩展。</p>
+<p>MDN上内容概述：</p>
+<pre><code>概述
+    Object.preventExtensions() 方法让一个对象变的不可扩展，也就是永远不能再添加新的属性。
+语法
+    Object.preventExtensions(obj)
+参数
+    obj 将要变得不可扩展的对象
+</code></pre><p>几个注意点包括但不限于：</p>
+<ul>
+<li>不可扩展的对象的属性通常<strong>仍然可以被删除。</strong></li>
+<li>尝试给一个不可扩展对象添加新属性的操作将会失败，不过<strong>可能是静默失败，也可能会抛出 TypeError 异常</strong>（严格模式下）。</li>
+<li>Object.preventExtensions 只能阻止一个对象不能再添加新的自身属性，<strong>仍然可以为该对象的原型添加属性。</strong></li>
+</ul>
+<p>比如：</p>
+<pre><code>var person1 = {
+    name: &quot;Lucas&quot;
+}
+
+Object.preventExtensions(person1);
+person1.age = 18;
+// 非严格模式下，这里不会有报错，属于静默失败
+person1.age // undefined
+// 扩展新属性失败了
+</code></pre><p>仍然可以向原型链添加属性：</p>
+<pre><code>person1.__proto__.age = 18;
+person1.age // 18
+// 可以从原型链上取到
+</code></pre><p>同样也可以复写一些属性：</p>
+<pre><code>person1.name = &quot;Eros&quot;;
+person1.name // &quot;Eros&quot;
+</code></pre><p>也可以删除已有属性：</p>
+<pre><code>person1.name; //  &quot;Eros&quot;,
+delete person1.name;
+person1.name; // undefined
+</code></pre><p>通过以上方法，我们实现了对一个对象属性扩展的冻结。但是同样也认识到，这并不是全面的保护：例如可以随意改动去覆盖已有属性，在对象原型链上增加属性也还是难以屏蔽。</p>
+<h2 id="衣带渐宽终不悔-为伊消得人憔悴"><a href="#衣带渐宽终不悔-为伊消得人憔悴" class="headerlink" title="衣带渐宽终不悔 为伊消得人憔悴"></a>衣带渐宽终不悔 为伊消得人憔悴</h2><p>第二种境界：“衣带渐宽终不悔，为伊消得人憔悴。”<br>这引用的是北宋柳永《蝶恋花》最后两句词，原词是表现作者对爱的艰辛和爱的无悔。若把“伊”字理解为词人所追求的理想和毕生从事的事业，亦无不可。王国维则别有用心，以此两句来比喻成大事业、大学问者，不是轻而易举，随便可得的，必须坚定不移，经过一番辛勤劳动，废寝忘食，孜孜以求，直至人瘦带宽也不后悔。</p>
+<p><strong>下面介绍一个更深一层的做法：密封特性。</strong></p>
+<p>密封对象是指那些不能添加新的属性，不能删除已有属性，以及不能修改已有属性的可枚举性（enumerable）、可配置性（configurable）、可写性（writable），但<strong>可能可以修改已有属性的值的对象。</strong></p>
+<p>他同样包含了两个基本方法：</p>
+<ul>
+<li>Object.isSealed</li>
+<li>Object.seal</li>
+</ul>
+<h3 id="Object-isSealed"><a href="#Object-isSealed" class="headerlink" title="Object.isSealed"></a>Object.isSealed</h3><p>MDN上内容概述：</p>
+<pre><code>概述 
+    Object.isSealed() 方法判断一个对象是否是密封的（sealed）。
+语法 
+    Object.isSealed(obj)
+参数
+    obj 将要检测的对象
+</code></pre><p>正常对象字面量声明的对象是不被密封的：</p>
+<pre><code>var person1 = {
+    name: &quot;Lucas&quot;
+}
+
+Object.isSealed(person1); // false
+</code></pre><p>当将这个对象禁止扩展时，它也不会变成密封的：</p>
+<pre><code>var person1 = {
+    name: &quot;Lucas&quot;
+}
+Object.preventExtensions(person1);
+Object.isSealed(person1); // false
+</code></pre><p>但是在此基础上，使用Object.defineProperty方法，把属性变得不可配置（configurable），则这个对象也就成了密封对象：</p>
+<pre><code>var person1 = {
+    name: &quot;Lucas&quot;
+}
+
+Object.defineProperty(person1, &quot;name&quot;, {configurable : false});
+
+Object.isSealed(person1); // true
+</code></pre><p>此时，我们有：</p>
+<pre><code>Object.getOwnPropertyDescriptor(person1, &apos;name&apos;);
+// 得到：
+Object {
+    value: &quot;Lucas&quot;, 
+    writable: true, 
+    enumerable: true, 
+    configurable: false
+}
+</code></pre><p>根据这个getOwnPropertyDescriptor，我们可以更加深入的理解密封特性：被密封的对象，就是在不可扩展基础上讲属性描述符configurable设置为false; 同时，<strong>被密封的对象，仍然有机会改变属性的值。</strong>只不过对于此对象本身而言，<strong>不可以再扩展新的属性，不可以更改已有属性的配置信息。</strong></p>
+<h3 id="Object-seal"><a href="#Object-seal" class="headerlink" title="Object.seal"></a>Object.seal</h3><p>相对应我们也有一个方法将一个对象密封。</p>
+<p>MDN上内容概述：</p>
+<pre><code>概述
+    Object.seal() 方法可以让一个对象密封，并返回被密封后的对象。
+语法
+    Object.seal(obj)
+参数
+    obj 将要被密封的对象
+</code></pre><p>比如：</p>
+<pre><code>var person1 = {
+    name: &quot;Lucas&quot;
+}
+Object.getOwnPropertyDescriptor(person1, &apos;name&apos;);
+// 得到：
+Object {
+    value: &quot;Lucas&quot;, 
+    writable: true, 
+    enumerable: true, 
+    configurable: true
+}
+</code></pre><p>将此对象密封后：</p>
+<pre><code>Object.seal(person1);
+Object.getOwnPropertyDescriptor(person1, &apos;name&apos;);
+// 得到：
+Object {
+    value: &quot;Lucas&quot;, 
+    writable: true, 
+    enumerable: true, 
+    configurable: false
+}
+</code></pre><p>也就是说：</p>
+<pre><code>person1.age = 18;
+person1.age; // undefined
+// 扩展新属性失败
+
+// 同时调用defineProperty失败
+Object.defineProperty(person1,&quot;name&quot;,{get : function(){return &quot;g&quot;;}});
+// 抛出异常
+</code></pre><p>任何除更改属性值以外的操作，非严格模式下都会静默失败，如上并如下：</p>
+<pre><code>delete person1.name;
+person1.name; // &quot;Lucas&quot;
+</code></pre><p>而更改属性值可以成功：</p>
+<pre><code>person1.name = &quot;Eros&quot;;
+person1.name; // &quot;Eros&quot;
+</code></pre><p>怎么理解这样的现象呢？牢记，被密封的对象拥有如下的属性描述符：</p>
+<pre><code>Object {
+    value: &quot;Lucas&quot;, 
+    writable: true, 
+    enumerable: true, 
+    configurable: false
+}
+</code></pre><p><strong>而删除属性属于configurable，更改属性才属于writable；</strong></p>
+<h3 id="一点延伸"><a href="#一点延伸" class="headerlink" title="一点延伸"></a>一点延伸</h3><p>借助于此，我们其实已经可以完成冻结对象的第三重境界：达到即密封又不可修改原属性值。因为可以这样做：</p>
+<pre><code>var person1 = {name: &quot;Lucas&quot;};
+Object.defineProperty(person1, &quot;name&quot;, {configurable: false, writable: false});
+Object.preventExtensions(o);
+</code></pre><p>总结下就是设置：</p>
+<blockquote>
+<p>configurable: false ＋ writable: false ＋ preventExtensions</p>
+</blockquote>
+<p>或者因为</p>
+<blockquote>
+<p>configurable: false＋ preventExtensions ＝ seal</p>
+</blockquote>
+<p>所以也可以设置：</p>
+<blockquote>
+<p>seal + writable: false</p>
+</blockquote>
+<h2 id="众里寻他千百度，蓦然回首，那人却在，灯火阑珊处"><a href="#众里寻他千百度，蓦然回首，那人却在，灯火阑珊处" class="headerlink" title="众里寻他千百度，蓦然回首，那人却在，灯火阑珊处"></a>众里寻他千百度，蓦然回首，那人却在，灯火阑珊处</h2><p>第三种境界：“众里寻他千百度，蓦然回首，那人却在，灯火阑珊处。”<br>这是引用南宋辛弃疾《青玉案》词中的最后四句。梁启超称此词“自怜幽独，伤心人别有怀抱”。这是借词喻事，与文学赏析已无交涉。王国维已先自表明，“吾人可以无劳纠葛”。他以此词最后的四句为“境界”之第三，即最终最高境界。</p>
+<p>这虽不是辛弃疾的原意，但也可以引出悠悠的远意：做学问、成大事业者，要达到第三境界，必须有专注的精神。反复追寻、研究，下足功夫，自然会豁然贯通，有所发现，有所发明，就能够从必然王国进入自由王国。</p>
+<p>上边那种冻结对象的方法，其实也有原生实现，可谓：“众里寻他千百度，蓦然回首，那人却在，灯火阑珊处”</p>
+<p>我们这里所说的一个对象的冻结（frozen）是指它不可扩展，所有属性都是不可配置的（non-configurable），且所有数据属性（data properties）都是不可写的（non-writable）。</p>
+<p>或者说，冻结对象是指那些不能添加新的属性，不能修改已有属性的值，不能删除已有属性，以及不能修改已有属性的可枚举性、可配置性、可写性的对象。也就是说，这个对象永远是不可变的。</p>
+<p>同样，包含了两个基本方法：</p>
+<ul>
+<li>Object.isFrozen</li>
+<li>Object.freeze</li>
+</ul>
+<h3 id="Object-isFrozen"><a href="#Object-isFrozen" class="headerlink" title="Object.isFrozen"></a>Object.isFrozen</h3><p>MDN上内容概述：</p>
+<pre><code>概述
+    Object.isFrozen() 方法判断一个对象是否被冻结（frozen）。
+语法
+    Object.isFrozen(obj)
+参数
+    obj 被检测的对象
+</code></pre><h3 id="Object-freeze-方法"><a href="#Object-freeze-方法" class="headerlink" title="Object.freeze 方法"></a>Object.freeze 方法</h3><p>MDN上内容概述：</p>
+<pre><code>概述
+    Object.freeze() 方法可以冻结一个对象。
+语法
+    Object.freeze(obj)
+参数
+    obj 将要被冻结的对象
+</code></pre><p>可以先理解为，这是最高一层的冻结对象：</p>
+<pre><code>var person1 = {
+    name: &quot;Lucas&quot;
+}
+
+Object.freeze(person1);
+</code></pre><p>此时，我们有：</p>
+<pre><code>Object.getOwnPropertyDescriptor(person1, &apos;name&apos;)
+
+Object {
+    value: &quot;Lucas&quot;, 
+    writable: false, 
+    enumerable: true, 
+    configurable: false
+}
+
+// 对冻结对象的任何操作都会失败
+person1.name = &quot;Eros&quot;; // 改写属性值，非严格模式下静默失败;
+person1.age = 18; // 扩展属性值，非严格模式下静默失败;
+Object.defineProperty(person1,&quot;name&quot;,{value: &quot;Eros&quot;}); // 使用defineProperty会直接报错
+</code></pre><p>改写属性值，扩展新属性，调用defineProperty，全部都会失败。</p>
+<p>但是，<strong>这种层面的冻结，只是浅冻结。</strong>如果对象里面还嵌套有对象，那么这个内部对象丝毫不受影响。</p>
+<pre><code>var person1 = {
+    name: &quot;Lucas&quot;,
+    family: {
+        brother: &quot;Eros&quot;
+    }
+}
+
+Object.freeze(person1);
+
+person1.family.brother = &quot;Tim&quot;;
+person1.family.brother // &quot;Tim&quot;
+</code></pre><h3 id="终极实现"><a href="#终极实现" class="headerlink" title="终极实现"></a>终极实现</h3><p>那么，如果我们想深层次冻结一个对象呢？思路和深拷贝暗合，使用递归：</p>
+<pre><code>Object.prototype.deepFreeze = Object.prototype.deepFreeze || function (o){
+    var prop, propKey;
+    Object.freeze(o); // 首先冻结第一层对象
+    for (propKey in o){
+        prop = o[propKey];
+        if(!o.hasOwnProperty(propKey) || !(typeof prop === &quot;object&quot;) || Object.isFrozen(prop)){
+            continue;
+        }
+        deepFreeze(prop); // 递归
+    }
+}
+</code></pre><p>这样子，我们再回过头来看：</p>
+<pre><code>var person1 = {
+    name: &quot;Lucas&quot;,
+    family: {
+        brother: &quot;Eros&quot;
+    }
+}
+
+Object.deepFreeze(person1);
+
+person1.family.brother = &quot;Tim&quot;;
+person1.family.brother // &quot;Eros&quot;
+</code></pre><p>已经达到了深层次对象属性的冻结。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文先后介绍了关于冻结一个对象的三种进阶方法。他们层层递进，却又相互关联。关系如图：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-55750ea1c4e62989.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="关系图"></p>
+<p>文章部分概念粘取了MDN语法介绍和<a href="https://segmentfault.com/a/1190000003894119" target="_blank" rel="external">Tomson的文章。</a></p>
+<p>在《文学小言》一文中，王国维把上述三境界说成“三种之阶级”。并说：“未有不阅第一第二阶级而能遽跻第三阶级者，文学亦然。此有文学上之天才者，所以又需莫大之修养也。”</p>
+<p>与大家共勉。</p>
+<p>Happy coding!</p>
+<p>PS: 作者<a href="https://github.com/HOUCe" target="_blank" rel="external">Github仓库</a>，欢迎通过代码各种形式交流。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/06/09/js/freeze-obj/" data-id="cj9m6cu25001bo9fy8uef58ih" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/06/09/js/freeze-obj/" data-title="JS冻结对象的《人间词话》 完美实现究竟有几层？" data-url="https://exp-team.github.io/blog/2017/06/09/js/freeze-obj/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/06/18/js/react_bind_this/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/06/04/js/react-ref/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">通过React Ref细小知识点 谈谈前端工程师的进阶</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 20px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 18px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/react-this/">从 React 绑定 this，看 JS 语言发展和框架设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/next/">React 服务端渲染如此轻松 从零开始构建前后端应用</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/iterator/">从贺老微博引出的“遍历器（Iterators）加速那些奥秘”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/node-cache/">教你编写 Node.js 中间件，实现服务端缓存（附demo源码）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/setState-promise/">从 setState promise 化的探讨 体会 React 团队设计思想</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

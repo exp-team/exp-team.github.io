@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>拒绝Redux文档“毒害” 一个项目告诉你Redux最新真正哲学 | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="如果你正在React应用中使用Redux，那么你十有八九使用了react-redux库来连接你的组件和state，并且使用了connect方法。这个方法其实是一个非常微妙或者狡猾（tricky）的API，尽管他的使用方式非常的简单，非">
+<meta name="keywords" content="js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="拒绝Redux文档“毒害” 一个项目告诉你Redux最新真正哲学">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/04/04/js/redux－tips/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:description" content="如果你正在React应用中使用Redux，那么你十有八九使用了react-redux库来连接你的组件和state，并且使用了connect方法。这个方法其实是一个非常微妙或者狡猾（tricky）的API，尽管他的使用方式非常的简单，非">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-29a267048bda0dbe.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-ed48e3446ba9e7cf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-ff65b8c97351f00c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-52bbcef9207bf074.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-c85dec06f426e764.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-05-02T08:18:45.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="拒绝Redux文档“毒害” 一个项目告诉你Redux最新真正哲学">
+<meta name="twitter:description" content="如果你正在React应用中使用Redux，那么你十有八九使用了react-redux库来连接你的组件和state，并且使用了connect方法。这个方法其实是一个非常微妙或者狡猾（tricky）的API，尽管他的使用方式非常的简单，非">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/4363003-29a267048bda0dbe.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/redux－tips" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/04/04/js/redux－tips/" class="article-date">
+  <time datetime="2017-04-03T16:00:00.000Z" itemprop="datePublished">2017-04-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      拒绝Redux文档“毒害” 一个项目告诉你Redux最新真正哲学
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>如果你正在React应用中使用Redux，那么你十有八九使用了react-redux库来连接你的组件和state，并且使用了connect方法。这个方法其实是一个非常微妙或者狡猾（tricky）的API，尽管他的使用方式非常的简单，非常魔幻。</p>
+<p>大部分人通过Redux文档来学习这个超级流行的数据流管理框架。可是，笔者发现，在中文的自述文档中，已经远远的与此框架脱节了。里面的内容和倡导的哲学理念，已经有失“先进”，甚至某种程度上有所误导。</p>
+<p>本文将借助Ryan Johnson的<a href="https://medium.com/dailyjs/quick-redux-tips-for-connecting-your-react-components-e08da72f5b3" target="_blank" rel="external">文章:Quick Redux tips for connecting your React components</a>，来告诉你Redux的秘密和演化。同时，<strong>穿插一个很简单的场景，来说明旧时思想的保守性，以及最新的设计理念。</strong></p>
+<p>同时，本文提供了<strong>一个结合“最先进”Redux理念的todo list demo，<a href="https://github.com/HOUCe/react-redux-multiConnect-renderCountProp" target="_blank" rel="external">地址请点击这里</a></strong>，欢迎围观并下载。</p>
+<p>如果你对这套技术栈有兴趣的话，欢迎参看我的其他类似文章：</p>
+<ul>
+<li><a href="http://www.jianshu.com/p/7a56ac1de2a8" target="_blank" rel="external">解析Twitter前端架构 学习复杂场景数据设计</a></li>
+<li><a href="http://www.jianshu.com/p/83c86dd0802d" target="_blank" rel="external">React Conf 2017 干货总结1: React + ES next = ♥</a></li>
+<li><a href="http://www.jianshu.com/p/cde3cf7e2760" target="_blank" rel="external">React+Redux打造“NEWS EARLY”单页应用 一个项目理解最前沿技术栈真谛</a></li>
+<li><a href="http://www.jianshu.com/p/8e28be0e7ab1" target="_blank" rel="external">一个react+redux工程实例</a></li>
+<li>……</li>
+</ul>
+<h2 id="Redux原作者的转变"><a href="#Redux原作者的转变" class="headerlink" title="Redux原作者的转变"></a>Redux原作者的转变</h2><blockquote>
+<p>“周虽旧邦，其命惟新”（出自《诗经·大雅》）</p>
+</blockquote>
+<p>大意是“周朝虽然是旧的国家，但却禀受了新的使命”。同样，Redux框架的发展历程，虽然历史并不太长久，也没有“南朝四百八十寺,多少楼台烟雨中”的昙花一现状态。但是其设计理念，也禀受了新的使命，得而更新。</p>
+<p>在最初版的Redux设计哲学中，Dan Abramov强调<strong>“在顶层保持一个容器组件”</strong>，其实这个是值得推敲的。正确的思想是不要把这个当做准则。</p>
+<blockquote>
+<p>让你的展现层组件保持独立。然后创建容器组件并在合适时进行连接。当你感觉到你是在父组件里通过复制代码为某些子组件提供数据时，就是时候抽取出一个容器了。只要你认为父组件过多了解子组件的数据或者action，就可以抽取容器。<br>总之，试着在数据流和组件职责间找到平衡。</p>
+</blockquote>
+<p>后来，Dan Abramov也发表了推文，对这一思想原则进行了“推翻”：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-29a267048bda0dbe.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="推文内容"></p>
+<h2 id="场景举例"><a href="#场景举例" class="headerlink" title="场景举例"></a>场景举例</h2><p>React-Redux提供connect方法，用于从UI组件生成容器组件。connect的意思，就是将这两种组件连起来。</p>
+<p>最初的Redux理念强调在最顶层connect我们的组件。<br>这究竟意味着什么呢？</p>
+<p>我们看下边的例子，<page>组件出现在组件树的最顶层，用于进行与外部的通信，将数据传给子孙组件，由UI组件渲染出视图。</page></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-ed48e3446ba9e7cf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="设计结构"></p>
+<p><strong>那么，这样做的弊端在哪里呢？</strong></p>
+<ul>
+<li>当你更改profile image时，整个<page>组件将会重新渲染；</page></li>
+<li>当你删除feed list中一项时，整个<page>组件将会重新渲染；</page></li>
+<li>当你增加一个image时，整个<page>组件将会重新渲染；</page></li>
+</ul>
+<p>那么，我们是否可以把 <profile>, <feed>, 和 <images>都抽出成容器组件，去关联他们所关心的state呢？<br>当然可以，就像下面这样：</images></feed></profile></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-ff65b8c97351f00c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="设计截图"></p>
+<p><strong>这样做，有哪些优势呢？</strong></p>
+<ul>
+<li>当你更改profile image时，只有<profile>组件将会重新渲染；</profile></li>
+<li>当你删除feed list中一项时，只有<feed>组件将会重新渲染；</feed></li>
+<li>当你增加一个image时，只有<images>组件将会重新渲染；</images></li>
+</ul>
+<p>时刻要记得，当使用connect进行组件和state连接时，你告诉了React：当前组件任何一处props改变时，都要进行渲染。<br>如果我们把容器组件进行拆分，当然就避免了那些不必要的渲染。</p>
+<h2 id="彩蛋环节"><a href="#彩蛋环节" class="headerlink" title="彩蛋环节"></a>彩蛋环节</h2><p>如果你在使用Redux，我推荐一个<a href="https://github.com/reactjs/reselect" target="_blank" rel="external">reselect类库</a>。它提供了带cache功能的selector。如果  Store/State和构造view的参数没有变化，那么每次Component获取的数据都将来自于上次调用/计算的结果。</p>
+<p>另外，仔细研读Redux最新文档，你会发现connect方法除了mapStateToProps和mapDispatchToProps之外，还存在很多选项。比如renderCountProp，它可以帮助我们记录组件渲染次数。</p>
+<p>最简单的todo list，你可以：</p>
+<pre><code>const VisibleTodoList = connect(mapStateToProps, mapDispatchToProps, null, { renderCountProp: &apos;renderCount&apos; })(TodoList)
+</code></pre><h2 id="总结和实战"><a href="#总结和实战" class="headerlink" title="总结和实战"></a>总结和实战</h2><p>之前说了这么多理论内容。笔者觉得有必要写一个简易demo，来实践一下本文主题。原谅我时间有限，选取了已经有骨架的todo list，融入了多connect，多容器组件思想，同时也使用了renderCountProp：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-52bbcef9207bf074.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="组件"></p>
+<p>如上图，我们有两个connect化的组件，分别为<addtodo>和<todolist>;</todolist></addtodo></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-c85dec06f426e764.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="renderCountProp"></p>
+<p>另外，我采用了react-redux: 5.0.1版本，这个版本下，经过代码处理，我们可以看到在组件中多了一个renderCountProp，这对于我们的性能调试非常重要。</p>
+<p>所有的代码实现，我已经托管在了<a href="https://github.com/HOUCe/react-redux-multiConnect-renderCountProp" target="_blank" rel="external">Github仓库当中</a>，欢迎围观评论！</p>
+<p>Happy Coding!</p>
+<p>PS: 作者<a href="https://github.com/HOUCe" target="_blank" rel="external">Github仓库</a>，欢迎通过代码各种形式交流。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/04/04/js/redux－tips/" data-id="cj9m6cu4n003lo9fyj9m1q5kp" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/04/04/js/redux－tips/" data-title="拒绝Redux文档“毒害” 一个项目告诉你Redux最新真正哲学" data-url="https://exp-team.github.io/blog/2017/04/04/js/redux－tips/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/04/04/js/access/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          万军丛中取敌将首级－如何优雅安全地在深层数据结构中取值
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/04/04/js/array_hack/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">三个叹为观止的ES6 Array hack</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 20px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 18px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/react-this/">从 React 绑定 this，看 JS 语言发展和框架设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/next/">React 服务端渲染如此轻松 从零开始构建前后端应用</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/iterator/">从贺老微博引出的“遍历器（Iterators）加速那些奥秘”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/node-cache/">教你编写 Node.js 中间件，实现服务端缓存（附demo源码）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/setState-promise/">从 setState promise 化的探讨 体会 React 团队设计思想</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

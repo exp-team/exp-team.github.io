@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>教你编写 Node.js 中间件，实现服务端缓存（附demo源码） | exp team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="教你编写 Node.js 中间件，实现服务端缓存（附demo源码）">
+<meta property="og:url" content="https://exp-team.github.io/blog/2017/11/04/js/node-cache/index.html">
+<meta property="og:site_name" content="exp team">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-bd4c498721be23c5.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-f8d70520775b89c4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-c46f7fbd8238dc23.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-11-05T02:45:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="教你编写 Node.js 中间件，实现服务端缓存（附demo源码）">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/4363003-bd4c498721be23c5.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+  
+    <link rel="alternate" href="/atom.xml" title="exp team" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <!-- <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?b549e90ef81d82146548abb71d982d0e";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">exp team</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">together, stronger</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/categories/weekly/">前端周刊</a>
+        
+          <a class="main-nav-link" href="/archives">存档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://exp-team.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-js/node-cache" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/blog/2017/11/04/js/node-cache/" class="article-date">
+  <time datetime="2017-11-03T16:00:00.000Z" itemprop="datePublished">2017-11-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/js/">js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      教你编写 Node.js 中间件，实现服务端缓存（附demo源码）
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://upload-images.jianshu.io/upload_images/4363003-bd4c498721be23c5.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>Express 作为 Node.js 的框架，如今发展可谓如日中天。我很喜欢其灵活、易扩展的设计理念。尤其是该框架的中间件架构设计：使得在应用中加入新特性更加标准化、成本最小化。<strong>这篇文章，我会尝试编写一个非常简单、小巧的中间件，完成服务端缓存功能，进而优化性能。</strong></p>
+<h2 id="关于中间件"><a href="#关于中间件" class="headerlink" title="关于中间件"></a>关于中间件</h2><p>说到中间件，Express 官网对它的阐述是这样的：</p>
+<blockquote>
+<p>“Express 是一个自身功能极简，完全是路由和中间件构成一个web开发框架：从本质上来说，一个 Express 应用就是在调用各种中间件。”</p>
+</blockquote>
+<p>也许你使用过各种各样的中间件进行开发，但是可能并不理解中间件原理，也没有深入过 Express 源码，探究其实现。这里并不打算长篇大论帮您分析，但是使用层面上大致可以参考下图：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-f8d70520775b89c4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="中间件原理"></p>
+<p>建议有兴趣、想深入的读者自己分析，有任何问题欢迎与我讨论。即便您不打算深入，也不会影响对下文中间件编写的理解。</p>
+<h2 id="关于服务端缓存"><a href="#关于服务端缓存" class="headerlink" title="关于服务端缓存"></a>关于服务端缓存</h2><p>缓存已经被广泛应用，来提高页面性能。一说到缓存，可能读者脑海里马上冒出来：“客户端缓存，CDN 缓存，服务器端缓存……”。另一维度上，也会想到：“200（from cache），expire，eTag……”等概念。</p>
+<p>当然作为前端开发者，我们一定要明白这些缓存概念，这些缓存理念是相对于某个具体用户访问来说的，性能优化体现在单个用户上。比如说，我第一次打开页面 A，耗时超长，下一次打开页面由于缓存的作用，时间缩短了。</p>
+<p>但是在服务器端，还存在另外一个维度，思考一下这样的场景：</p>
+<p>我们有一个<strong>静态</strong>页面 B，这个页面服务端需要从数据库获取部分数据 b1，根据 b1 又要计算得到部分数据 b2，还得做各种高复杂度操作，最终才能“东拼西凑”出需要返回的完整页面 B，整个过程耗时2s。</p>
+<p>那么面临的灾难就是，user1 打开页面耗时2s，user2同样打开页面耗时2s……而这些页面都是静态页面 B，内容是完全一样的。为了解决这个灾难，这时候我们也需要缓存，这种缓存就叫先做服务端缓存（server-side cache）。</p>
+<p><strong>总结一下，服务端缓存的目的其实就是对于同一个页面请求，而返回（缓存的）同样的页面内容。这个过程完全独立于不同的用户。</strong></p>
+<p>上面的话有些拗口，可以参考英文表达更清晰：</p>
+<blockquote>
+<p>The goal of server side cache is responding to the same content for the same request independently of the client’s request. </p>
+</blockquote>
+<p>因此，下面展示的 demo 在第一次请求到达时，服务端耗费5秒来返回 HTML；而接下来再次请求该页面，将会命中缓存，不过是哪个用户访问，只需要几毫秒便可得到完整页面。</p>
+<h2 id="Show-me-the-code-amp-Demo"><a href="#Show-me-the-code-amp-Demo" class="headerlink" title="Show me the code &amp; Demo"></a>Show me the code &amp; Demo</h2><p>其实上文提到的缓存概念非常简单，稍微有些后端经验的同学都能很好理解。但是这篇文章除去科普基本概念外，更重要的就是介绍 Express  中间件思想，并自己来实现一个服务端缓存中间件。</p>
+<p>让我们开工吧！<br>最终 Demo 代码，欢迎访问<a href="https://github.com/HOUCe/server-side-cache-with-express" target="_blank" rel="external">它的Github地址</a>。</p>
+<p>我将会使用 npm 上 memory-cache 这个包，以方便进行缓存的读写。最终的中间件代码很简单：</p>
+<pre><code>&apos;use strict&apos;
+
+var mcache = require(&apos;memory-cache&apos;);
+
+var cache = (duration) =&gt; {
+  return (req, res, next) =&gt; {
+    let key = &apos;__express__&apos; + req.originalUrl || req.url
+    let cachedBody = mcache.get(key)
+    if (cachedBody) {
+      res.send(cachedBody)
+      return
+    } else {
+      res.sendResponse = res.send
+      res.send = (body) =&gt; {
+        mcache.put(key, body, duration * 1000);
+        res.sendResponse(body)
+      }
+      next()
+    }
+  }
+}
+</code></pre><p>为了简单，我使用了请求 URL 作为 cache 的 key：</p>
+<ul>
+<li>当它（cache key）及其对应的 value 值存在时，便直接返回其 value 值；</li>
+<li>当它（cache key）及其对应的 value 值不存在时，我们将对 Express send 方法做一层拦截：在最终返回前，存入这对 key-value。</li>
+</ul>
+<p>缓存的有效时间是10秒。</p>
+<p>最终在判断之外，<strong>我们的中间件把控制权交给下一个中间件。</strong></p>
+<p>最终使用和测试如下代码：</p>
+<pre><code>app.get(&apos;/&apos;, cache(10), (req, res) =&gt; {
+  setTimeout(() =&gt; {
+    res.render(&apos;index&apos;, { title: &apos;Hey&apos;, message: &apos;Hello there&apos;, date: new Date()})
+  }, 5000) //setTimeout was used to simulate a slow processing request
+})
+</code></pre><p>我使用了 setTimeout 来模拟一个超长（5s）的操作。</p>
+<p>打开浏览器控制面板，发现在10秒缓存到期以内：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/4363003-c46f7fbd8238dc23.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="加载信息"></p>
+<p>至于为什么 cache 中间件要那样子写、next() 为什么是中间件把控制权传递，我并不打算展开去讲。有兴趣的读者可以看一下 Express 源码。</p>
+<h2 id="还有几个小问题"><a href="#还有几个小问题" class="headerlink" title="还有几个小问题"></a>还有几个小问题</h2><p>仔细看我们的页面，再去体会一下实现代码。也许细心的读者能发现一个问题：刚才的实现我们<strong>缓存了整个页面</strong>，并将 date: new Date() 传入了 jade 模版 index.jade 里。那么，在命中缓存的条件下，10秒内，页面无法动态刷新来同步，直到10秒缓存到期。</p>
+<p>同时，我们什么时候可以使用上述中间件，进行服务端缓存呢？当然是静态内容才可以使用。同时，PUT, DELETE 和 POST 操作都不应该进行类似的缓存处理。</p>
+<p>同样，我们使用了 npm 模块：memory-cache，它存在优缺点如下：</p>
+<ul>
+<li>读写迅速而简单，不需要其他依赖；</li>
+<li>当服务器或者这个进程挂掉的时候，缓存中的内容将会全部丢失。</li>
+<li>memcache 是将缓存内容存放在了自己进程的内存中，所以这部分内容是无法在多个 Node.js 进程之间共享的。</li>
+</ul>
+<p>如果这些弊端 really matter，在实际开发中我们可以选择分布式的 cache 服务，比如 Redis。同样你可以在 npm 上找到：express-redis-cache 模块使用。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在真实的开发场景中，服务端缓存已经成为 common sense，但是在 Node.js 的世界里，体会其中间件思想，自己手动编写服务，同样乐趣无穷。</p>
+<p>与实践相结合，我认为真正缓存整个页面（如同 demo 那样）并不是一个推荐的做法（当时实际场景实际分析），同样使用请求 url 作为缓存的 key 也有待考虑。比如，页面中的一些静态内容可能会在其他页面中重复使用到，复用就成了问题。</p>
+<p>真实场景下，<strong>一切设计和逻辑都要为自己业务情况所负责。脱离需求谈实现，都是耍流氓。</strong>这个 demo 简易轻巧，有需要的读者可以访问<a href="https://github.com/HOUCe/server-side-cache-with-express" target="_blank" rel="external">它的Github地址</a>，欢迎玩出各种花样。</p>
+<p>Happy Coding!</p>
+<p>PS:<br>作者<a href="https://github.com/HOUCe" target="_blank" rel="external">Github仓库</a> 和 <a href="https://www.zhihu.com/people/lucas-hc/answers" target="_blank" rel="external">知乎问答链接</a><br>欢迎各种形式交流。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://exp-team.github.io/blog/2017/11/04/js/node-cache/" data-id="cj9m6cu3a0026o9fy4ee09s6l" class="article-share-link">分享</a>
+      
+        <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="blog/2017/11/04/js/node-cache/" data-title="教你编写 Node.js 中间件，实现服务端缓存（附demo源码）" data-url="https://exp-team.github.io/blog/2017/11/04/js/node-cache/"></div>
+<!-- 多说评论框 end -->
+
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2017/11/04/js/iterator/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          从贺老微博引出的“遍历器（Iterators）加速那些奥秘”
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2017/11/04/js/setState-promise/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">从 setState promise 化的探讨 体会 React 团队设计思想</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+  
+  <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"exp-team"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/hexo/">hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js/">js</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/">other</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/program/">program</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/tool/">tool</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web/">web</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pac/">pac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/summary/">summary</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/weekly/">weekly</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/js/" style="font-size: 20px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/other/" style="font-size: 10px;">other</a> <a href="/tags/pac/" style="font-size: 10px;">pac</a> <a href="/tags/program/" style="font-size: 16px;">program</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/summary/" style="font-size: 10px;">summary</a> <a href="/tags/tool/" style="font-size: 14px;">tool</a> <a href="/tags/web/" style="font-size: 12px;">web</a> <a href="/tags/weekly/" style="font-size: 18px;">weekly</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">十月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">九月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">八月 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">七月 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/react-this/">从 React 绑定 this，看 JS 语言发展和框架设计</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/next/">React 服务端渲染如此轻松 从零开始构建前后端应用</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/iterator/">从贺老微博引出的“遍历器（Iterators）加速那些奥秘”</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/node-cache/">教你编写 Node.js 中间件，实现服务端缓存（附demo源码）</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2017/11/04/js/setState-promise/">从 setState promise 化的探讨 体会 React 团队设计思想</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 exp developer<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/categories/weekly/" class="mobile-nav-link">前端周刊</a>
+  
+    <a href="/archives" class="mobile-nav-link">存档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    
+
+<script src="https://apps.bdimg.com/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
