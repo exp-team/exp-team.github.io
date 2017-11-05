@@ -18,7 +18,7 @@ author: 侯策
 >我们共同见证，用户触碰滑动的瞬间。
 
 
-![cover.jpg](http://upload-images.jianshu.io/upload_images/4363003-013d341c9151767c.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![Martin Garrix 在 TomorrowLand 2017](http://upload-images.jianshu.io/upload_images/4363003-013d341c9151767c.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
 
@@ -56,7 +56,7 @@ author: 侯策
 负责任地说，我从来没见到过像百度经验步骤页一样，极尽手势掌控之能事，尤其是在天生畸形的浏览器上，我们看看它都实现了什么：
 
 
-![image.jpg](http://upload-images.jianshu.io/upload_images/4363003-ab94bcae4206c75d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![丑图](http://upload-images.jianshu.io/upload_images/4363003-ab94bcae4206c75d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
 
@@ -65,7 +65,7 @@ author: 侯策
 同时，图片画廊并不是一个新的页面，全部以原页面加遮罩形式出现。你可以理解为 SPA（单页面应用），各种消息交互，手势触控矛盾处理耦合，继续如图：
 
 
-![mind.png](http://upload-images.jianshu.io/upload_images/4363003-1e8692c29fe81ee1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![组件消息通信](http://upload-images.jianshu.io/upload_images/4363003-1e8692c29fe81ee1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
 单纯的双指缩放其实并不难，你可能也会想到就是二维坐标轴的各种计算罢了。
@@ -85,7 +85,7 @@ author: 侯策
 它采用 ES Next 完全面向对象，封装了大量必要的计算过程，同时对外暴露出各种贴心的回调。我个人很厌恶功能大而全的 UI 库，限定死了太多内容而无法拓展。因此 exp touch 只进行兼容性处理以及数学计算。同时为了增强可用性和学习成本，基于 exp touch 手势库，我实现了海量 demos，第三方开发者完全可以复制粘贴，分分钟解锁各种姿势。
 
 
-![intro.gif](http://upload-images.jianshu.io/upload_images/4363003-7037997de4248d4e.gif?imageMogr2/auto-orient/strip)
+![解锁各种姿势](http://upload-images.jianshu.io/upload_images/4363003-7037997de4248d4e.gif?imageMogr2/auto-orient/strip)
 
 
 
@@ -96,30 +96,30 @@ author: 侯策
 demo: 这是一个简单的滚动。但是不出现滚动条，因为完全不依靠浏览器 scroll，而是根据 touchmove 实时计算 transformY，同时包含了缓冲区域设置：
 
 
-![srcoll.gif](http://upload-images.jianshu.io/upload_images/4363003-e581965b3dcdc7c1.gif?imageMogr2/auto-orient/strip)
+![神奇的滚动](http://upload-images.jianshu.io/upload_images/4363003-e581965b3dcdc7c1.gif?imageMogr2/auto-orient/strip)
 
 
 demo: 这是一个常见的移动端轮播图
 
 
-![broad.gif](http://upload-images.jianshu.io/upload_images/4363003-1a322e443bcb7cad.gif?imageMogr2/auto-orient/strip)
+![仿百度经验轮首页播图](http://upload-images.jianshu.io/upload_images/4363003-1a322e443bcb7cad.gif?imageMogr2/auto-orient/strip)
 
 demo: 这是一个常见的整屏幕翻动 H5:
-![intro.gif](http://upload-images.jianshu.io/upload_images/4363003-7037997de4248d4e.gif?imageMogr2/auto-orient/strip)
+![H5 Slides](http://upload-images.jianshu.io/upload_images/4363003-7037997de4248d4e.gif?imageMogr2/auto-orient/strip)
 
 
 demo: 这是一个信息流展现，包含下拉刷新，和头部动画：
 
-![feeds.gif](http://upload-images.jianshu.io/upload_images/4363003-49101851198effe4.gif?imageMogr2/auto-orient/strip)
+![综合 demo](http://upload-images.jianshu.io/upload_images/4363003-49101851198effe4.gif?imageMogr2/auto-orient/strip)
 
 
 demo: 这是一个 2D 抽奖转盘，手势转动开启；
 
-![prize.gif](http://upload-images.jianshu.io/upload_images/4363003-271c8382ab827c83.gif?imageMogr2/auto-orient/strip)
+![转盘 demo](http://upload-images.jianshu.io/upload_images/4363003-271c8382ab827c83.gif?imageMogr2/auto-orient/strip)
 
 demo: 这是一个拖拽：
 
-![drag.gif](http://upload-images.jianshu.io/upload_images/4363003-55a0fa5998dceb84.gif?imageMogr2/auto-orient/strip)
+![拖拽 demo](http://upload-images.jianshu.io/upload_images/4363003-55a0fa5998dceb84.gif?imageMogr2/auto-orient/strip)
 
 （这些 demo 灵感来自 AlloyTeam 团队，我只是照着自己实现了一下）
 
