@@ -23,7 +23,7 @@
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-49101851198effe4.gif?imageMogr2/auto-orient/strip">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-271c8382ab827c83.gif?imageMogr2/auto-orient/strip">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/4363003-55a0fa5998dceb84.gif?imageMogr2/auto-orient/strip">
-<meta property="og:updated_time" content="2017-11-05T03:17:31.000Z">
+<meta property="og:updated_time" content="2017-11-05T03:27:07.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="来自百度经验前端 —— 超级 sexy 的手势库">
 <meta name="twitter:description" content="一个页面，日均亿人围观，数以百计的终端承载；跳跃指尖，点按触碰拖拽，丝般顺滑追求极致体验；你还在为手势交互开发困扰吗，你还在为碎片化兼容性">
@@ -124,11 +124,12 @@ var _hmt = _hmt || [];
 <p>一个页面，日均亿人围观，数以百计的终端承载；<br>跳跃指尖，点按触碰拖拽，丝般顺滑追求极致体验；<br>你还在为<strong>手势交互开发</strong>困扰吗，你还在为<strong>碎片化兼容性</strong>心塞吗？<br>去 <a href="">exp touch</a> 看看，<br>丰富手势交互封装，完美 demo 尽现。<br>我们共同见证，用户触碰滑动的瞬间。</p>
 </blockquote>
 <p><img src="http://upload-images.jianshu.io/upload_images/4363003-013d341c9151767c.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="cover.jpg"></p>
-<p>这是一篇技术推广，软文营销，但是并不会扯技术，产品、运营宝宝们不要走。它关于一个超级 sexy 的前端手势库：<a href="">exp touch</a> 要开源啦！这是百度经验前端自研的手势库。</p>
+<p>这是一篇技术推广，软文营销，但是并不会扯技术（产品、运营宝宝们不要走，底部超多可爱的 gif 图 demos)。它关于一个超级 sexy 的前端手势库：<strong><a href="">exp touch</a> 要开源啦</strong>！这是百度经验前端自研的手势库。</p>
 <p><strong>包含：</strong>单点、双击、长摁、拖拽、滑动、旋转等交互；<br><strong>覆盖：</strong>轮播图、抽奖转盘、3D 旋转、捏合缩放、上提（下拉）刷新等 demos；<br><strong>采用:</strong> ES Next 语法以及面向对象思想开发，辅以大量数学计算；<br><strong>最终：</strong>以<strong>极致用户体验</strong>和<strong>高效性能</strong>为亮点，横空出世！</p>
 <p>本文是一篇纯软文，<strong>PM、运营、后端、老板、水果大哥、酸奶小妹、保洁阿姨，阅读统统绝无障碍</strong>（技术细节文章会令写）。如果你已经厌倦营销文章的自吹自擂，那么作为前端程序员，我想先和你谈谈产品和交互体验。</p>
-<h2 id="Wap-VS-Native-天空是否有边际"><a href="#Wap-VS-Native-天空是否有边际" class="headerlink" title="Wap VS Native: 天空是否有边际"></a>Wap VS Native: 天空是否有边际</h2><p>前端 Wap 开发，不同于我们认知的 Native App。天生决定，我们开发的宿主是浏览器。这个绝好舞台的另一面，隐藏着我们带镣铐起舞的尴尬。没错，<strong>我有多爱浏览器，就有多恨浏览器</strong>。尤其是移动端，主流浏览器内核夹杂国产各种山寨，同时安卓和苹果两大手机系统天然鸿沟，种种碎片化导致事件规范不一致，最终成为产品体验的绊脚石。</p>
-<p>尤其关于触摸事件，更是一部血泪史。关于此，我会另起技术文章分析，这里不在展开。说回产品，直面我们的痛楚：可爱的 PM 童鞋，在设计交互大开脑洞（褒义）的同时，对齐标准完全是 Native App！想想在评审时，wuli 我 PM 总会说：“就是这样，XX App 你用过的吧，你们像 XX App 一样做就可以了！”</p>
+<h2 id="Wap-VS-Native-天空是否有边际"><a href="#Wap-VS-Native-天空是否有边际" class="headerlink" title="Wap VS Native: 天空是否有边际"></a>Wap VS Native: 天空是否有边际</h2><p>前端 Wap 开发，不同于我们认知的 Native App。天生决定，我们开发的宿主是浏览器。这个绝好舞台的另一面，隐藏着我们带镣铐起舞的尴尬。没错，<strong>我有多爱浏览器，就有多恨浏览器</strong>。</p>
+<p>尤其是移动端，主流浏览器内核夹杂国产各种山寨，同时安卓和苹果两大手机系统天然鸿沟，种种碎片化导致事件规范不一致，最终成为产品体验的绊脚石。</p>
+<p><strong>尤其关于触摸事件</strong>，更是一部血泪史。为此，我会另起技术文章分析，这里不在展开。说回产品，直面我们的痛楚：可爱的 PM 童鞋，在设计交互大开脑洞（褒义）的同时，对齐标准完全是 Native App！想想在评审时，wuli 我 PM 总会说： <strong>“就是这样，XX App 你用过的吧，你们像 XX App 一样做就可以了！”</strong></p>
 <p>真的就可以吗？每次都想以：“你了解 App 和 Wap 的技术实现差别吗？”这种正当的纯技术理由怼回去，可是转念就压在心里，供五脏六腑之间交流。同时理智占据上风，信念控制住<strong>马上要抽起藏在抽屉中砍刀</strong>的麒麟臂，老老实实放回到键盘上。</p>
 <p>夜深人静时，我也想：“Wap 端真的就不可以实现 Native 那样的触控操作吗？”为此，我遍访了众多 Wap 页面，无奈都是饮恨而归。比如，我从来没有看到过： <strong>Wap 端手指捏和缩放图片时，以手指中心为焦点，图片放大的同时图片自身也进行位移，保持预期中的放大焦点始终在双指中心。</strong>如同在微信朋友圈中的图片缩放效果那般自然。可是在 Wap 页上，真的很少有实现！</p>
 <p>我一直不甘心，直到这次的<strong>百度经验步骤页改版</strong>，让我向不可能发起挑战。来，慢慢跟你说。</p>
@@ -139,10 +140,13 @@ var _hmt = _hmt || [];
 <p>上图中的文字仅仅涵盖了图片画廊手势交互一部分，各种自适应以及各种物理惰性回弹、缩放摩擦系数、缩放阈值、缓冲区域、回弹系数等等也就不一一列举了。</p>
 <p>同时，图片画廊并不是一个新的页面，全部以原页面加遮罩形式出现。你可以理解为 SPA（单页面应用），各种消息交互，手势触控矛盾处理耦合，继续如图：</p>
 <p><img src="http://upload-images.jianshu.io/upload_images/4363003-1e8692c29fe81ee1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="mind.png"></p>
-<p>单纯的双指缩放其实并不难，你可能也会想到就是二维坐标轴的各种计算罢了。<br><strong>可是：</strong>单击双击时间差如何区分；有角度的滑动算左滑还是右滑；指定元素上 touch move 期间滑动出了手机屏要不要触发 touch end 事件；一根手指和两根手指和多根手指放在不同的元素上要怎么划分？<br>诸如此类太多逻辑和细节交织，这酸爽足以醉人。再加上隔着浏览器兼容性的壁垒，这都构成 Wap 页面很少有大规模手势操控实现的原因。不信你去找找，Wap 上图片画廊支持切换图片且支持手指中心图片缩放的 case……额，找到有奖，找到源代码？有大奖！</p>
+<p>单纯的双指缩放其实并不难，你可能也会想到就是二维坐标轴的各种计算罢了。</p>
+<p><strong>可是：</strong>单击双击时间差如何区分；有角度的滑动算左滑还是右滑；指定元素上 touch move 期间滑动出了手机屏要不要触发 touch end 事件；一根手指和两根手指和多根手指放在不同的元素上要怎么划分？</p>
+<p>诸如此类太多逻辑和细节交织，这酸爽足以醉人。再加上隔着浏览器兼容性的壁垒，这都构成 Wap 页面很少有大规模手势操控实现的原因。不信你去找找，Wap 上图片画廊支持切换图片且支持手指中心图片缩放的 case……额，找到有奖，找到源代码？有大奖！</p>
 <p>可是这次的步骤页改版，我们偏偏要把这些实现。</p>
 <h2 id="新版步骤页和新新版步骤页和新新新新新版步骤页"><a href="#新版步骤页和新新版步骤页和新新新新新版步骤页" class="headerlink" title="新版步骤页和新新版步骤页和新新新新新版步骤页"></a>新版步骤页和新新版步骤页和新新新新新版步骤页</h2><p>经过呕心吐血的骚操作，在去年步骤页改版全量上线之后，不管是 PV、UV、还是广告收益都有大幅度上涨。可是改版常年有，难道以后年年折腾一遍？</p>
-<p>我选择拒绝，之前的开发心得并没有白积累。我利用周末时间，基于 AlloyTouch 等良心作品，<strong>开发了 exp touch 这个百度经验手势库</strong>。它采用 ES Next 完全面向对象，封装了大量必要的计算过程，同时对外暴露出各种贴心的回调。我个人很厌恶功能大而全的 UI 库，限定死了太多内容而无法拓展。因此 exp touch 只进行兼容性处理以及数学计算。同时为了增强可用性和学习成本，基于 exp touch 手势库，我实现了海量 demos，第三方开发者完全可以复制粘贴，分分钟解锁各种姿势。</p>
+<p>我选择拒绝，之前的开发心得并没有白积累。我利用周末时间，基于 AlloyTouch 等良心作品，<strong>开发了 exp touch 这个百度经验手势库</strong>。</p>
+<p>它采用 ES Next 完全面向对象，封装了大量必要的计算过程，同时对外暴露出各种贴心的回调。我个人很厌恶功能大而全的 UI 库，限定死了太多内容而无法拓展。因此 exp touch 只进行兼容性处理以及数学计算。同时为了增强可用性和学习成本，基于 exp touch 手势库，我实现了海量 demos，第三方开发者完全可以复制粘贴，分分钟解锁各种姿势。</p>
 <p><img src="http://upload-images.jianshu.io/upload_images/4363003-7037997de4248d4e.gif?imageMogr2/auto-orient/strip" alt="intro.gif"></p>
 <h2 id="是骡子是马迁出来溜溜"><a href="#是骡子是马迁出来溜溜" class="headerlink" title="是骡子是马迁出来溜溜"></a>是骡子是马迁出来溜溜</h2><p>那我们直接看看 Gif 图好咯：</p>
 <p>demo: 这是一个简单的滚动。但是不出现滚动条，因为完全不依靠浏览器 scroll，而是根据 touchmove 实时计算 transformY，同时包含了缓冲区域设置：</p>
