@@ -8,14 +8,14 @@ author: 侯策
 
 
 
->一个页面，日均亿人围观，数以百计终端承载；
+>一个页面，日均亿次围观，数以百计终端承载；
 >跳跃指尖，点按触碰拖拽，丝般顺滑，极致体验；
 
 >你还在为**手势交互开发**困扰吗，你还在为**碎片化兼容性**心塞吗？
 >去 [exp touch]() 看看：
 
 >丰富手势交互封装，完美 demo 尽现。
->让我们共同见证，用户指腹滑起的瞬间。
+>让我们共同见证，指尖滑起的瞬间。
 
 
 ![Martin Garrix 在 TomorrowLand 2017](http://upload-images.jianshu.io/upload_images/4363003-013d341c9151767c.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
